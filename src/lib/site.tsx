@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { LOGO_SRC } from './logo'
 
-export type RouteId = '' | 'join' | 'resources' | 'map' | 'handbook' | 'events' | 'column' | 'match'
+export type RouteId = '' | 'about' | 'join' | 'resources' | 'map' | 'handbook' | 'events' | 'column' | 'match'
 
 export const NAV: { group: string; items: { id: RouteId; label: string; desc: string }[] }[] = [
   { group: '認識布穀島', items: [
     { id: '', label: '首頁', desc: '我們為什麼串聯' },
+    { id: 'about', label: '關於我們', desc: '誰在做這件事' },
     { id: 'column', label: '專欄', desc: '服務故事與經驗' },
     { id: 'events', label: '活動', desc: '報名與活動紀錄' },
   ] },

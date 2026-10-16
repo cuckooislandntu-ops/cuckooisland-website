@@ -6,10 +6,11 @@ import Join from '@/pages/Join'
 import { ClubMap, Column, Events, Handbook, Match } from '@/pages/Sections'
 import Resources from '@/pages/Resources'
 import Article from '@/pages/Article'
+import About from '@/pages/About'
 import Cuckoo from '@/components/Cuckoo'
 import { POSTS } from '@/lib/content'
 
-const TITLES: Record<string, string> = { '': '布穀島社', join: '加入會員', resources: '資料庫', map: '社團地圖', handbook: '經營手冊', events: '活動', column: '專欄', match: '需求媒合' }
+const TITLES: Record<string, string> = { '': '布穀島社', about: '關於我們', join: '加入會員', resources: '資料庫', map: '社團地圖', handbook: '經營手冊', events: '活動', column: '專欄', match: '需求媒合' }
 
 export default function App() {
   const route = useRoute()
@@ -29,6 +30,7 @@ export default function App() {
     <>
       <SiteHeader route={route} tone={tone} />
       {route === '' && <Home key="home" onTone={setTone} />}
+      {route === 'about' && <About />}
       {route === 'join' && <Join />}
       {route === 'resources' && <Resources />}
       {route === 'map' && <ClubMap />}

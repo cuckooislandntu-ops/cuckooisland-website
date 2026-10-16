@@ -451,3 +451,47 @@ body, .hero-band, .article-head, .db-stage, .cat-bar, .bar.solid { background-im
 @keyframes cuckoo-say { 0% { opacity: 0; translate: 0 6px; } 15% { opacity: 1; translate: 0 0; } 75% { opacity: 1; } 100% { opacity: 0; translate: 0 -10px; } }
 @media (prefers-reduced-motion: reduce) { .cuckoo-say { animation: none; } }
 .cuckoo-tip { font-size: 13px; animation-duration: 1.8s; margin-left: -48px; }
+
+/* 關於布穀島 */
+.vision { margin: 0; display: grid; gap: 10px; justify-items: center; }
+.vision img { width: 100%; max-width: 560px; height: auto; }
+.vision figcaption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.about-sec { display: grid; gap: 12px; }
+.about-sec > p { margin: 0; font-size: 16px; line-height: 1.9; }
+.about-sec b, .fact-a b { font-weight: 400; }
+.about-strong { font-family: var(--kai); font-size: 17.5px !important; line-height: 1.75 !important; padding-left: 12px; border-left: 4px solid var(--brand); }
+.about-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.about-stats div { display: grid; gap: 2px; align-content: start; padding: 14px 10px; border-radius: 16px; background: var(--cream); box-shadow: 3px 4px 0 rgba(35,31,53,.08); text-align: center; }
+.about-stats b { font-size: 22px; background: none; color: var(--leaf); }
+.about-stats span { font-size: 12.5px; line-height: 1.5; color: var(--ink-soft); }
+.about-quote { margin: 0; padding: 16px 18px; border-radius: 16px; background: var(--cream); font-family: var(--kai); font-size: 16px; line-height: 1.8; box-shadow: 4px 5px 0 rgba(35,31,53,.08); }
+.about-quote cite { display: block; margin-top: 8px; font-family: var(--sans); font-style: normal; font-size: 12.5px; color: var(--ink-soft); text-align: right; }
+.about-quote cite::before { content: "—— "; }
+.holes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.holes li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; padding: 12px 14px; border-radius: 14px; background: rgba(79,181,192,.12); }
+.holes i { font-style: normal; font-size: 20px; color: var(--sea); line-height: 1.3; }
+.holes b { display: block; font-weight: 400; font-size: 15.5px; background: none; }
+.holes span { font-size: 14px; line-height: 1.65; color: var(--ink-soft); }
+.footnote { font-size: 12.5px !important; line-height: 1.75 !important; color: var(--ink-soft); padding-top: 10px; border-top: 1px dashed rgba(35,31,53,.2); }
+.axes { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.axis { padding: 16px; border-radius: 18px; background: var(--cream); box-shadow: 4px 5px 0 rgba(35,31,53,.08); display: grid; gap: 6px; }
+.axis svg { width: 120px; height: 44px; }
+.axis h3 { font-size: 17px; }
+.axis p { margin: 0; font-size: 14.5px; line-height: 1.75; color: var(--ink-soft); }
+.facts-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.fact-card { border-radius: 18px; background: var(--tint); box-shadow: 4px 5px 0 rgba(35,31,53,.1); overflow: hidden; }
+.fact-card > button { width: 100%; display: grid; gap: 4px; text-align: left; padding: 16px 18px; border: 0; background: none; font-family: var(--sans); color: var(--ink); cursor: pointer; }
+.fact-no { font-size: 12px; letter-spacing: .1em; color: var(--ink-soft); }
+.fact-q { font-size: 17px; line-height: 1.55; }
+.fact-hint { font-size: 12.5px; color: var(--leaf); }
+.fact-a { padding: 0 18px 18px; display: grid; gap: 12px; animation: fact-in .25s ease-out; }
+.fact-a p { margin: 0; font-size: 15.5px; line-height: 1.85; }
+.fact-a img { width: 100%; height: auto; border-radius: 14px; }
+.fact-a kbd { display: inline-block; min-width: 1.6em; padding: 0 6px; border-radius: 6px; background: var(--cream); box-shadow: 0 2px 0 rgba(35,31,53,.25); font-family: var(--sans); font-size: 14px; text-align: center; }
+.fact-try { min-height: 42px; font-size: 15px; justify-self: start; padding: 0 16px; }
+@keyframes fact-in { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .fact-a { animation: none; } }
+.about-end { display: grid; gap: 8px; }
+.about-end p { margin: 0; color: var(--ink-soft); }
+.about-link { margin-left: 14px; color: inherit; font-size: 14px; text-underline-offset: 4px; }
+.fact-a[hidden] { display: none; }

@@ -72,6 +72,7 @@ export function HeroArt({ kind }: { kind: RouteId }) {
     </g>
   )
   const motif: Record<string, ReactElement> = {
+    about: <><path d="M112 112c4-34 26-56 56-56s46 26 50 56z" fill="rgba(35,31,53,.18)" transform="translate(4 3)" /><path d="M112 112c4-34 26-56 56-56s46 26 50 56z" fill="#231F35" /><path d="M138 112c0-16 10-26 24-26s22 10 22 26z" fill="#FFFDF6" /><path d="M152 98q4 3 8 0M168 98q4 3 8 0" stroke="#231F35" strokeWidth="2" fill="none" strokeLinecap="round" /><path d="M176 78q4 3 8 0M190 76q4 3 8 0" stroke="#FFFDF6" strokeWidth="2" fill="none" strokeLinecap="round" /><path d="M200 92c-8 10-14 16-22 18" stroke="#231F35" strokeWidth="8" strokeLinecap="round" /></>,
     join: <>{person(126, 112, '#F4A7A0')}{person(160, 108, '#F4A7A0', 1.08)}{person(194, 112, '#F4A7A0')}<path d="M100 54h120" stroke="#D6EC6E" strokeWidth="5" strokeLinecap="round" /></>,
     resources: <>{[[118, 90], [150, 90], [182, 90], [134, 64], [166, 64], [150, 38]].map(([x, y], i) => <g key={i}><rect x={x + 3} y={y + 3} width="30" height="24" rx="4" fill={sh} /><rect x={x} y={y} width="30" height="24" rx="4" fill={['#F7C948', '#F06A5A', '#B7A6D9', '#4FB5C0', '#F4A7A0', ink][i]} /></g>)}</>,
     map: <>{[[128, 76], [170, 58], [196, 92], [150, 100]].map(([x, y], i) => <g key={i}><circle cx={x} cy={y} r="13" fill="#D6EC6E" opacity=".35" /><circle cx={x} cy={y} r="5" fill={ink} /></g>)}<path d="M128 76L170 58L196 92L150 100Z" fill="none" stroke={ink} strokeWidth="1.6" strokeDasharray="4 5" /></>,

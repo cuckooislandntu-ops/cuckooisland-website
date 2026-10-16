@@ -161,7 +161,7 @@ export default function Home({ onTone }: { onTone: (t: 'light' | 'dark') => void
                 <a className="btn primary" href="#join">申請加入島鏈</a>
                 <a className="btn ghost" href="#resources">先逛逛資料庫</a>
               </div>
-              <p style={{ margin: 0 }}><a className="ig" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a></p>
+              <p style={{ margin: 0 }}><a className="ig" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a><a className="about-link" href="#about">認識布穀島社</a></p>
             </div>
           </div>
         </section>
