@@ -1,0 +1,35 @@
+{
+  "published": true,
+  "order": 5,
+  "name": "台大東谷沙飛",
+  "tagline": "部落英語口說與課輔",
+  "school": "國立臺灣大學",
+  "size": "",
+  "ig": "",
+  "types": [
+    "線上課輔",
+    "營隊"
+  ],
+  "color": "#9EB14F",
+  "partial": true,
+  "overview": "",
+  "ideals": [],
+  "highlights": [
+    "用多元教案主題補上部落缺少的英語口說資源"
+  ],
+  "closing": "",
+  "sites": [
+    {
+      "name": "雙龍部落",
+      "region": "central",
+      "location": "{\"type\":\"Point\",\"coordinates\":[120.88,23.74]}",
+      "detail": "上山進行田野調查、訪談居民，協助課輔並帶教案活動。"
+    },
+    {
+      "name": "線上英文口說課輔",
+      "region": "",
+      "location": "",
+      "detail": "每週兩節，五、六年級各一節，用自己設計的教案練習口說。"
+    }
+  ]
+}

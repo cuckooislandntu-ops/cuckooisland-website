@@ -1,0 +1,54 @@
+{
+  "published": true,
+  "added": "2026-10-16",
+  "title": "簡慈萱",
+  "sub": "教學設計",
+  "headline": "Hahow 好學校 資深內容創作暨課程品管經理｜Teach For Taiwan 第 8 屆校友",
+  "photo": "/uploads/lecturers/chien.webp",
+  "quote": "在教育現場累積的「共融領導力」，在新創職場同樣適用！",
+  "desc": "跨領域工作者，從金融科技、食品外商、藝文展演走到教育現場，現職 Hahow 好學校，從不同角度回應教育不平等議題。",
+  "topics": [
+    "教學設計",
+    "企業內訓",
+    "AI 效率應用"
+  ],
+  "career": [
+    {
+      "org": "吉時嶼工作室",
+      "role": "創辦人",
+      "note": "企業內訓、教學設計、AI 效率應用",
+      "edu": false
+    },
+    {
+      "org": "Hahow 好學校",
+      "role": "資深內容創作暨課程品管經理",
+      "note": "",
+      "edu": false
+    },
+    {
+      "org": "Teach For Taiwan",
+      "role": "第 8 屆計劃成員",
+      "note": "花蓮縣國民小學高年級導師",
+      "edu": true
+    },
+    {
+      "org": "必應創造股份有限公司",
+      "role": "新創市場專案經理",
+      "note": "北京、上海",
+      "edu": false
+    },
+    {
+      "org": "恩沛國際投資股份有限公司",
+      "role": "新創市場專案經理",
+      "note": "首爾",
+      "edu": false
+    },
+    {
+      "org": "台灣微客行動協會",
+      "role": "國際志工專案領隊",
+      "note": "尼泊爾、新疆、柬埔寨",
+      "edu": true
+    }
+  ],
+  "url": ""
+}

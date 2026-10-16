@@ -1,0 +1,388 @@
+# 布穀島社網站編輯後台（Sveltia CMS）設定
+# 後台網址：https://cuckooisland-website.vercel.app/admin/
+# 在後台按「儲存」會直接更新 GitHub 上的 content/ 資料夾，Vercel 約 1 分鐘後自動更新網站。
+# 說明文件：https://sveltiacms.app/en/docs
+
+backend:
+  name: github
+  repo: cuckooislandntu-ops/cuckooisland-website
+  branch: main
+  commit_messages:
+    create: "後台新增 {{collection}}：{{slug}}"
+    update: "後台更新 {{collection}}：{{slug}}"
+    delete: "後台刪除 {{collection}}：{{slug}}"
+    uploadMedia: "後台上傳檔案：{{path}}"
+    deleteMedia: "後台刪除檔案：{{path}}"
+
+site_url: https://cuckooisland-website.vercel.app
+display_url: https://cuckooisland-website.vercel.app
+logo:
+  src: /favicon.png
+
+# 上傳的照片和檔案都放在 public/uploads/，網站上的網址是 /uploads/...
+media_folder: public/uploads
+public_folder: /uploads
+media_libraries:
+  default:
+    config:
+      slugify_filename: true
+      transformations:
+        # 照片自動轉成 WebP、最長邊 1600px，網站載入比較快
+        raster_image:
+          format: webp
+          quality: 85
+          width: 1600
+          height: 1600
+
+collections:
+  # ---------------- 資料庫 ----------------
+  - name: teach
+    label: 教學資源
+    label_singular: 教學資源
+    description: 教案、學習單、教學影片等可以直接拿來用的教學資源平台。
+    folder: content/teach
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
+    summary: "{{title}}（{{sub}}）"
+    sortable_fields: [added, title, sub]
+    view_groups:
+      - { label: 分類, field: sub }
+    fields:
+      # 「上架」「登錄日期」每個資料庫類別都有，這裡定義一次，下面用 *published、*added 重複使用
+      - &published
+        name: published
+        label: 上架
+        widget: boolean
+        default: true
+        hint: 取消勾選就會從網站上隱藏，但資料不會刪除。
+      - &added
+        name: added
+        label: 登錄日期
+        widget: datetime
+        format: YYYY-MM-DD
+        date_format: YYYY-MM-DD
+        time_format: false
+        required: false
+        hint: 資料庫首頁的「最新登錄」依這個日期排序。沒填的話用新增那天。
+      - { name: title, label: 名稱, widget: string }
+      - name: sub
+        label: 分類
+        widget: select
+        options: [綜合型, SEL, SDGs, 社會議題, 科普, 資訊素養, 閱讀, 班級經營, 非營利媒體, 日常探險趣, 參訪與戶外教育, 其他]
+      - { name: url, label: 連結, widget: string, required: false, hint: "完整網址，例如 https://www.shareclass.org/" }
+      - { name: desc, label: 簡短說明, widget: text, required: false, hint: 一兩句話說明這個資源是什麼。下面有填「評分介紹」的話，網站會改顯示評分介紹。 }
+      - { name: grade, label: 適用年級, widget: string, required: false, hint: 例如：低年級、中高年級、全年段 }
+      - { name: area, label: 地區, widget: string, required: false, hint: 參訪行程才需要，例如：北部、全台 }
+      - { name: source, label: 資料來源, widget: string, required: false }
+      - name: review
+        label: 評分介紹（IG《布可不資道》用，選填）
+        widget: object
+        required: false
+        collapsed: true
+        fields:
+          - { name: ep, label: 出自哪一集, widget: string, required: false, hint: 例如：布可不資道 EP.3 SEL }
+          - name: rating
+            label: 推薦指數
+            widget: select
+            required: false
+            options:
+              - { label: "★★★★★ 5 顆星", value: "5" }
+              - { label: "★★★★☆ 4 顆星", value: "4" }
+              - { label: "★★★☆☆ 3 顆星", value: "3" }
+              - { label: "★★☆☆☆ 2 顆星", value: "2" }
+              - { label: "★☆☆☆☆ 1 顆星", value: "1" }
+            hint: 4 顆星以上會出現在資料庫首頁的「小編評分精選」。
+          - { name: intro, label: 介紹, widget: text, required: false, hint: 有填介紹，這張卡片才會顯示評分區塊。 }
+          - { name: themes, label: 主題方向, widget: string, required: false }
+          - { name: provides, label: 提供內容, widget: string, required: false, hint: 例如：教案、學習單、教學影片 }
+          - { name: grades, label: 適用年段, widget: string, required: false, hint: 例如：國小、國中 }
+          - { name: os, label: 小編 OS, widget: text, required: false }
+
+  - name: sponsor
+    label: 贊助資源
+    label_singular: 贊助資源
+    description: 基金會、企業、政府的補助與贊助公告。
+    folder: content/sponsor
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
+    summary: "{{title}}"
+    sortable_fields: [added, title]
+    view_groups:
+      - { label: 類型, field: sub }
+    fields:
+      - *published
+      - *added
+      - { name: title, label: 計畫名稱, widget: string }
+      - name: sub
+        label: 類型
+        widget: select
+        options: [經費補助, 政府補助, 物資贊助, 競賽與計畫, 場地, 其他]
+      - { name: desc, label: 單位與日期, widget: string, required: false, hint: "格式：單位｜日期，例如：晶豪科技教育基金會｜2026 年 9 月 4 日公告" }
+      - { name: url, label: 公告連結, widget: string, required: false }
+      - { name: area, label: 地區, widget: string, required: false }
+      - { name: source, label: 資料來源, widget: string, required: false, hint: 例如：中國醫藥大學服務學習組公告 }
+
+  - name: lecturers
+    label: 講師
+    label_singular: 講師
+    description: 社團可以透過布穀島社邀請的講師。
+    folder: content/lecturers
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
+    summary: "{{title}}｜{{headline}}"
+    media_folder: /public/uploads/lecturers
+    public_folder: /uploads/lecturers
+    fields:
+      - *published
+      - *added
+      - { name: title, label: 姓名, widget: string }
+      - name: sub
+        label: 主要領域
+        widget: select
+        options: [幹部培訓, 教學設計, 兒少安全, 社團經營, 其他]
+      - { name: headline, label: 現職與頭銜, widget: string, hint: "例如：Hahow 好學校 資深內容創作暨課程品管經理｜Teach For Taiwan 第 8 屆校友" }
+      - { name: photo, label: 照片, widget: image, required: false, hint: 建議用正方形、去背、臉在正中間的照片。沒有照片會顯示名字縮寫。 }
+      - { name: quote, label: 一句話, widget: string, required: false }
+      - { name: desc, label: 介紹, widget: text }
+      - name: topics
+        label: 可以邀請的主題
+        widget: list
+        required: false
+        field: { name: topic, label: 主題, widget: string }
+      - name: career
+        label: 經歷
+        widget: list
+        required: false
+        summary: "{{fields.org}}｜{{fields.role}}"
+        fields:
+          - { name: org, label: 單位, widget: string }
+          - { name: role, label: 職稱, widget: string, required: false }
+          - { name: note, label: 補充, widget: string, required: false, hint: 例如：花蓮縣國民小學高年級導師 }
+          - { name: edu, label: 教育相關經歷, widget: boolean, default: false, hint: 勾選後會用不同顏色標示。 }
+      - { name: url, label: 聯絡或個人頁連結, widget: string, required: false }
+
+  - name: activities
+    label: 團隊活動
+    label_singular: 團隊活動
+    description: 破冰、暖身、團隊凝聚的活動帶領指南。
+    folder: content/activities
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
+    summary: "{{title}}（{{sub}}）"
+    fields:
+      - *published
+      - *added
+      - { name: title, label: 活動名稱, widget: string }
+      - name: sub
+        label: 類型
+        widget: select
+        options: [破冰, 暖身遊戲, 團隊凝聚, 團隊合作, 反思回饋, 其他]
+      - { name: grade, label: 適合年段, widget: string, required: false, hint: 例如：國小中年級以上 }
+      - { name: desc, label: 簡介, widget: text }
+      - { name: goal, label: 活動目的, widget: string, required: false }
+      - { name: people, label: 人數, widget: string, required: false, hint: 例如：8–30 人 }
+      - { name: time, label: 時間, widget: string, required: false, hint: 例如：10–15 分鐘 }
+      - { name: space, label: 場地, widget: string, required: false }
+      - { name: props, label: 道具, widget: string, required: false }
+      - name: steps
+        label: 玩法步驟
+        widget: list
+        field: { name: step, label: 步驟, widget: text }
+      - name: tips
+        label: 帶領技巧
+        widget: list
+        required: false
+        field: { name: tip, label: 技巧, widget: text }
+      - name: variations
+        label: 變化玩法
+        widget: list
+        required: false
+        field: { name: variation, label: 玩法, widget: text }
+      - name: links
+        label: 延伸閱讀
+        widget: list
+        required: false
+        summary: "{{fields.title}}"
+        fields:
+          - { name: title, label: 標題, widget: string }
+          - { name: url, label: 連結, widget: string }
+
+  - name: templates
+    label: 模板
+    label_singular: 模板
+    description: 同意書、企劃書、預算表等可以下載修改的範本。
+    folder: content/templates
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
+    summary: "{{title}}"
+    media_folder: /public/uploads/templates
+    public_folder: /uploads/templates
+    fields:
+      - *published
+      - *added
+      - { name: title, label: 模板名稱, widget: string }
+      - name: sub
+        label: 類型
+        widget: select
+        options: [同意書, 企劃書, 預算表, 交接清單, 報名表, 其他]
+      - { name: grade, label: 適用場合, widget: string, required: false, hint: 例如：營隊、課輔 }
+      - { name: desc, label: 說明, widget: text }
+      - { name: file, label: 範本檔案, widget: file, required: false, hint: 上傳 Word、Excel、PDF 等檔案，網站上會出現「下載範本」按鈕。 }
+      - { name: fileFormat, label: 檔案說明, widget: string, required: false, hint: 例如：Word 檔，一頁 A4。沒填會依副檔名自動顯示。 }
+      - name: contents
+        label: 內容包含
+        widget: list
+        required: false
+        field: { name: item, label: 項目, widget: string }
+      - { name: url, label: 線上版連結, widget: string, required: false, hint: 例如 Google 文件的「建立副本」連結。 }
+
+  # ---------------- 社團地圖 ----------------
+  - name: clubs
+    label: 社團
+    label_singular: 社團
+    description: 社團地圖上的社團與服務據點。
+    folder: content/clubs
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: name
+    slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
+    summary: "{{name}}"
+    sortable_fields: [order, name]
+    fields:
+      - *published
+      - { name: order, label: 排序, widget: number, value_type: int, default: 99, hint: 數字小的排前面。 }
+      - { name: name, label: 社團名稱, widget: string }
+      - { name: tagline, label: 一句話介紹, widget: string }
+      - { name: school, label: 學校, widget: string }
+      - { name: size, label: 人數, widget: string, required: false, hint: 例如：約 50 人 }
+      - { name: ig, label: IG 帳號, widget: string, required: false, hint: 不用加 @，例如 ntuwvs }
+      - name: types
+        label: 服務形式
+        widget: list
+        field: { name: type, label: 形式, widget: string }
+        hint: 例如：營隊、課輔、國際服務
+      - { name: color, label: 地圖顏色, widget: color, default: "#9EB14F" }
+      - { name: partial, label: 介紹還在整理中, widget: boolean, default: false, hint: 勾選後卡片上會註明「內容可能不完整」。 }
+      - { name: overview, label: 服務介紹, widget: text, required: false }
+      - name: ideals
+        label: 理念目標
+        widget: list
+        required: false
+        field: { name: ideal, label: 理念, widget: text }
+      - name: highlights
+        label: 社團亮點
+        widget: list
+        field: { name: highlight, label: 亮點, widget: text }
+      - { name: closing, label: 結語, widget: text, required: false }
+      - name: sites
+        label: 服務據點
+        widget: list
+        summary: "{{fields.name}}"
+        fields:
+          - { name: name, label: 據點名稱, widget: string }
+          - name: region
+            label: 地區
+            widget: select
+            required: false
+            options:
+              - { label: 北部, value: north }
+              - { label: 中部, value: central }
+              - { label: 南部, value: south }
+              - { label: 東部, value: east }
+              - { label: 海外, value: abroad }
+          - { name: location, label: 地圖位置, widget: map, required: false, decimals: 4, hint: 搜尋地名或直接在地圖上點一下。海外或不固定的據點可以不填，就不會出現在地圖上。 }
+          - { name: detail, label: 服務內容, widget: text }
+
+  # ---------------- 專欄 ----------------
+  - name: posts
+    label: 專欄文章
+    label_singular: 文章
+    description: 專欄文章。社團介紹寫在《布穀好朋友》，資源評比寫在《布可不資道》，其他服務故事選「服務故事」。
+    folder: content/posts
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "post-{{year}}{{month}}{{day}}-{{hour}}{{minute}}"
+    summary: "{{date}}｜{{title}}"
+    media_folder: /public/uploads/posts
+    public_folder: /uploads/posts
+    sortable_fields: [date, title]
+    view_groups:
+      - { label: 系列, field: series }
+    fields:
+      - *published
+      - name: series
+        label: 系列
+        widget: select
+        options: [布穀好朋友, 布可不資道, 服務故事]
+        default: 服務故事
+      - { name: ep, label: 集數, widget: string, required: false, hint: 例如：EP.7 }
+      - { name: date, label: 發布日期, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
+      - { name: title, label: 標題, widget: string }
+      - { name: hook, label: 開場一句, widget: string, required: false, hint: 標題下方的小字。 }
+      - { name: sum, label: 卡片摘要, widget: text, hint: 專欄列表卡片上的一兩句話。 }
+      - { name: cover, label: 封面圖, widget: image, required: false, hint: 會出現在專欄列表卡片和文章最上方，建議橫式照片。 }
+      - name: body
+        label: 內文
+        widget: richtext
+        required: false
+        hint: 可以加小標、粗體、清單和照片。社團介紹文章可以留空，網站會自動排出社團小檔案。
+      - name: club
+        label: 介紹的社團
+        widget: relation
+        collection: clubs
+        value_field: "{{slug}}"
+        search_fields: [name]
+        display_fields: [name]
+        required: false
+        hint: 《布穀好朋友》才需要選。選了以後，文章會自動帶出社團小檔案、據點和亮點。
+      - name: resources
+        label: 文章提到的教學資源
+        widget: relation
+        collection: teach
+        value_field: "{{slug}}"
+        search_fields: [title]
+        display_fields: [title]
+        multiple: true
+        required: false
+        hint: 選了的資源會以卡片排在內文後面。
+      - { name: closing, label: 結語, widget: text, required: false }
+      - { name: credit, label: 作者與設計, widget: string, required: false, hint: "例如：內容：偉齡｜設計：偉齡" }
+      - { name: ig, label: IG 原始貼文連結, widget: string, required: false }
+
+  # ---------------- 網站設定 ----------------
+  - name: settings
+    label: 網站設定
+    editor: { preview: false }
+    files:
+      - name: site
+        label: 加入會員表單
+        file: content/settings.json
+        format: json
+        fields:
+          - { name: joinFormUrl, label: 會員申請表單連結, widget: string, hint: "Google 表單的分享連結，例如 https://forms.gle/..." }
+          - { name: joinFormEmbed, label: 表單嵌入網址（選填）, widget: string, required: false, hint: "在 Google 表單按「傳送 → <> 嵌入 HTML」，複製 iframe 裡 src=\"...\" 的網址貼在這裡，加入會員頁就會直接嵌入表單。" }
