@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { IMPORTED } from '@/lib/resources-data'
+import { PHOTO_CHIEN } from '@/lib/photos'
 
 type Cat = 'all' | 'teach' | 'sponsor' | 'lecturer' | 'activity' | 'template'
 type Review = { ep: string; rating?: number; intro: string; themes?: string; provides?: string; grades?: string; os?: string }
 type Entry = { id: number; cat: Exclude<Cat, 'all'>; sub: string; title: string; desc: string; grade: string; url: string; area?: string; source?: string; review?: Review
   file?: { href: string; name: string; format: string }; contents?: string[]
+  lecturer?: { headline: string; photo?: string; quote?: string; topics: string[]; career: { org: string; role: string; note?: string; edu?: boolean }[] }
   activity?: { goal: string; people: string; time: string; space: string; props: string; steps: string[]; tips: string[]; variations?: string[]; links?: { t: string; u: string }[] } }
 
 const PERSONA: Record<Cat, { label: string; bg: string; badge: string; lines: string[]; subs: string[] }> = {
@@ -55,7 +57,25 @@ const ACTIVITIES: Entry[] = [
       tips: ['提醒大家，假的那件也要說得像真的，才好玩。', '鼓勵說一些平常不會講的小事，更能拉近距離。', '小朋友可以先把三件事寫在紙上，比較不會忘記。'],
       variations: ['小隊競賽：猜對一次得一分，比哪一隊最會看穿。', '主題版：限定題目，例如「關於我的童年」或「關於服務的經驗」。'] } },
 ]
-export const ENTRIES: Entry[] = [...(IMPORTED as unknown as Entry[]).map(e => ({ ...e, sub: MERGE[e.sub] || e.sub })), ...TEMPLATES, ...ACTIVITIES]
+// Lecturers clubs can invite through 布穀島社
+const LECTURERS: Entry[] = [
+  { id: 1004, cat: 'lecturer', sub: '教學設計', title: '簡慈萱', grade: '', url: '',
+    desc: '跨領域工作者，從金融科技、食品外商、藝文展演走到教育現場，現職 Hahow 好學校，從不同角度回應教育不平等議題。',
+    lecturer: {
+      headline: 'Hahow 好學校 資深內容創作暨課程品管經理｜Teach For Taiwan 第 8 屆校友',
+      photo: PHOTO_CHIEN,
+      quote: '在教育現場累積的「共融領導力」，在新創職場同樣適用！',
+      topics: ['教學設計', '企業內訓', 'AI 效率應用'],
+      career: [
+        { org: '吉時嶼工作室', role: '創辦人', note: '企業內訓、教學設計、AI 效率應用' },
+        { org: 'Hahow 好學校', role: '資深內容創作暨課程品管經理' },
+        { org: 'Teach For Taiwan', role: '第 8 屆計劃成員', note: '花蓮縣國民小學高年級導師', edu: true },
+        { org: '必應創造股份有限公司', role: '新創市場專案經理', note: '北京、上海' },
+        { org: '恩沛國際投資股份有限公司', role: '新創市場專案經理', note: '首爾' },
+        { org: '台灣微客行動協會', role: '國際志工專案領隊', note: '尼泊爾、新疆、柬埔寨', edu: true },
+      ] } },
+]
+export const ENTRIES: Entry[] = [...(IMPORTED as unknown as Entry[]).map(e => ({ ...e, sub: MERGE[e.sub] || e.sub })), ...TEMPLATES, ...ACTIVITIES, ...LECTURERS]
 const rank = (e: Entry) => (e.review ? 100 + (e.review.rating || 2.5) * 10 : 0)
 const PICKS = ENTRIES.filter(e => (e.review?.rating || 0) >= 4).sort((a, b) => (b.review!.rating! - a.review!.rating!) || b.id - a.id)
 const subsOf = (c: Cat) => { const m = new Map<string, number>(); ENTRIES.filter(e => e.cat === c).forEach(e => m.set(e.sub, (m.get(e.sub) || 0) + 1)); return [...m.entries()].sort((a, b) => b[1] - a[1]).map(x => x[0]) }
@@ -191,7 +211,40 @@ function ActivityGuide({ a }: { a: NonNullable<Entry['activity']> }) {
   )
 }
 
+function LecturerCard({ e, fresh }: { e: Entry; fresh?: boolean }) {
+  const l = e.lecturer!, p = PERSONA[e.cat]
+  const [all, setAll] = useState(false)
+  const shown = all ? l.career : l.career.slice(0, 3)
+  return (
+    <article className="entry lecturer">
+      <div className="entry-top">
+        <span className="cat-badge" style={{ background: p.badge }}>{p.label}</span>
+        {l.topics.map(t => <span key={t} className="sub-tag">{t}</span>)}
+        {fresh && <span className="fresh">新登錄</span>}
+      </div>
+      <div className="lec-head">
+        {l.photo
+          ? <span className="lec-photo"><img src={l.photo} alt={`${e.title}的照片`} width={360} height={360} loading="lazy" /></span>
+          : <span className="lec-avatar" aria-hidden="true">{e.title.slice(-2)}</span>}
+        <div><h3>{e.title}</h3><p className="lec-headline">{l.headline}</p></div>
+      </div>
+      {l.quote && <blockquote className="lec-quote">{l.quote}</blockquote>}
+      <p className="entry-desc">{e.desc}</p>
+      <p className="contents-label">經歷</p>
+      <ol className="career">
+        {shown.map(c => <li key={c.org + c.role} className={c.edu ? 'edu' : ''}><b>{c.org}</b><span>{c.role}{c.note ? `｜${c.note}` : ''}</span></li>)}
+      </ol>
+      {l.career.length > 3 && <button type="button" className="guide-toggle" aria-expanded={all} onClick={() => setAll(!all)}>{all ? '收起經歷' : `看全部經歷（${l.career.length}）`}</button>}
+      <div className="entry-foot">
+        <span className="host">邀請請透過布穀島社聯繫</span>
+        <a className="open-link" href="#match">邀請講師</a>
+      </div>
+    </article>
+  )
+}
+
 export function EntryCard({ e, fresh }: { e: Entry; fresh?: boolean }) {
+  if (e.lecturer) return <LecturerCard e={e} fresh={fresh} />
   const p = PERSONA[e.cat]
   const host = e.url ? e.url.replace(/^https?:\/\//, '').split('/')[0].replace(/^www\./, '') : ''
   return (
@@ -241,7 +294,7 @@ export default function Resources() {
 
   return (
     <main className="page" id="main">
-      <section className="db-stage" style={{ background: p.bg }}>
+      <section className="db-stage" style={{ backgroundColor: p.bg }}>
         <div className="hero-inner">
           <h1>資料庫</h1>
           <p className="lede">贊助、教學資源、講師、團隊活動和模板，都整理在這裡。</p>
