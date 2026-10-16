@@ -10,5 +10,51 @@
   <body>
     <!-- Sveltia CMS：設定在同一個資料夾的 config.yml -->
     <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
+    <script>
+      // 專欄內文的照片元件。存成 <figure> HTML，網站會照樣排出照片和圖說。
+      const esc = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+      const parse = html => new DOMParser().parseFromString(html, 'text/html').querySelector('figure')
+      const SIZES = [{ label: '一般', value: 'normal' }, { label: '滿版', value: 'wide' }, { label: '小圖置中', value: 'small' }]
+
+      CMS.registerEditorComponent({
+        id: 'photo',
+        label: '照片',
+        icon: 'add_photo_alternate',
+        fields: [
+          { name: 'src', label: '照片', widget: 'image' },
+          { name: 'caption', label: '圖說', widget: 'string', required: false, hint: '顯示在照片下方的小字，例如：2026 寒假營隊，孩子們在操場玩大地遊戲。' },
+          { name: 'size', label: '大小', widget: 'select', options: SIZES, default: 'normal' },
+          { name: 'alt', label: '照片描述（給看不到圖片的讀者）', widget: 'string', required: false, hint: '沒填會用圖說。' },
+        ],
+        pattern: /^<figure class="fig fig-(?:normal|wide|small)">[\s\S]*?<\/figure>$/m,
+        fromBlock: match => {
+          const f = parse(match[0]), img = f && f.querySelector('img')
+          return { src: img ? img.getAttribute('src') : '', alt: img ? img.getAttribute('alt') : '', caption: f && f.querySelector('figcaption') ? f.querySelector('figcaption').textContent : '', size: (f && (f.className.match(/fig-(normal|wide|small)/) || [])[1]) || 'normal' }
+        },
+        toBlock: ({ src = '', caption = '', size = 'normal', alt = '' }) =>
+          `<figure class="fig fig-${size || 'normal'}"><img src="${esc(src)}" alt="${esc(alt || caption)}">${caption ? `<figcaption>${esc(caption)}</figcaption>` : ''}</figure>`,
+        toPreview: ({ src = '', caption = '' }) => `<figure><img src="${esc(src)}" style="max-width:100%">${caption ? `<figcaption>${esc(caption)}</figcaption>` : ''}</figure>`,
+      })
+
+      CMS.registerEditorComponent({
+        id: 'photo-row',
+        label: '並排照片',
+        icon: 'photo_library',
+        fields: [
+          { name: 'images', label: '照片（2–3 張）', widget: 'image', multiple: true },
+          { name: 'caption', label: '圖說', widget: 'string', required: false },
+        ],
+        pattern: /^<figure class="fig fig-row">[\s\S]*?<\/figure>$/m,
+        fromBlock: match => {
+          const f = parse(match[0])
+          return { images: f ? [...f.querySelectorAll('img')].map(i => i.getAttribute('src')) : [], caption: f && f.querySelector('figcaption') ? f.querySelector('figcaption').textContent : '' }
+        },
+        toBlock: ({ images = [], caption = '' }) => {
+          const list = (Array.isArray(images) ? images : [images]).filter(Boolean)
+          return `<figure class="fig fig-row">${list.map(s => `<img src="${esc(s)}" alt="${esc(caption)}">`).join('')}${caption ? `<figcaption>${esc(caption)}</figcaption>` : ''}</figure>`
+        },
+        toPreview: ({ images = [], caption = '' }) => `<figure>${(Array.isArray(images) ? images : [images]).filter(Boolean).map(s => `<img src="${esc(s)}" style="width:32%;margin-right:1%">`).join('')}${caption ? `<figcaption>${esc(caption)}</figcaption>` : ''}</figure>`,
+      })
+    </script>
   </body>
 </html>

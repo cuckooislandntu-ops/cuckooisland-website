@@ -6,6 +6,7 @@ import Join from '@/pages/Join'
 import { ClubMap, Column, Events, Handbook, Match } from '@/pages/Sections'
 import Resources from '@/pages/Resources'
 import Article from '@/pages/Article'
+import Cuckoo from '@/components/Cuckoo'
 import { POSTS } from '@/lib/content'
 
 const TITLES: Record<string, string> = { '': '布穀島社', join: '加入會員', resources: '資料庫', map: '社團地圖', handbook: '經營手冊', events: '活動', column: '專欄', match: '需求媒合' }
@@ -37,6 +38,7 @@ export default function App() {
       {route === 'match' && <Match />}
       {route.startsWith('post-') && <Article key={route} id={route} />}
       <Footer />
+      <Cuckoo />
     </>
   )
 }

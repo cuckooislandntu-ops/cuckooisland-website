@@ -1,9 +1,37 @@
+import { useEffect, useState } from 'react'
+import type { MouseEvent } from 'react'
+import { createPortal } from 'react-dom'
 import { CLUBS, ENTRIES, POSTS, REGION_LABEL, SERIES_INFO, fmtDate } from '@/lib/content'
 import { EntryCard } from '@/pages/Resources'
 
 const IG = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
 
+// Tap a photo in the article body to see it large; Esc or tap again to close
+function useLightbox() {
+  const [shot, setShot] = useState<{ src: string; cap: string } | null>(null)
+  useEffect(() => {
+    if (!shot) return
+    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') setShot(null) }
+    addEventListener('keydown', k); return () => removeEventListener('keydown', k)
+  }, [shot])
+  const open = (e: MouseEvent<HTMLDivElement>) => {
+    const img = (e.target as HTMLElement).closest('img')
+    if (!img) return
+    const fig = img.closest('figure')
+    setShot({ src: img.currentSrc || img.src, cap: fig?.querySelector('figcaption')?.textContent || img.alt || '' })
+  }
+  const view = shot && createPortal(
+    <div className="lightbox" role="dialog" aria-modal="true" aria-label="放大照片" onClick={() => setShot(null)}>
+      <figure><img src={shot.src} alt={shot.cap} />{shot.cap && <figcaption>{shot.cap}</figcaption>}</figure>
+      <button type="button" aria-label="關閉">×</button>
+    </div>,
+    document.body,
+  )
+  return { open, view }
+}
+
 export default function Article({ id }: { id: string }) {
+  const lb = useLightbox()
   const i = POSTS.findIndex(p => p.id === id)
   const post = POSTS[i]
   if (!post) {
@@ -41,7 +69,7 @@ export default function Article({ id }: { id: string }) {
       <article className="article-body">
         <div className="article-inner prose">
           {club && <>
-            {post.html && <div className="md" dangerouslySetInnerHTML={{ __html: post.html }} />}
+            {post.html && <div className="md" onClick={lb.open} dangerouslySetInnerHTML={{ __html: post.html }} />}
             <p className="lead">{club.name}，{club.tagline}。</p>
             <section>
               <h2>社團小檔案</h2>
@@ -77,7 +105,7 @@ export default function Article({ id }: { id: string }) {
           </>}
 
           {!club && <>
-            {post.html && <div className="md" dangerouslySetInnerHTML={{ __html: post.html }} />}
+            {post.html && <div className="md" onClick={lb.open} dangerouslySetInnerHTML={{ __html: post.html }} />}
             {res.length > 0 && <section>
               <h2>{post.series === '布可不資道' ? '這一集介紹的資源' : '文章提到的資源'}</h2>
               <div className="entries">{res.map(e => <EntryCard key={e.id} e={e} />)}</div>
@@ -95,6 +123,7 @@ export default function Article({ id }: { id: string }) {
           <a className="ig" href={post.ig || 'https://www.instagram.com/cuckoo_island/'} target="_blank" rel="noopener noreferrer"><IG />{post.ig ? '在 IG 看原始貼文' : '在 IG @cuckoo_island 看更多'}</a>
         </div>
       </article>
+      {lb.view}
     </main>
   )
 }
