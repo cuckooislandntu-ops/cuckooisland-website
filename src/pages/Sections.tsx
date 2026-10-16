@@ -75,8 +75,8 @@ export function ClubMap() {
             </div>
           </article>
         ))}
-        <Empty title="你們的社團也想出現在這裡？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="#join">申請會員並登錄社團</a>}>
-          申請會員時填寫社團訪談問卷，審核通過後，我們會把你們的社團整理到地圖上。
+        <Empty title="你們的社團也想出現在這裡？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="#join">申請加入島鏈</a>}>
+          申請加入島鏈時填寫社團訪談文件，經你們審稿後，我們會把社團整理到地圖上，也寫成《布穀好朋友》專欄。
         </Empty>
       </div>
     </PageShell>
@@ -176,7 +176,7 @@ export function Column() {
           </a>
         ))}
       </div>
-      <Empty title="想寫你們社團的故事？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="#join">先成為會員</a>}>
+      <Empty title="想寫你們社團的故事？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="#join">申請加入島鏈</a>}>
         帶營隊時印象最深的一刻、社團撐過的難關、交接時想對學弟妹說的話，都歡迎寫下來。
       </Empty>
     </PageShell>

@@ -1,53 +1,82 @@
-import { useState } from 'react'
 import { PageShell } from '@/components/Chrome'
 
-// Paste the Google Form link here (the "send → link" URL). On the real site the form can be embedded with an <iframe>;
-// this preview page cannot embed other sites, so it opens the form in a new tab instead.
-export const JOIN_FORM_URL = ''
+// 會員申請用的 Google 表單（加入布穀島｜島鏈計畫會員申請）。
+// 正式網站要直接嵌入表單的話：在 Google 表單按「傳送 → <> 嵌入 HTML」，把 iframe 的 src 貼到 JOIN_FORM_EMBED。
+export const JOIN_FORM_URL = 'https://forms.gle/Qm3Nj9ytpMLVAHbWA'
+export const JOIN_FORM_EMBED = ''
 
-const ASKS = [
-  { t: '基本資料', d: '姓名、Email，以及你是社團幹部、資源單位還是個人。' },
-  { t: '社團小檔案', d: '隸屬學校、整體人數、理念目標。' },
-  { t: '服務據點', d: '合作關係、服務對象與人數、志工人數、營隊或課輔頻率。' },
-  { t: '社團亮點', d: '你們最想讓別人知道的特色。' },
-  { t: '願意分享的經驗與資源', d: '教案、招生經驗、可出借的器材……你分享一份，其他社團就少準備一份。' },
+const BENEFITS = [
+  { t: '收到整理好的資源', d: '布穀島整理的服務資源、工具與參考資料，包括教案、贊助資訊和講師名單。' },
+  { t: '優先收到活動與贊助品', d: '我們媒合到的免費活動資訊與贊助品，會員會先知道。' },
+  { t: '和其他社團交換經驗', d: '每個社團回答幾個外界很難找到答案的問題，例如出隊預算怎麼分配。有回答，就能看到其他社團的回答整理。' },
+  { t: '用布穀島的名義聯絡', d: '對外找贊助、邀講師或發感謝狀時，可以用布穀島的名義聯絡。' },
+]
+
+const SECTIONS = [
+  { t: '基本資料', who: '所有人', d: '姓名、Email（審核結果會寄到這裡）、手機或 LINE ID，以及申請身分。' },
+  { t: '社團資料', who: '代表社團申請', d: '學校與社團全名、你的系級與社團角色、幹部任期、社團 IG 或 FB，以及社團訪談文件。' },
+  { t: '單位或個人資料', who: '資源單位、個人', d: '單位或學校名稱，以及你想怎麼參與：提供贊助或物資、擔任講師、分享教案或經驗、活動志工，或先了解看看。' },
+  { t: '最後幾題', who: '所有人', d: '從哪裡知道布穀島、是否有興趣加入布穀島團隊，以及資料使用同意。' },
+]
+
+const TIPS = [
+  '可以由幾位幹部一起完成，不用一次填完。',
+  '依社團願意公開的程度填寫就好。不想公開的內容，在該題後面標註【不公開】；不適用的題目填【無】。',
+  '社團經營上的困難請照實寫，不用美化。我們想知道你們真正需要什麼。',
+  '資料發布到 IG 或網站之前，我們一定會先請你們審稿。',
 ]
 
 export default function Join() {
-  const [msg, setMsg] = useState('')
   return (
-    <PageShell kind="join" title="加入布穀島會員" tint="#F9D3C9"
-      lede="成為島鏈的一份子。通過審核後，就能使用資料庫、經營手冊與需求媒合。">
-      <ol className="flow-steps" aria-label="加入流程">
-        <li>填寫申請表單</li><li>完成社團訪談問卷</li><li>通過審核，開始使用資料庫</li>
+    <PageShell kind="join" title="加入布穀島" tint="#F9D3C9"
+      lede="島鏈計畫會員申請。每個服務性社團都是一座島，加入島鏈，讓資源流通、經驗傳遞，一起發揮 1+1>2 的影響力。">
+      <ol className="flow-steps" aria-label="申請流程">
+        <li>填寫申請表單，約 3 分鐘</li>
+        <li>填寫社團訪談文件</li>
+        <li>布穀島夥伴聯絡確認，正式加入島鏈</li>
       </ol>
 
       <div className="sheet" style={{ display: 'grid', gap: 12 }}>
         <h2>申請表單</h2>
-        <p className="section-lede" style={{ marginTop: 0 }}>表單用 Google 表單填寫，約 10 分鐘。社團幹部的訪談內容，審核後會整理成社團地圖上的介紹，就像我們在 IG《布穀好朋友》做的那樣。</p>
-        {JOIN_FORM_URL
-          ? <a className="btn primary" href={JOIN_FORM_URL} target="_blank" rel="noopener noreferrer">開啟申請表單</a>
-          : <button className="btn primary" type="button" onClick={() => setMsg('表單網址還沒設定。把 Google 表單連結交給網站管理者後，這顆按鈕就會開啟表單。')}>開啟申請表單</button>}
-        <p className="status" role="status" aria-live="polite">{msg}</p>
+        <p className="section-lede" style={{ marginTop: 0 }}>社團、資源單位或個人都可以申請。代表社團申請的話，表單會帶你下載社團訪談文件。</p>
+        {JOIN_FORM_EMBED
+          ? <iframe className="form-embed" src={JOIN_FORM_EMBED} title="島鏈計畫會員申請表單" loading="lazy">載入中…</iframe>
+          : null}
+        <a className="btn primary" href={JOIN_FORM_URL} target="_blank" rel="noopener noreferrer">填寫會員申請表單</a>
+        <p className="status" style={{ margin: 0 }}>表單會在新分頁開啟，是 Google 表單。</p>
+      </div>
+
+      <div>
+        <h2>加入島鏈，你們可以</h2>
+        <div className="benefits" style={{ marginTop: 12 }}>
+          {BENEFITS.map(b => <div key={b.t} className="benefit"><b>{b.t}</b><span>{b.d}</span></div>)}
+        </div>
       </div>
 
       <div>
         <h2>表單會問這些</h2>
-        <p className="section-lede">先準備好，填起來會比較快。</p>
+        <p className="section-lede">選好申請身分後，只需要回答和你有關的題目。</p>
         <ul className="toc" style={{ marginTop: 12 }}>
-          {ASKS.map((a, i) => <li key={a.t}><i>{i + 1}</i><div><b>{a.t}</b><span>{a.d}</span></div></li>)}
+          {SECTIONS.map((s, i) => <li key={s.t}><i>{i + 1}</i><div><b>{s.t}<em className="who">{s.who}</em></b><span>{s.d}</span></div></li>)}
         </ul>
+      </div>
+
+      <div className="sheet" style={{ display: 'grid', gap: 10 }}>
+        <h2>填寫社團訪談文件的小提醒</h2>
+        <p className="section-lede" style={{ marginTop: 0 }}>訪談文件的內容，經你們審稿後，會整理成社團地圖和專欄《布穀好朋友》裡的介紹。</p>
+        <ul className="tips">{TIPS.map(t => <li key={t}>{t}</li>)}</ul>
+        <a className="link-plain" href="#post-friends-1">看看《布穀好朋友》寫成的樣子</a>
       </div>
 
       <div className="paths">
         <div className="path" style={{ background: 'var(--cream)', boxShadow: 'var(--shadow-riso)' }}>
-          <h3>審核要多久？</h3>
-          <p>布穀島社會在收到申請後聯絡你。通過審核後，就能查看資料庫的資源連結與聯絡窗口。</p>
+          <h3>送出之後</h3>
+          <p>布穀島夥伴看過資料後，會用你留下的 Email 跟你們聯絡，確認後就正式成為島鏈的一份子。</p>
         </div>
         <div className="path" style={{ background: 'var(--cream)', boxShadow: 'var(--shadow-riso)' }}>
-          <h3>不是社團幹部？</h3>
-          <p>資源單位或想幫忙的個人，也可以先到需求媒合留下你能提供的資源。</p>
-          <a className="link-plain" href="#match">前往需求媒合</a>
+          <h3>有問題？</h3>
+          <p>歡迎私訊 IG，我們會盡快回覆。</p>
+          <a className="link-plain" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer">IG @cuckoo_island</a>
         </div>
       </div>
     </PageShell>

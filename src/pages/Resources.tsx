@@ -177,7 +177,7 @@ export default function Resources() {
       </div>
 
       <div className="content"><div className="content-inner">
-        <p className="sample-note">共 {ENTRIES.length} 筆資源，整理自布穀島社現有的資源清單。正式上線後，資源連結只開放給通過審核的會員。</p>
+        <p className="sample-note">共 {ENTRIES.length} 筆資源，整理自布穀島社現有的資源清單。島鏈會員會收到這些資源的整理與更新。</p>
         {cat === 'all' ? (
           <>
             <div>
@@ -221,8 +221,8 @@ export default function Resources() {
         )}
         <div className="sheet" style={{ display: 'grid', gap: 8 }}>
           <h2>有資源想分享？</h2>
-          <p className="section-lede" style={{ marginTop: 0 }}>會員通過審核後，就能在這裡登錄教案、講師或贊助資訊。你分享一份，其他社團就少準備一份。</p>
-          <a className="btn primary" href="#join">申請成為會員</a>
+          <p className="section-lede" style={{ marginTop: 0 }}>加入島鏈後，可以把你們的教案、講師或贊助資訊分享進資料庫。你分享一份，其他社團就少準備一份。</p>
+          <a className="btn primary" href="#join">申請加入島鏈</a>
         </div>
       </div></div>
     </main>

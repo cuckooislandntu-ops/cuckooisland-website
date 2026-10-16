@@ -153,12 +153,12 @@ export default function Home({ onTone }: { onTone: (t: 'light' | 'dark') => void
               <p className="vision">願有一天，每座投入教育的島嶼，都能突破圈層限制，形成彼此支持的島鏈。</p>
               <h2>成為島鏈的一份子</h2>
               <ol className="join-steps">
-                <li><b>填寫會員表單</b><span>社團幹部、資源單位或個人都可以申請。</span></li>
-                <li><b>提供社團資料</b><span>社團介紹、服務地區，以及你們願意分享的經驗。</span></li>
-                <li><b>通過審核，開始使用</b><span>就能取用資料庫裡的教案、講師與贊助資訊。</span></li>
+                <li><b>填寫會員申請表單</b><span>約 3 分鐘，社團、資源單位或個人都可以申請。</span></li>
+                <li><b>填寫社團訪談文件</b><span>分享你們的做法和真正需要的支持，經你們審稿後才會公開。</span></li>
+                <li><b>正式加入島鏈</b><span>收到整理好的教案、贊助資訊與講師名單，也能看到其他社團的經驗整理。</span></li>
               </ol>
               <div className="btns">
-                <a className="btn primary" href="#join">填寫會員表單</a>
+                <a className="btn primary" href="#join">申請加入島鏈</a>
                 <a className="btn ghost" href="#resources">先逛逛資料庫</a>
               </div>
               <p style={{ margin: 0 }}><a className="ig" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a></p>

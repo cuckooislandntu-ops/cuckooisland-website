@@ -354,3 +354,12 @@
 .article-nav a.right { text-align: right; }
 .article-nav span { font-size: 12.5px; color: var(--ink-soft); }
 .article-nav b { font-family: var(--kai); font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+
+.benefits { display: grid; gap: 10px; }
+@media (min-width: 640px) { .benefits { grid-template-columns: 1fr 1fr; } }
+.benefit { display: grid; gap: 4px; padding: 14px 16px; border-radius: 16px; background: var(--cream); box-shadow: 4px 5px 0 rgba(35,31,53,.08); border-left: 0; }
+.benefit b { font-family: var(--kai); font-size: 17px; }
+.benefit span { font-size: 14px; color: var(--ink-soft); line-height: 1.7; }
+.toc .who { font-style: normal; font-family: var(--sans); font-size: 12px; color: var(--ink-soft); margin-left: 8px; }
+.tips { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; font-size: 14.5px; line-height: 1.75; }
+.form-embed { width: 100%; height: 1200px; border: 0; border-radius: 16px; background: var(--cream); }
