@@ -4,10 +4,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "node scripts/build-content.mjs && vite",
+    "build": "node scripts/build-content.mjs && tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "content": "node scripts/build-content.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -62,6 +63,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "autoprefixer": "^10.6.1",
     "html-inline": "^1.2.0",
+    "marked": "^18.1.1",
     "oxlint": "^1.81.0",
     "parcel": "^2.16.4",
     "parcel-resolver-tspaths": "^0.0.9",

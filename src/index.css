@@ -349,6 +349,24 @@ body, .hero-band, .article-head, .db-stage, .cat-bar, .bar.solid { background-im
 .key-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; counter-reset: k; }
 .key-list li { counter-increment: k; display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border-radius: 999px; background: var(--cream); font-size: 15px; box-shadow: 3px 3px 0 rgba(35,31,53,.08); }
 .key-list li::before { content: counter(k); display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #2F6F5A; color: var(--cream); font-size: 13px; }
+/* article body written in the /admin editor */
+.md { display: grid; gap: 16px; min-width: 0; }
+.md > * { margin: 0; }
+.md p { font-size: 16px; line-height: 1.9; }
+.md h2 { margin-top: 8px; }
+.md h3 { font-size: 17.5px; line-height: 1.5; margin-top: 4px; }
+.md ul, .md ol { padding-left: 1.4em; display: grid; gap: 6px; font-size: 15.5px; line-height: 1.75; }
+.md ol { list-style: decimal; }
+.md ul { list-style: disc; }
+.md ol li::marker { color: #2F6F5A; }
+.md a { color: #2F6F5A; text-underline-offset: 3px; overflow-wrap: anywhere; }
+.md img { display: block; width: 100%; height: auto; border-radius: 16px; box-shadow: 4px 5px 0 rgba(35,31,53,.1); }
+.md hr { border: 0; border-top: 1px dashed rgba(35,31,53,.25); }
+.md code { font-size: .92em; background: var(--cream); padding: 1px 6px; border-radius: 6px; }
+.md table { border-collapse: collapse; font-size: 14.5px; display: block; overflow-x: auto; }
+.md th, .md td { border: 1px solid rgba(35,31,53,.15); padding: 6px 10px; text-align: left; }
+.article-cover { display: block; width: 100%; height: auto; margin-top: 18px; border-radius: 18px; box-shadow: 5px 6px 0 rgba(35,31,53,.12); }
+.post-cover { display: block; width: calc(100% + 32px); max-width: none; aspect-ratio: 16 / 9; object-fit: cover; margin: -16px -16px 6px; border-radius: 18px 18px 0 0; }
 .article-actions { display: grid; gap: 10px; justify-items: start; }
 .article-actions .btn { width: 100%; }
 .article-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; border-top: 1px solid rgba(35,31,53,.12); padding-top: 18px; }

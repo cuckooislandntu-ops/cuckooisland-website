@@ -1,15 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { IMPORTED } from '@/lib/resources-data'
-import { PHOTO_CHIEN } from '@/lib/photos'
-
-type Cat = 'all' | 'teach' | 'sponsor' | 'lecturer' | 'activity' | 'template'
-type Review = { ep: string; rating?: number; intro: string; themes?: string; provides?: string; grades?: string; os?: string }
-type Entry = { id: number; cat: Exclude<Cat, 'all'>; sub: string; title: string; desc: string; grade: string; url: string; area?: string; source?: string; review?: Review
-  file?: { href: string; name: string; format: string }; contents?: string[]
-  lecturer?: { headline: string; photo?: string; quote?: string; topics: string[]; career: { org: string; role: string; note?: string; edu?: boolean }[] }
-  activity?: { goal: string; people: string; time: string; space: string; props: string; steps: string[]; tips: string[]; variations?: string[]; links?: { t: string; u: string }[] } }
+import { ENTRIES, newestFirst } from '@/lib/content'
+import type { Cat, Entry } from '@/lib/content'
 
 const PERSONA: Record<Cat, { label: string; bg: string; badge: string; lines: string[]; subs: string[] }> = {
   all: { label: '總覽', bg: '#E6F1B5', badge: '#6E8C25', subs: [],
@@ -27,57 +20,9 @@ activity: { label: '團隊活動', bg: '#D5EDC9', badge: '#B4531B', subs: [],
 }
 const ORDER: Cat[] = ['all', 'teach', 'sponsor', 'lecturer', 'activity', 'template']
 
-const MERGE: Record<string, string> = { 'YT頻道': '科普', '各式課程皆有': '綜合型', '夢想實驗室': '綜合型', '公共衛生': '社會議題' }
-// Templates clubs can download and edit; files live in public/templates/
-const TEMPLATES: Entry[] = [
-  { id: 1000, cat: 'template', sub: '同意書', title: '營隊家長同意書範本', grade: '營隊、課輔', url: '',
-    desc: '營隊、課輔活動都能用的家長同意書。把【】裡的文字換成你們的活動資訊，就能直接列印。',
-    file: { href: '/templates/parent-consent.docx', name: '營隊家長同意書範本.docx', format: 'Word 檔，一頁 A4' },
-    contents: ['活動資訊', '學員資料', '健康與注意事項', '緊急聯絡人', '接送方式', '保險', '照片與影片使用', '家長簽名'] },
-]
-// Team-building activities, written as lead-it-yourself guides
-const ACTIVITIES: Entry[] = [
-  { id: 1001, cat: 'activity', sub: '團隊凝聚', title: '圍圈：每個人都被聽見', grade: '全年段', url: '',
-    desc: '大家圍成一圈，輪流拿著發言物分享。適合營隊第一天、每天的開場或結束，讓孩子和隊輔都練習好好說、好好聽。',
-    activity: { goal: '建立安全感、練習聆聽、凝聚團隊', people: '6–25 人', time: '15–30 分鐘', space: '室內或安靜的戶外，能坐成一圈', props: '一個發言物（小球、玩偶或石頭）',
-      steps: ['大家坐成一圈，帶領者也坐在圈裡，和大家一樣高。', '說明三個約定：拿到發言物的人才說話；其他人專心聽、不打斷；不想說可以說「先跳過」。', '帶領者先示範，用一句話回答暖身題，例如「用一種天氣形容今天的心情」。', '把發言物依順時針傳下去，每個人輪流分享。', '第二輪換成深一點的題目，例如「今天最想謝謝誰」。', '最後由帶領者整理大家說到的共同點，謝謝每個人的分享。'],
-      tips: ['題目從輕到重，先讓每個人都能輕鬆開口。', '尊重說「先跳過」的孩子，可以在最後再問一次。', '帶領者不評論分享內容，只回應「謝謝你」。'],
-      variations: ['品格圈：每次圍繞一個品格主題，例如勇敢、感謝。', '心情溫度計：用 1 到 10 分說今天的心情，再說一個原因。'],
-      links: [{ t: '圍圈在班級和課堂的應用', u: 'https://www.htcfoundation.org.tw/knowledge/show/11' }, { t: '耶拿輕鬆學：圍圈（影片）', u: 'https://www.youtube.com/watch?v=mzfzj6xekKM&t=156s' }] } },
-  { id: 1002, cat: 'activity', sub: '暖身遊戲', title: '虎克船長', grade: '國小中年級以上', url: '',
-    desc: '考驗反應的經典團康。指到誰，誰就要喊出口號、做出動作，旁邊的人也要一起動。幾分鐘就能讓全場醒過來。',
-    activity: { goal: '暖身提神、訓練反應與專注', people: '8–30 人', time: '10–15 分鐘', space: '能圍成一圈的空間', props: '不需要',
-      steps: ['大家站成一圈，帶領者先當第一位船長。', '船長雙手比向圈內任一人，喊「虎克」。', '被指到的人要馬上舉起雙手，喊「船長」。', '同時，被指到的人左右兩邊的人要做划船動作，一起喊「嘿咻」。', '剛剛被指到的人接著喊「虎克」，指向下一個人，遊戲繼續。', '慢了、喊錯或做錯動作的人，接受一個小懲罰，例如表演一個動作，再回到圈裡繼續玩。'],
-      tips: ['先慢速示範一輪，確定大家都知道誰要做什麼。', '越玩越快，節奏是好玩的關鍵。', '懲罰以好玩、不羞辱為原則。'],
-      variations: ['各社團的口號和動作常常不一樣，可以換成你們自己的版本。', '加入「颱風來了」之類的口令，讓所有人換位置，增加變化。'] } },
-  { id: 1003, cat: 'activity', sub: '破冰', title: '兩真一假', grade: '國小中年級以上', url: '',
-    desc: '每個人說三件關於自己的事，兩件是真的、一件是假的，讓大家猜哪一件是假的。剛認識的時候最好用。',
-    activity: { goal: '破冰、快速認識彼此', people: '4–30 人（人多時分成 5–6 人一組）', time: '15–25 分鐘', space: '不限', props: '紙筆（選用）',
-      steps: ['給大家 2 分鐘，想好三件關於自己的事，兩真一假。', '帶領者先示範，例如「我養過一隻烏龜、我會騎單輪車、我去過 10 個國家」。', '輪流說出三件事，其他人討論後，猜哪一件是假的。', '公布答案，請本人補充一個真話背後的小故事。', '所有人輪完後，選出「最會騙人」和「最讓人驚訝」的人。'],
-      tips: ['提醒大家，假的那件也要說得像真的，才好玩。', '鼓勵說一些平常不會講的小事，更能拉近距離。', '小朋友可以先把三件事寫在紙上，比較不會忘記。'],
-      variations: ['小隊競賽：猜對一次得一分，比哪一隊最會看穿。', '主題版：限定題目，例如「關於我的童年」或「關於服務的經驗」。'] } },
-]
-// Lecturers clubs can invite through 布穀島社
-const LECTURERS: Entry[] = [
-  { id: 1004, cat: 'lecturer', sub: '教學設計', title: '簡慈萱', grade: '', url: '',
-    desc: '跨領域工作者，從金融科技、食品外商、藝文展演走到教育現場，現職 Hahow 好學校，從不同角度回應教育不平等議題。',
-    lecturer: {
-      headline: 'Hahow 好學校 資深內容創作暨課程品管經理｜Teach For Taiwan 第 8 屆校友',
-      photo: PHOTO_CHIEN,
-      quote: '在教育現場累積的「共融領導力」，在新創職場同樣適用！',
-      topics: ['教學設計', '企業內訓', 'AI 效率應用'],
-      career: [
-        { org: '吉時嶼工作室', role: '創辦人', note: '企業內訓、教學設計、AI 效率應用' },
-        { org: 'Hahow 好學校', role: '資深內容創作暨課程品管經理' },
-        { org: 'Teach For Taiwan', role: '第 8 屆計劃成員', note: '花蓮縣國民小學高年級導師', edu: true },
-        { org: '必應創造股份有限公司', role: '新創市場專案經理', note: '北京、上海' },
-        { org: '恩沛國際投資股份有限公司', role: '新創市場專案經理', note: '首爾' },
-        { org: '台灣微客行動協會', role: '國際志工專案領隊', note: '尼泊爾、新疆、柬埔寨', edu: true },
-      ] } },
-]
-export const ENTRIES: Entry[] = [...(IMPORTED as unknown as Entry[]).map(e => ({ ...e, sub: MERGE[e.sub] || e.sub })), ...TEMPLATES, ...ACTIVITIES, ...LECTURERS]
+export { ENTRIES }
 const rank = (e: Entry) => (e.review ? 100 + (e.review.rating || 2.5) * 10 : 0)
-const PICKS = ENTRIES.filter(e => (e.review?.rating || 0) >= 4).sort((a, b) => (b.review!.rating! - a.review!.rating!) || b.id - a.id)
+const PICKS = ENTRIES.filter(e => (e.review?.rating || 0) >= 4).sort((a, b) => (b.review!.rating! - a.review!.rating!) || newestFirst(a, b))
 const subsOf = (c: Cat) => { const m = new Map<string, number>(); ENTRIES.filter(e => e.cat === c).forEach(e => m.set(e.sub, (m.get(e.sub) || 0) + 1)); return [...m.entries()].sort((a, b) => b[1] - a[1]).map(x => x[0]) }
 const RM = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -287,10 +232,10 @@ export default function Resources() {
   const p = PERSONA[cat]
   useEffect(() => { setQ(''); setSub(null) }, [cat])
 
-  const latest = useMemo(() => [...ENTRIES].sort((a, b) => b.id - a.id).slice(0, 6), [])
+  const latest = useMemo(() => [...ENTRIES].sort(newestFirst).slice(0, 6), [])
   const subs = useMemo(() => subsOf(cat), [cat])
   const list = useMemo(() => ENTRIES.filter(e => e.cat === cat && (!sub || e.sub === sub) && (!q.trim() || (e.title + e.desc + e.sub + e.grade).toLowerCase().includes(q.trim().toLowerCase())))
-    .sort((a, b) => (rank(b) - rank(a)) || b.id - a.id), [cat, sub, q])
+    .sort((a, b) => (rank(b) - rank(a)) || newestFirst(a, b)), [cat, sub, q])
 
   return (
     <main className="page" id="main">

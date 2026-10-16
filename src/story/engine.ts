@@ -481,6 +481,13 @@ export function startStory(cv: HTMLCanvasElement, main: HTMLElement, onTone: (to
     }
   }
 
+  let grainPat: CanvasPattern | null = null;
+  function makeGrain() {
+    const size = 256 * DPR, n = document.createElement('canvas'); n.width = n.height = size; const g = n.getContext('2d');
+    const r = rng(11);
+    for (let i = 0; i < 4200 * DPR * DPR; i++) { g.fillStyle = `rgba(35,31,53,${.05 + r() * .09})`; g.fillRect(Math.floor(r() * size), Math.floor(r() * size), 1, 1); }
+    grainPat = c.createPattern(n, 'repeat');
+  }
   const root = document.documentElement;
   // the two "other side" sections hold the old timeline still while the camera pans
   // 5–8.2: other side + sharing (story clock held); 8.2–8.62: lights fly into Taiwan; 8.62–9: the finished network rests
@@ -492,6 +499,8 @@ export function startStory(cv: HTMLCanvasElement, main: HTMLElement, onTone: (to
     root.style.setProperty('--scrim', g1); root.style.setProperty('--scrim0', g1.replace('rgb(', 'rgba(').replace(')', ',0)'));
     const gr = c.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, g1); gr.addColorStop(1, g2);
     c.fillStyle = gr; c.fillRect(0, 0, W, H);
+    // paper grain on the background only; scenes are drawn on top, so characters stay clean
+    if (grainPat) { grainPat.setTransform(new DOMMatrix().scale(1 / DPR)); c.fillStyle = grainPat; c.fillRect(0, 0, W, H); }
     if (S < 2.95) early(S);
     underwater(S);
     stars(S);
@@ -567,7 +576,7 @@ export function startStory(cv: HTMLCanvasElement, main: HTMLElement, onTone: (to
     const r = cv.getBoundingClientRect();
     if (Math.abs(r.width - lastW) < 1 && Math.abs(r.height - lastH) < 120) { measure(); return; }
     lastW = r.width; lastH = r.height; W = r.width; H = r.height; DPR = Math.min(2, devicePixelRatio || 1);
-    U = Math.min(W / 390, H / 760); cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); measure();
+    U = Math.min(W / 390, H / 760); cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); measure(); makeGrain();
   }
   addEventListener('resize', resize);
   const ro = 'ResizeObserver' in window ? new ResizeObserver(measure) : null;

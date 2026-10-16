@@ -1,9 +1,10 @@
 import { PageShell } from '@/components/Chrome'
+import { SETTINGS } from '@/lib/content'
 
-// 會員申請用的 Google 表單（加入布穀島｜島鏈計畫會員申請）。
-// 正式網站要直接嵌入表單的話：在 Google 表單按「傳送 → <> 嵌入 HTML」，把 iframe 的 src 貼到 JOIN_FORM_EMBED。
-export const JOIN_FORM_URL = 'https://forms.gle/Qm3Nj9ytpMLVAHbWA'
-export const JOIN_FORM_EMBED = ''
+// 會員申請用的 Google 表單（加入布穀島｜島鏈計畫會員申請）：在 /admin 的「網站設定」修改。
+// 要直接嵌入表單：在 Google 表單按「傳送 → <> 嵌入 HTML」，把 iframe 的 src 貼到「表單嵌入網址」。
+export const JOIN_FORM_URL = SETTINGS.joinFormUrl
+export const JOIN_FORM_EMBED = SETTINGS.joinFormEmbed
 
 const BENEFITS = [
   { t: '收到整理好的資源', d: '布穀島整理的服務資源、工具與參考資料，包括教案、贊助資訊和講師名單。' },

@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { Empty, PageShell } from '@/components/Chrome'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TAIWAN_LL } from '@/story/engine'
-import { CLUBS, REGION_LABEL } from '@/lib/clubs'
-import type { Region } from '@/lib/clubs'
-import { POSTS, SERIES_INFO } from '@/lib/posts'
+import { CLUBS, POSTS, REGION_LABEL, SERIES_INFO } from '@/lib/content'
+import type { Region, Series } from '@/lib/content'
 
 const tabsListCls = 'grid w-full h-auto p-1 rounded-2xl bg-[#F3E2B8]'
 const tabCls = 'min-h-[44px] rounded-xl text-[15px] font-bold data-[state=active]:bg-[#231F35] data-[state=active]:text-[#D6EC6E]'
@@ -53,14 +52,14 @@ export function ClubMap() {
       <div style={{ display: 'grid', gap: 12 }}>
         <h2>{region ? REGION_LABEL[region] + '的社團' : '所有社團'}（{shown.length}）</h2>
         <p className="section-lede" style={{ marginTop: -6 }}>社團介紹整理自布穀島社 IG《布穀好朋友》系列。</p>
-        {shown.map(c => (
+        {shown.map(c => { const post = POSTS.find(p => p.clubId === c.id); return (
           <article key={c.id} id={'club-' + c.id} className={'club' + (pick === c.id ? ' lit' : '')} style={{ ['--club' as any]: c.color }}>
             <div className="club-head">
               <h3>{c.name}</h3>
               <p className="club-tag">{c.tagline}</p>
               <div className="entry-top">
                 {c.types.map(t => <span key={t} className="sub-tag">{t}</span>)}
-                {c.ep && <span className="sub-tag">{c.ep}</span>}
+                {post?.series === '布穀好朋友' && <span className="sub-tag">{post.series} {post.ep}</span>}
               </div>
               <p className="club-meta"><span>{c.school}</span>{c.size && <span>{c.size}</span>}</p>
             </div>
@@ -71,10 +70,10 @@ export function ClubMap() {
             {c.partial && <p className="status">這個社團的介紹還在整理，內容可能不完整。</p>}
             <div className="entry-foot">
               {c.ig ? <a className="ig club-ig" href={`https://www.instagram.com/${c.ig}/`} target="_blank" rel="noopener noreferrer"><IG />@{c.ig}</a> : <span />}
-              {POSTS.find(p => p.clubId === c.id) && <a className="open-link" href={'#' + POSTS.find(p => p.clubId === c.id)!.id}>完整介紹</a>}
+              {post && <a className="open-link" href={'#' + post.id}>完整介紹</a>}
             </div>
           </article>
-        ))}
+        ) })}
         <Empty title="你們的社團也想出現在這裡？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="#join">申請加入島鏈</a>}>
           申請加入島鏈時填寫社團訪談文件，經你們審稿後，我們會把社團整理到地圖上，也寫成《布穀好朋友》專欄。
         </Empty>
@@ -160,15 +159,17 @@ export function Events() {
 export function Column() {
   const [f, setF] = useState<string | null>(null)
   const list = POSTS.filter(p => !f || p.series === f)
+  const series = (Object.keys(SERIES_INFO) as Series[]).filter(k => POSTS.some(p => p.series === k))
   return (
     <PageShell kind="column" title="專欄" tint="#F3E2B8" lede="服務現場的故事、社團的樣子，和我們實際評過的教學資源。">
       <div className="chips" role="group" aria-label="專欄系列">
         <button type="button" className="chip" aria-pressed={f === null} onClick={() => setF(null)}>全部</button>
-        {(Object.keys(SERIES_INFO) as (keyof typeof SERIES_INFO)[]).map(k => <button key={k} type="button" className="chip" aria-pressed={f === k} onClick={() => setF(f === k ? null : k)}>{k}（{SERIES_INFO[k].label}）</button>)}
+        {series.map(k => <button key={k} type="button" className="chip" aria-pressed={f === k} onClick={() => setF(f === k ? null : k)}>{k}（{SERIES_INFO[k].label}）</button>)}
       </div>
       <div className="entries">
         {list.map(p => (
           <a key={p.id} className="entry post-card" href={'#' + p.id}>
+            {p.cover && <img className="post-cover" src={p.cover} alt="" loading="lazy" />}
             <div className="entry-top"><span className="cat-badge" style={{ background: SERIES_INFO[p.series].color }}>{p.series} {p.ep}</span>{p.date && <span className="sub-tag">{+p.date.slice(5, 7)} 月 {+p.date.slice(8)} 日</span>}</div>
             <h3>{p.title}</h3>
             <p className="entry-desc">{p.sum}</p>

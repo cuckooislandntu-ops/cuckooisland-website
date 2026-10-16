@@ -1,147 +1,86 @@
-# 布穀島社官網：總整理
+# 布穀島社官網
 
-整理日期：2026-10-17
+串聯全台教育服務性社團：交流經驗、共享資源、一起成長。
 
----
+手機優先的網站：首頁是一段跟著捲動播放的動畫故事，另外有加入會員、資料庫、社團地圖、經營手冊、活動、專欄、需求媒合等頁面。
 
-## 一、網站現況
-
-| 項目 | 位置 |
-|---|---|
-| 正式網站 | https://cuckooisland-website.vercel.app |
-| 編輯後台 | https://cuckooisland-website.vercel.app/admin/ |
-| 程式碼 | GitHub `cuckooislandntu-ops/cuckooisland-website`（main 分支） |
-| 主機 | Vercel（GitHub 更新後約 1–2 分鐘自動上線） |
-| 會員申請表單 | https://forms.gle/Qm3Nj9ytpMLVAHbWA |
-| IG | @cuckoo_island |
-
-費用：Vercel、GitHub、Sveltia CMS（後台）都是免費方案，日常編輯不會產生費用。
+- IG：[@cuckoo_island](https://www.instagram.com/cuckoo_island/)
+- 技術：React 18 + TypeScript + Vite + Tailwind CSS
 
 ---
 
-## 二、網站有哪些頁面
+## 編輯內容：用 /admin 後台
 
-| 頁面 | 網址 | 內容 |
-|---|---|---|
-| 首頁 | `/` | 手機優先、跟著捲動播放的動畫故事，最後邀請加入島鏈 |
-| 加入會員 | `#join` | 會員權益、申請流程、Google 表單 |
-| 資料庫 | `#resources` | 總覽＋教學資源、贊助資源、講師、團隊活動、模板，有會說話換裝的導覽角色 |
-| 社團地圖 | `#map` | 台灣地圖＋社團介紹卡片，可依地區篩選 |
-| 經營手冊 | `#handbook` | 手冊功能介紹與入口 |
-| 活動 | `#events` | 活動報名資訊與活動紀錄 |
-| 專欄 | `#column` | 文章列表，每篇點進去是獨立文章（`#post-...`） |
-| 需求媒合 | `#match` | 服務需求媒合流程 |
+資料庫（教學資源、贊助資源、講師、團隊活動、模板）、社團地圖、專欄文章、會員表單連結，都在後台編輯：
 
-### 首頁故事流
+1. 打開 https://cuckooisland-website.vercel.app/admin/
+2. 第一次按「Sign In Using Access Token」，貼上 GitHub 權杖（產生方式見下方）。
+3. 左邊選類別 →「New」新增，或點一筆修改 → 按「Save」。
+4. 約 1–2 分鐘後網站自動更新。
 
-1. 營隊的美好：寒暑假，一群學生走進山邊海邊的小學。
-2. 一個社團自己扛：招生、經費、教案、交接壓在幹部身上。
-3. 沉下去：除了社團夥伴本身，能支持的資源少之又少。
-4. 一群社團：全台很多社團都是這樣。
-5. 為什麼，不能串聯？每個社團手上都有可以分享的經驗。
-6. 分享：社團之間分享經驗與教學內容，看見更多方法與可能。
-7. 海的另一邊：50+ 教育發展組織、20+ 議題組織。
-8. 企業：上萬間企業有 CSR 目標，30+ 企業與單位辦理贊助計畫。
-9. 布穀島社出場：三個面向，資金與物資、教學內容、志工品質。
-10. 你分享一份經驗，就能接住上千份。
-11. 被看見：企業、基金會與教育組織找得到社團。
-12. 洋流回到孩子。
-13. 加入島鏈：填會員申請表單 → 填社團訪談文件 → 正式加入。
-
-### 資料庫的導覽角色
-
-| 類別 | 角色與場景 | 目前內容 |
-|---|---|---|
-| 總覽 | 漁夫帽嚮導 | 最新登錄、小編評分精選（4 顆星以上）、依類別找 |
-| 教學資源 | 老師與黑板 | 81 筆，含 IG《布可不資道》評分 |
-| 贊助資源 | 企業代表、錢幣 | 20 筆補助公告 |
-| 講師 | 舞台講者、麥克風 | 簡慈萱（去背照片） |
-| 團隊活動 | 教練、運動場 | 圍圈、虎克船長、兩真一假 |
-| 模板 | 秘書、書櫃 | 營隊家長同意書（Word 可下載） |
-
-角色會邊打字邊動嘴說台詞，點角色換下一句，切換類別時背景、服裝和台詞一起換。
-
----
-
-## 三、日常更新內容：用 /admin 後台
-
-### 可以在後台編輯的內容
-
-- **教學資源**：名稱、分類、連結、說明、評分介紹（星等、小編 OS）
-- **贊助資源**：計畫名稱、類型、單位與日期、公告連結
-- **講師**：姓名、頭銜、照片（直接拖進去）、介紹、主題、經歷
-- **團隊活動**：人數、時間、道具、步驟、帶領技巧、變化玩法
-- **模板**：說明、上傳範本檔案（網站會出現下載按鈕）
-- **社團**：社團介紹、服務據點（可搜尋地名或在地圖上點位置）
-- **專欄文章**：有排版編輯器，可以加小標、粗體、清單、照片；可勾選文章提到的資源、介紹的社團
-- **網站設定**：會員表單連結、表單嵌入網址
-
-### 第一次登入：產生 GitHub 權杖
-
-1. 用布穀島的 GitHub 帳號登入 GitHub。
-2. 右上頭像 → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token。
-3. Repository access 選「Only select repositories」→ `cuckooisland-website`。
-4. Permissions 的 **Contents** 設成 **Read and write**。
-5. 到期日選 1 年，按 Generate，複製權杖存好。
-
-權杖等於帳號密碼，不要貼到群組。到期後重新產生一組就好。
-
-### 平常怎麼用
-
-1. 打開 `/admin/` → 按「Sign In Using Access Token」→ 貼上權杖（瀏覽器會記住）。
-2. 左邊選類別 → 按「New」新增，或點一筆修改。
-3. 按「Save」，約 1–2 分鐘後網站更新。
+**GitHub 權杖**：用布穀島的 GitHub 帳號登入 → 右上頭像 → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token。Repository access 選「Only select repositories」→ `cuckooisland-website`；Permissions 的 **Contents** 設成 **Read and write**。到期日可以選 1 年。權杖等於密碼，不要傳到群組。
 
 小提醒：
-- 取消「上架」會從網站隱藏，但資料不會刪除。
-- 照片會自動轉成 WebP、縮到 1600px。講師照片請先去背、臉放中間。
-- 資料庫首頁的「最新登錄」依「登錄日期」排序。
-- 存檔後網站沒更新：到 Vercel 看最新一次部署。格式有問題的那筆會被略過，記錄裡會寫「注意：」，不會讓整個網站壞掉。
+- 取消「上架」就會從網站隱藏，不會刪除。
+- 照片上傳會自動轉成 WebP、縮到 1600px。講師照片請先去背、臉放中間。
+- 存檔後如果網站沒更新，到 Vercel 看最新一次部署有沒有失敗；建置時有問題的資料會被略過並在記錄裡寫「注意：」。
+
+內容存放在 `content/` 資料夾（一筆一個 JSON 檔），`scripts/build-content.mjs` 會在每次建置時把它轉成網站讀的 `src/generated/content.ts`（自動產生，不要手動改）。後台的欄位設定在 `public/admin/config.yml`。
+
+## 其他修改：要改哪個檔案
+
+| 想改的東西 | 檔案 | 說明 |
+|---|---|---|
+| 首頁每一段的文字 | `src/pages/Home.tsx` | 每段都有註解標號，例如 `{/* 6. 海的另一邊：教育組織 */}` |
+| 資料庫角色的台詞、類別顏色 | `src/pages/Resources.tsx` 最上方的 `PERSONA` | 每個類別一組 `lines` |
+| 後台的分類選項、欄位 | `public/admin/config.yml` | 例如教學資源的「分類」選項 |
+| 經營手冊章節、活動紀錄、需求媒合流程 | `src/pages/Sections.tsx` | |
+| 加入會員頁的權益說明 | `src/pages/Join.tsx` | 表單連結在後台「網站設定」改 |
+| 選單項目 | `src/lib/site.tsx` 的 `NAV` | |
+| 顏色、字級 | `src/index.css` 最上方 `:root` | 字型是 Huninn（jf open 粉圓） |
+| Logo | `src/lib/logo.ts`、`public/` | 網頁內的 Logo 以 base64 內嵌；`public/` 放網站圖示與分享預覽圖 |
+
+### 直接在 GitHub 網頁上改
+
+1. 在 GitHub 打開要改的檔案，按右上角的鉛筆圖示。
+2. 改完按「Commit changes」。
+3. 有接 Vercel 的話，約 1 分鐘後網站會自動更新。
 
 ---
 
-## 四、改設計或功能：請 Claude 幫忙
+## 在自己電腦上預覽
 
-1. 在「布穀島社」專案開新對話，說明要改什麼（附截圖、試算表、PDF 都可以）。
-2. 目前 GitHub 還沒連到 Claude，Claude 會打包「只含改動檔案」的 zip。
-3. 上傳方式：
-   - 在 repo **最外層**按「Add file → Upload files」。
-   - 把解壓縮後的**資料夾本身**（`src`、`public`、`content`…）和最外層檔案拖進去，按 Commit。
-   - 不要拖資料夾裡面的檔案，否則會放錯位置、網站讀不到。
-4. **重要**：在後台改過內容後，請告訴 Claude「後台有改過內容」。Claude 打包時要避開 `content/` 資料夾，才不會蓋掉後台的修改。
+需要 [Node.js](https://nodejs.org/) 20 以上和 pnpm（`npm i -g pnpm`）。
 
-### 程式檔案對照
-
-| 想改的東西 | 位置 |
-|---|---|
-| 資料庫、社團、專欄、會員表單連結 | 後台（資料存在 `content/`） |
-| 上傳的照片與檔案 | `public/uploads/` |
-| 首頁每段文字 | `src/pages/Home.tsx` |
-| 首頁動畫 | `src/story/engine.ts` |
-| 資料庫角色台詞與類別顏色 | `src/pages/Resources.tsx` 的 `PERSONA` |
-| 後台的欄位與分類選項 | `public/admin/config.yml` |
-| 加入會員頁的權益說明 | `src/pages/Join.tsx` |
-| 經營手冊、活動紀錄、需求媒合 | `src/pages/Sections.tsx` |
-| 選單 | `src/lib/site.tsx` |
-| 顏色、字級 | `src/index.css` |
+```bash
+pnpm install
+pnpm dev      # 開發預覽，打開終端機顯示的網址
+pnpm build    # 產生正式版到 dist/
+```
 
 ---
 
-## 五、會員制度
+## 部署到 Vercel（第一次設定）
 
-- **流程**：① 填會員申請表單（約 3 分鐘）② 填社團訪談文件 ③ 布穀島夥伴聯絡確認，正式加入島鏈。
-- **權益**：收到整理好的教案、贊助資訊、講師名單；優先收到媒合到的活動與贊助品；回答交流問題就能看到其他社團的回答整理；可以用布穀島的名義對外聯絡。
-- **公開原則**：訪談文件標註【不公開】的內容只供內部參考；發布前一定先請社團審稿。
-- **未來的會員登入**（還沒做）：可以用 Supabase 或 Firebase 做 Google 登入，審核通過才看得到資源連結。
+1. 到 [vercel.com](https://vercel.com) 用這個 GitHub 帳號登入。
+2. 「Add New → Project」，選這個 repo，按「Import」。
+3. 設定會自動偵測為 Vite（Build Command `pnpm build`、Output Directory `dist`），直接按「Deploy」。
+4. 完成後會拿到一個公開網址。之後每次推到 `main` 分支，網站都會自動更新。
+5. 想用自己的網域：在 Vercel 專案的「Settings → Domains」加入網域，照指示設定 DNS。
 
----
-
-## 六、設計規範
-
-- 風格延續動態影片：risograph 扁平色塊、偏移陰影、紙張顆粒（只在背景，不蓋到文字）。
-- 字體：Huninn（jf open 粉圓），只用一種粗細，用字級拉層次。
-- 主要色：紙色 #FBF1D6、墨色 #231F35、品牌綠 #9EB14F、深綠 #6E8C25、螢光 #D6EC6E、鮭魚粉 #F4A7A0。
-- 手機優先，文字底下有遮罩避免壓在圖上。
-- 避免：單一詞換色強調、全大寫標籤、按鈕加「→」。
+網址格式：各頁是 `#join`、`#resources`、`#map` 這樣的錨點，專欄文章是 `#post-friends-1` 這種格式，可以直接分享。
 
 ---
+
+## 資料來源
+
+- 教學資源：布穀島社資源整理試算表（教學資源、TFT 參考資料、活動參觀行程）。
+- 資源評分與介紹：IG《布可不資道》EP.1–4。
+- 贊助資訊：[中國醫藥大學服務學習組公告](https://service-learning.cmu.edu.tw/news-cata/23)（第 1 頁）。
+- 社團介紹：IG《布穀好朋友》EP.1、2、5、6。社團地圖上的點是大約位置。
+
+## 之後可以做的
+
+- 把資源、社團、文章改由 Google 試算表管理，網站自動讀取，不會寫程式的人也能更新。
+- 會員登入與審核：接 Supabase 或 Firebase（Google 登入），審核通過的會員才看得到資源連結。
+- 把 Google 表單直接嵌入加入會員頁。

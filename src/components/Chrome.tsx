@@ -95,7 +95,7 @@ export function HeroArt({ kind }: { kind: RouteId }) {
 export function PageShell({ kind, title, lede, tint, children }: { kind: RouteId; title: string; lede: string; tint: string; children: ReactNode }) {
   return (
     <main className="page" id="main">
-      <section className="hero-band" style={{ background: tint }}>
+      <section className="hero-band" style={{ backgroundColor: tint }}>
         <div className="hero-inner">
           <h1>{title}</h1>
           <p className="lede">{lede}</p>
