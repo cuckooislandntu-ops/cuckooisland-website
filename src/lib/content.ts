@@ -16,7 +16,6 @@ export type Site = { name: string; detail: string; region?: Region; at?: [number
 export type Club = {
   id: string; name: string; tagline: string; school: string; size?: string; ig?: string
   types: string[]; sites: Site[]; highlights: string[]; color: string; partial?: boolean
-  overview?: string; ideals?: string[]; closing?: string
 }
 
 export type Series = '布穀好朋友' | '布可不資道' | '服務故事'

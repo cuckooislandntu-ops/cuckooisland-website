@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import { Empty, PageShell } from '@/components/Chrome'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TAIWAN_LL } from '@/story/engine'
 import { CLUBS, POSTS, REGION_LABEL, SERIES_INFO } from '@/lib/content'
 import type { Region, Series } from '@/lib/content'
 
@@ -11,9 +10,7 @@ const tabCls = 'min-h-[44px] rounded-xl text-[15px] font-bold data-[state=active
 
 /* ---------- 社團地圖 ---------- */
 const REGIONS: Region[] = ['north', 'central', 'south', 'east', 'abroad']
-const sx = (lo: number) => 20 + (lo - 120.05) * 0.917 * 120
-const sy = (la: number) => 16 + (25.35 - la) * 120
-const TW_PTS = TAIWAN_LL.map(([lo, la]) => `${sx(lo).toFixed(1)},${sy(la).toFixed(1)}`).join(' ')
+const ClubLeafletMap = lazy(() => import('@/components/ClubLeafletMap'))
 const IG = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
 
 export function ClubMap() {
@@ -28,25 +25,13 @@ export function ClubMap() {
           <button type="button" className="chip" aria-pressed={region === null} onClick={() => setRegion(null)}>全部</button>
           {REGIONS.map(r => <button key={r} type="button" className="chip" aria-pressed={region === r} onClick={() => setRegion(r)}>{REGION_LABEL[r]}</button>)}
         </div>
-        <svg className="tw-map" viewBox="0 0 270 440" role="img" aria-label="台灣服務據點地圖">
-          <polygon points={TW_PTS} fill="rgba(35,31,53,.16)" transform="translate(5 4)" />
-          <polygon points={TW_PTS} fill="#9EB14F" />
-          <polygon points={TW_PTS} fill="none" stroke="#6E8C25" strokeWidth="2" />
-          {CLUBS.flatMap(c => c.sites.filter(s => s.at).map((s, i) => {
-            const on = (!region || s.region === region) && (!pick || pick === c.id)
-            return (
-              <g key={c.id + i} className={'pin' + (pick === c.id ? ' lit' : '')} opacity={on ? 1 : .25} onClick={() => choose(c.id)}>
-                <title>{c.name}：{s.name}</title>
-                <circle cx={sx(s.at![0])} cy={sy(s.at![1])} r="11" fill={c.color} opacity=".35" />
-                <circle cx={sx(s.at![0])} cy={sy(s.at![1])} r="5.5" fill={c.color} stroke="#231F35" strokeWidth="1.6" />
-              </g>
-            )
-          }))}
-        </svg>
+        <Suspense fallback={<div className="osm-wrap"><div className="osm-map osm-loading">地圖載入中…</div></div>}>
+          <ClubLeafletMap clubs={CLUBS} region={region} pick={pick} onPick={id => { setPick(id); setTimeout(() => document.getElementById('club-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50) }} />
+        </Suspense>
         <ul className="legend" aria-label="圖例">
           {CLUBS.map(c => <li key={c.id}><button type="button" aria-pressed={pick === c.id} onClick={() => choose(c.id)}><i style={{ background: c.color }} />{c.name}</button></li>)}
         </ul>
-        <p className="status" style={{ fontSize: 12.5 }}>地圖上的點是大約位置；部分社團的據點每學期更換，沒有標在地圖上。</p>
+        <p className="status" style={{ fontSize: 12.5 }}>點地圖上的圓點看據點介紹；點一下地圖後可以用滑鼠滾輪縮放。部分社團的據點每學期更換，沒有標在地圖上。</p>
       </div>
 
       <div style={{ display: 'grid', gap: 12 }}>

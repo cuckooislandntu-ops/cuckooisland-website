@@ -260,7 +260,7 @@ collections:
   - name: clubs
     label: 社團
     label_singular: 社團
-    description: 社團地圖上的社團與服務據點。
+    description: 社團的基本資料、服務據點和亮點，會出現在社團地圖，也會自動帶進《布穀好朋友》文章。社團的故事、理念和服務介紹，請寫在「專欄文章」。
     folder: content/clubs
     format: json
     extension: json
@@ -285,17 +285,10 @@ collections:
         hint: 例如：營隊、課輔、國際服務
       - { name: color, label: 地圖顏色, widget: color, default: "#9EB14F" }
       - { name: partial, label: 介紹還在整理中, widget: boolean, default: false, hint: 勾選後卡片上會註明「內容可能不完整」。 }
-      - { name: overview, label: 服務介紹, widget: text, required: false }
-      - name: ideals
-        label: 理念目標
-        widget: list
-        required: false
-        field: { name: ideal, label: 理念, widget: text }
       - name: highlights
         label: 社團亮點
         widget: list
         field: { name: highlight, label: 亮點, widget: text }
-      - { name: closing, label: 結語, widget: text, required: false }
       - name: sites
         label: 服務據點
         widget: list
@@ -319,7 +312,7 @@ collections:
   - name: posts
     label: 專欄文章
     label_singular: 文章
-    description: 專欄文章。社團介紹寫在《布穀好朋友》，資源評比寫在《布可不資道》，其他服務故事選「服務故事」。
+    description: 社團介紹寫在《布穀好朋友》（選介紹的社團，資料會自動帶入），資源評比寫在《布可不資道》，其他服務故事選「服務故事」。
     folder: content/posts
     format: json
     extension: json
@@ -340,6 +333,15 @@ collections:
         widget: select
         options: [布穀好朋友, 布可不資道, 服務故事]
         default: 服務故事
+      - name: club
+        label: 介紹的社團
+        widget: relation
+        collection: clubs
+        value_field: "{{slug}}"
+        search_fields: [name]
+        display_fields: [name]
+        required: false
+        hint: 《布穀好朋友》才需要選。選了以後，文章會自動帶出這個社團的小檔案、服務據點和亮點（在「社團」裡編輯），你只要在下面的內文寫服務介紹、理念和故事。
       - { name: ep, label: 集數, widget: string, required: false, hint: 例如：EP.7 }
       - { name: date, label: 發布日期, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
       - { name: title, label: 標題, widget: string }
@@ -351,16 +353,7 @@ collections:
         widget: richtext
         required: false
         editor_components: [photo, photo-row, hr]
-        hint: 插入照片：按工具列的「+」選「照片」（可寫圖說、選大小）或「並排照片」（一次放 2–3 張）。社團介紹文章可以留空，網站會自動排出社團小檔案。
-      - name: club
-        label: 介紹的社團
-        widget: relation
-        collection: clubs
-        value_field: "{{slug}}"
-        search_fields: [name]
-        display_fields: [name]
-        required: false
-        hint: 《布穀好朋友》才需要選。選了以後，文章會自動帶出社團小檔案、據點和亮點。
+        hint: 插入照片：按工具列的「Insert」選「照片」（可寫圖說、選大小）或「並排照片」（一次放 2–3 張）。《布穀好朋友》建議用小標「服務介紹」「理念目標」來寫，社團小檔案、據點和亮點會自動接在後面。
       - name: resources
         label: 文章提到的教學資源
         widget: relation

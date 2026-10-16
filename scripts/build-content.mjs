@@ -105,7 +105,7 @@ const REGIONS = ['north', 'central', 'south', 'east', 'abroad']
 const CLUBS = readDir('clubs').filter(({ file, data }) => str(data.name) || (warn(file, '沒有社團名稱，已略過'), false)).map(({ key, file, data: d }) => ({
   id: key, order: Number(d.order) || 999, name: str(d.name), tagline: str(d.tagline), school: str(d.school), size: str(d.size), ig: str(d.ig).replace(/^@/, ''),
   types: list(d.types), color: /^#[0-9a-f]{3,8}$/i.test(str(d.color)) ? str(d.color) : '#9EB14F', partial: !!d.partial,
-  overview: str(d.overview), ideals: list(d.ideals), highlights: list(d.highlights), closing: str(d.closing),
+  highlights: list(d.highlights),
   sites: (Array.isArray(d.sites) ? d.sites : []).filter(s => str(s?.name)).map(s => {
     const site = { name: str(s.name), detail: str(s.detail) }
     if (REGIONS.includes(str(s.region))) site.region = str(s.region)

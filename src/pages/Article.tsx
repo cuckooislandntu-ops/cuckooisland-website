@@ -69,7 +69,6 @@ export default function Article({ id }: { id: string }) {
       <article className="article-body">
         <div className="article-inner prose">
           {club && <>
-            {post.html && <div className="md" onClick={lb.open} dangerouslySetInnerHTML={{ __html: post.html }} />}
             <p className="lead">{club.name}，{club.tagline}。</p>
             <section>
               <h2>社團小檔案</h2>
@@ -79,25 +78,18 @@ export default function Article({ id }: { id: string }) {
                 <dt>服務形式</dt><dd>{club.types.join('、')}</dd>
               </dl>
             </section>
-            {club.ideals && <section>
-              <h2>理念目標</h2>
-              <ul>{club.ideals.map(x => <li key={x}>{x}</li>)}</ul>
-            </section>}
-            {club.overview && <section>
-              <h2>服務介紹</h2>
-              <p>{club.overview}</p>
-            </section>}
-            <section>
+            {post.html && <div className="md" onClick={lb.open} dangerouslySetInnerHTML={{ __html: post.html }} />}
+            {club.sites.length > 0 && <section>
               <h2>服務據點</h2>
               <ul className="sites">
                 {club.sites.map(s => <li key={s.name}><b>{s.name}{s.region && <em>{REGION_LABEL[s.region]}</em>}</b><span>{s.detail}</span></li>)}
               </ul>
-            </section>
-            <section>
+            </section>}
+            {club.highlights.length > 0 && <section>
               <h2>社團亮點</h2>
               <ul>{club.highlights.map(x => <li key={x}>{x}</li>)}</ul>
-            </section>
-            {club.closing && <blockquote>{club.closing}</blockquote>}
+            </section>}
+            {post.closing && <blockquote>{post.closing}</blockquote>}
             <div className="article-actions">
               <a className="btn primary" href="#map">在社團地圖上看{club.name.replace('台大', '')}</a>
               {club.ig && <a className="ig" href={`https://www.instagram.com/${club.ig}/`} target="_blank" rel="noopener noreferrer"><IG />@{club.ig}</a>}
