@@ -1,0 +1,20 @@
+{
+  "published": true,
+  "added": "2026-10-16",
+  "title": "環境探索館（環境部）",
+  "sub": "SDGs",
+  "url": "https://eeis.moenv.gov.tw/EELib/Default.aspx?type=6",
+  "desc": "主要有環境教育、氣候變遷、災害防救、自然保育等類別的教案",
+  "grade": "",
+  "area": "",
+  "source": "",
+  "review": {
+    "ep": "布可不資道 EP.2 SDGs",
+    "rating": "3",
+    "intro": "環境部建置的網站，以電子圖書館概念，整合多年環保教育的成果。",
+    "themes": "環境教育、氣候變遷、災害防救、自然保育",
+    "provides": "教案、電子書、教學影片",
+    "grades": "國小、國中、高中",
+    "os": ""
+  }
+}
