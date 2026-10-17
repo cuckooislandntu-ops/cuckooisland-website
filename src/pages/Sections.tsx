@@ -1,15 +1,14 @@
 import { Suspense, lazy, useState } from 'react'
 import { Empty, PageShell } from '@/components/Chrome'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { CLUBS, EVENTS, POSTS, REGION_LABEL, SERIES_INFO, STATUS_LABEL, eventStatus, weekday } from '@/lib/content'
 import type { Event, Region, Series } from '@/lib/content'
 import EditLink from '@/components/EditLink'
 import { to } from '@/lib/site'
 import MatchScene, { type Beat } from '@/components/MatchScene'
 import SchoolCampForm from '@/components/SchoolCampForm'
+import { PillTab, PillTabsList } from '@/components/PillTabs'
 
-const tabsListCls = 'grid w-full h-auto p-1 rounded-2xl bg-[#F3E2B8]'
-const tabCls = 'min-h-[44px] rounded-xl text-[15px] font-bold data-[state=active]:bg-[#231F35] data-[state=active]:text-[#D6EC6E]'
 
 
 /* ---------- 社團地圖 ---------- */
@@ -98,10 +97,10 @@ export function Events() {
   return (
     <PageShell kind="events" title="活動" tint="#DDD3F0" lede="交流小聚、幹部培訓與聯合活動的報名資訊，以及過去活動的紀錄。">
       <Tabs defaultValue={coming.length ? 'open' : 'past'}>
-        <TabsList className={tabsListCls + ' grid-cols-2'}>
-          <TabsTrigger value="open" className={tabCls}>報名中・即將舉行</TabsTrigger>
-          <TabsTrigger value="past" className={tabCls}>活動紀錄</TabsTrigger>
-        </TabsList>
+        <PillTabsList cols={2} aria-label="活動分頁">
+          <PillTab value="open">報名中・即將舉行</PillTab>
+          <PillTab value="past">活動紀錄</PillTab>
+        </PillTabsList>
         <TabsContent value="open" className="mt-5" style={{ display: 'grid', gap: 12 }}>
           {coming.map(e => <EventCard key={e.id} e={e} />)}
           {coming.length === 0 && <Empty title="目前沒有開放報名的活動" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer">追蹤 IG，第一時間收到通知</a>}>
@@ -148,11 +147,28 @@ export function Column() {
 }
 
 /* ---------- 需求媒合 ---------- */
-/* 三個角色：學校、企業、教育組織。每個分頁有一段三拍的動畫（beats）、合作重點（items）。文字直接改這裡；
+/* 四個角色：社團、學校、企業、教育組織。每個分頁有一段三拍的動畫（beats）、合作重點（items）。文字直接改這裡；
    動畫畫面在 src/components/MatchScene.tsx，學校的需求表單在 src/components/SchoolCampForm.tsx。 */
 const PARTNERS = {
+  club: {
+    tab: '社團',
+    title: '缺什麼，說出來，島鏈一起接住',
+    lede: '缺講師、缺物資、缺合作的學校……社團不必再一個人扛。把需要說清楚，布穀島社會從企業、教育組織、學校和其他社團裡，找到接得住的人。',
+    beats: [
+      { h: '說出你們的需要', p: '講師、志工、物資、場地，或想找合作的學校。' },
+      { h: '布穀島社串起資源', p: '企業、教育組織和學校，都在同一條島鏈上。' },
+      { h: '不用自己扛了', p: '資源接上之後，社團專心把營隊帶好。' },
+    ],
+    items: [
+      { h: '提出需求', p: '缺講師、志工、物資、器材或場地時，布穀島社協助從會員、合作單位與資料庫裡找。' },
+      { h: '接到學校的營隊邀請', p: '學校在這一頁提出營隊需求，我們會把地區、時間和主題合適的邀請轉給你們。' },
+      { h: '用到改編好的教案', p: '教育組織的課堂教案，可以一起改成適合營隊的版本，混齡、時間更短也能用。' },
+      { h: '加入島鏈，消息先到', p: '會員會優先收到活動與贊助品的消息，也能用布穀島社的名義對外聯絡。' },
+    ],
+    note: '社團的需求表單準備中，現在可以先到 IG 私訊我們。',
+  },
   school: {
-    tab: '給學校',
+    tab: '學校',
     title: '想讓孩子有一場營隊？說說你們的需要',
     lede: '全台有上千個教育服務性社團，每年寒暑假都在找願意一起合作的學校。告訴我們方便的時間、想要的主題和孩子的樣子，我們幫你找到合適的社團。',
     beats: [
@@ -168,7 +184,7 @@ const PARTNERS = {
     note: '每個社團的服務方式、地區與費用不同，配對時會先說明清楚，再由學校決定。',
   },
   company: {
-    tab: '給企業',
+    tab: '企業',
     title: '和社團合作，讓 CSR 落在真實的服務現場',
     lede: '教育服務性社團每年寒暑假都在偏鄉、部落和各地國小帶營隊。企業的投入，可以直接變成孩子身邊的一場營隊、一份教材、一段陪伴。',
     beats: [
@@ -185,7 +201,7 @@ const PARTNERS = {
     note: '合作細節（形式、時數、成果怎麼紀錄）會在媒合時和社團一起確認。',
   },
   org: {
-    tab: '給教育組織',
+    tab: '教育組織',
     title: '讓你們的教材與資源，走進更多營隊',
     lede: '許多優秀的教案與教材是為學校課堂設計的；社團則常常需要好資源，卻不知道去哪裡找。我們幫兩邊接上線。',
     beats: [
@@ -204,23 +220,39 @@ const PARTNERS = {
 } as const
 type PartnerKey = keyof typeof PARTNERS
 const ROLE_KEYS = Object.keys(PARTNERS) as PartnerKey[]
-// 與首頁「一次服務的三個面向」同色：贊助單位金黃、教育組織水藍；學校用首頁孩子的淡紫
-const ROLE_COLOR: Record<PartnerKey, string> = { school: '#B7A6D9', company: '#F7C948', org: '#6FCFD5' }
+// 與首頁「一次服務的三個面向」同色：學生社團鮭魚粉、贊助單位金黃、教育組織水藍；學校用首頁孩子的淡紫
+const ROLE_COLOR: Record<PartnerKey, string> = { club: '#F4A7A0', school: '#B7A6D9', company: '#F7C948', org: '#6FCFD5' }
 const IG_LINK = 'https://www.instagram.com/cuckoo_island/'
 
-function ForPartners({ role, setRole }: { role: PartnerKey; setRole: (r: PartnerKey) => void }) {
+function RoleCta({ k, formOpen, openForm }: { k: PartnerKey; formOpen: boolean; openForm: () => void }) {
+  if (k === 'club') return (
+    <div className="role-cta">
+      <a className="btn primary" href={to('join')}>替社團申請加入</a>
+      <a className="btn ghost" href={IG_LINK} target="_blank" rel="noopener noreferrer">到 IG 私訊提出需求</a>
+    </div>
+  )
+  if (k === 'school') return formOpen
+    ? <div className="sf-wrap"><h3 className="sf-title">學校營隊需求</h3><SchoolCampForm /></div>
+    : <div className="sf-open"><button className="btn primary" type="button" aria-expanded={false} onClick={openForm}>填寫營隊需求</button><span>約 3 分鐘，四個段落，填完會產生一張需求卡</span></div>
+  return <div className="role-cta"><a className="btn primary" href={IG_LINK} target="_blank" rel="noopener noreferrer">到 IG 私訊聊聊合作</a></div>
+}
+
+function Roles({ role, setRole }: { role: PartnerKey; setRole: (r: PartnerKey) => void }) {
   const [formOpen, setFormOpen] = useState(false)
+  const switchTo = (r: PartnerKey) => { setRole(r); requestAnimationFrame(() => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth', block: 'start' })) }
   return (
-    <section id="for-partners" style={{ display: 'grid', gap: 12, scrollMarginTop: 90 }}>
-      <h2>三種角色，一起把營隊帶到孩子身邊</h2>
-      <p className="section-lede" style={{ marginTop: -6 }}>學校、企業和教育組織，各自可以怎麼和教育服務性社團合作。</p>
+    <section id="roles" className="roles" aria-labelledby="roles-title">
+      <div>
+        <h2 id="roles-title">你是哪一種角色？</h2>
+        <p className="section-lede">選一個，看看可以怎麼和教育服務性社團一起合作。</p>
+      </div>
       <Tabs value={role} onValueChange={v => setRole(v as PartnerKey)}>
-        <TabsList className={tabsListCls + ' grid-cols-3'}>
-          {ROLE_KEYS.map(k => <TabsTrigger key={k} value={k} className={tabCls}><i className="role-dot" style={{ background: ROLE_COLOR[k] }} aria-hidden="true" />{PARTNERS[k].tab}</TabsTrigger>)}
-        </TabsList>
+        <PillTabsList cols={ROLE_KEYS.length} aria-label="選擇你的角色" className="role-tabs">
+          {ROLE_KEYS.map(k => <PillTab key={k} value={k}><i className="role-dot" style={{ background: ROLE_COLOR[k] }} aria-hidden="true" />{PARTNERS[k].tab}</PillTab>)}
+        </PillTabsList>
         {ROLE_KEYS.map(k => { const d = PARTNERS[k]; return (
           <TabsContent key={k} value={k} className="mt-5">
-            <div className={"sheet partner-sheet role-" + k}>
+            <div className={'sheet partner-sheet role-' + k}>
               <h3>{d.title}</h3>
               <p className="partner-lede">{d.lede}</p>
               <MatchScene role={k} beats={d.beats as unknown as Beat[]} label={d.tab + '的合作流程：' + d.beats.map(b => b.h).join('、')} />
@@ -228,12 +260,14 @@ function ForPartners({ role, setRole }: { role: PartnerKey; setRole: (r: Partner
                 {d.items.map(it => <li key={it.h}><b>{it.h}</b><span>{it.p}</span></li>)}
               </ul>
               <p className="status">{d.note}</p>
-              {k === 'school'
-                ? (formOpen
-                    ? <div className="sf-wrap"><h3 className="sf-title">學校營隊需求</h3><SchoolCampForm /></div>
-                    : <div className="sf-open"><button className="btn primary" type="button" aria-expanded={false} onClick={() => setFormOpen(true)}>填寫營隊需求</button><span>約 3 分鐘，四個段落，填完會產生一張需求卡</span></div>)
-                : <div><a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={IG_LINK} target="_blank" rel="noopener noreferrer">到 IG 私訊聊聊合作</a></div>}
+              <RoleCta k={k} formOpen={formOpen} openForm={() => setFormOpen(true)} />
             </div>
+            <nav className="role-others" aria-label="看看其他角色">
+              <span>看看其他角色</span>
+              {ROLE_KEYS.filter(o => o !== k).map(o => (
+                <button key={o} type="button" className="chip" onClick={() => switchTo(o)}><i className="role-dot" style={{ background: ROLE_COLOR[o] }} aria-hidden="true" />{PARTNERS[o].tab}</button>
+              ))}
+            </nav>
           </TabsContent>
         ) })}
       </Tabs>
@@ -242,41 +276,25 @@ function ForPartners({ role, setRole }: { role: PartnerKey; setRole: (r: Partner
 }
 
 export function Match() {
-  const [msg, setMsg] = useState('')
   const [role, setRole] = useState<PartnerKey>(() => {
-    try { const r = new URLSearchParams(window.location.search).get('role'); return r && r in PARTNERS ? (r as PartnerKey) : 'school' } catch { return 'school' }
+    try { const r = new URLSearchParams(window.location.search).get('role'); return r && r in PARTNERS ? (r as PartnerKey) : 'club' } catch { return 'club' }
   })
-  const soon = () => setMsg('社團的媒合表單準備中，上線前可以先到 IG 私訊我們。')
-  const goRole = (r: PartnerKey) => { setRole(r); setTimeout(() => document.getElementById('for-partners')?.scrollIntoView({ behavior: 'smooth' }), 30) }
   return (
-    <PageShell kind="match" title="服務需求媒合" tint="#BFE3E6" lede="社團、學校和資源單位，在這裡找到彼此。">
-      <div className="paths">
-        <div className="path" style={{ background: 'var(--ink)', color: 'var(--cream)' }}>
-          <h3 style={{ color: 'var(--lime)' }}>我需要幫忙</h3>
-          <p>給社團或服務學校。</p>
-          <ul><li>缺講師、缺志工</li><li>缺物資、器材或場地</li><li>學校想辦一場營隊</li></ul>
-          <button className="path-more on-dark" type="button" onClick={() => goRole('school')}>學校：填寫營隊需求</button>
-          <button className="btn" style={{ background: 'var(--lime)', color: 'var(--ink)', marginTop: 6 }} type="button" onClick={soon}>社團：提出需求</button>
-        </div>
-        <div className="path" style={{ background: 'var(--cream)', boxShadow: 'var(--shadow-riso)' }}>
-          <h3>我可以提供</h3>
-          <p>給企業、教育組織、講師或個人。</p>
-          <ul><li>經費、物資、場地</li><li>教案、教材或專業分享</li><li>員工志工與長期合作</li></ul>
-          <button className="path-more" type="button" onClick={() => goRole('company')}>企業的合作方式</button>
-          <button className="path-more" type="button" onClick={() => goRole('org')}>教育組織的合作方式</button>
-        </div>
-      </div>
-      <p className="status" role="status" aria-live="polite">{msg}</p>
-      <ForPartners role={role} setRole={setRole} />
-      <div>
-        <h2>媒合怎麼進行</h2>
+    <PageShell kind="match" title="服務需求媒合" tint="#BFE3E6" lede="社團、學校、企業和教育組織，在這裡找到彼此。">
+      <Roles role={role} setRole={setRole} />
+      <section aria-labelledby="how-title">
+        <h2 id="how-title">媒合怎麼進行</h2>
+        <p className="section-lede">不論你是哪一種角色，都是這四步。</p>
         <ol className="steps" style={{ marginTop: 12 }}>
-          <li><div><b>填寫需求或資源</b><span>說明需要什麼、什麼時候、在哪裡。</span></div></li>
-          <li><div><b>布穀島社協助配對</b><span>從會員與資料庫裡找合適的對象。</span></div></li>
-          <li><div><b>雙方直接對接</b><span>確認細節後，由雙方約好合作方式。</span></div></li>
-          <li><div><b>完成後分享回饋</b><span>留下紀錄，讓下一次媒合更順利。</span></div></li>
+          <li><div><b>說出需要或可以提供的</b><span>需要什麼、什麼時候、在哪裡；或能提供什麼資源。</span></div></li>
+          <li><div><b>布穀島社協助配對</b><span>從島鏈的社團、合作單位與資料庫裡，找合適的對象。</span></div></li>
+          <li><div><b>雙方直接對接</b><span>我們介紹雙方認識，細節由你們一起約定。</span></div></li>
+          <li><div><b>完成後分享回饋</b><span>留下紀錄與心得，讓下一次媒合更順利。</span></div></li>
         </ol>
-      </div>
+      </section>
+      <Empty title="還不確定自己適合哪一種？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={IG_LINK} target="_blank" rel="noopener noreferrer">到 IG 私訊我們</a>}>
+        講師、個人志工，或想用其他方式支持教育服務性社團，都歡迎直接聊聊。
+      </Empty>
     </PageShell>
   )
 }

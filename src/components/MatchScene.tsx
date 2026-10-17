@@ -7,7 +7,7 @@ import { LOGO_SRC } from '@/lib/logo'
    動畫只用 transform／opacity，由外層的 on1/on2/on3 class 觸發，樣式在 index.css「需求媒合：三拍動畫」。
    每一拍的標題與說明在 Sections.tsx 的 PARTNERS。 */
 
-export type SceneRole = 'school' | 'company' | 'org'
+export type SceneRole = 'club' | 'school' | 'company' | 'org'
 export type Beat = { h: string; p: string }
 
 const BEAT_MS = 3000
@@ -74,6 +74,7 @@ export default function MatchScene({ role, beats, label }: { role: SceneRole; be
           {role === 'school' && <SchoolScene moving={moving} />}
           {role === 'company' && <CompanyScene moving={moving} />}
           {role === 'org' && <OrgScene moving={moving} />}
+          {role === 'club' && <ClubScene moving={moving} />}
         </svg>
       </div>
       <div className="ms-side">
@@ -294,7 +295,7 @@ function SchoolScene({ moving }: { moving: boolean }) {
         <rect x="36" y="121" width="8" height="7" fill={C.aqua} /><rect x="66" y="121" width="8" height="7" fill={C.aqua} />
       </g>
       {/* 社團：第三拍沿著串聯線來到學校，站在孩子後面（同首頁結尾） */}
-      <g className="ms-club">
+      <g className="ms-crew">
         {[-17, 0, 17].map((dx, i) => <Person key={dx} x={R.cx + dx} y={top(R, R.cx + dx)} s={0.22} col={C.salmon} item={i === 1 ? 'flag' : null} arms={i === 1 ? 'up' : 'down'} smileOn="always" />)}
       </g>
       {/* 老師與孩子 */}
@@ -424,7 +425,58 @@ function OrgScene({ moving }: { moving: boolean }) {
       <Tag x={150} y={142} text="課堂 40 分鐘" cls="b1 only" />
       <Tag x={192} y={128} text="營隊版・混齡・短時" cls="b2 only late" />
       <Bubble x={98} y={98} text="這些教案，誰用得上？" cls="b1" />
-      <Bubble x={304} y={114} text="教案影響力UP！" cls="b3 last" bg={C.lime} />
+      <Bubble x={304} y={114} text="大孩子小孩子都能玩！" cls="b3 last" bg={C.lime} />
+    </g>
+  )
+}
+
+/* ================= 社團：說出需要 → 布穀島社串起資源 → 不用自己扛了 =================
+   接住首頁第 2 段「所有壓力，都得一個社團自己扛」。 */
+function ClubScene({ moving }: { moving: boolean }) {
+  const M: Isle = { cx: 180, base: 172, w: 176, h: 26 }
+  const G: Isle = { cx: 54, base: 92, w: 84, h: 12 }, T: Isle = { cx: 306, base: 92, w: 84, h: 12 }, S: Isle = { cx: 316, base: 176, w: 76, h: 12 }
+  const paths = {
+    gold: 'M72 64Q120 34 166 52L180 110',
+    teal: 'M288 64Q240 34 194 52L180 110',
+    school: 'M300 150Q258 92 194 66L180 110',
+  }
+  return (
+    <g>
+      <Sky id="cl" night={['#6E7A96', '#3A3556']} dawn={['#F4A7A0', '#F7D7A0']} stars />
+      <Glow id="cl-glow" color={C.lime} />
+      <Sea y={150} id="cl-sea" />
+      <Islet {...M} />
+      {/* 島鏈上的其他角色：一開始在遠處，第二拍亮起來 */}
+      <g className="ms-src">
+        <Islet {...G} />
+        <Person x={54} y={top(G, 54)} s={0.22} col={C.gold} arms="hold" item="box" smileOn="always" />
+        <Tag x={54} y={102} text="企業" />
+        <Islet {...T} />
+        <Person x={306} y={top(T, 306)} s={0.22} col={C.teal} arms="hold" item="book" smileOn="always" />
+        <Tag x={306} y={102} text="教育組織" />
+        <Islet {...S} />
+        <g transform="translate(316 168) scale(.5) translate(-55 -148)">
+          <rect x="34" y="117" width="50" height="34" fill={SH} />
+          <rect x="30" y="114" width="50" height="34" fill={C.cream} />
+          <path d="M24 116L55 94L86 116Z" fill={C.coral} />
+          <rect x="49" y="128" width="12" height="20" fill={C.ink} />
+          <rect x="36" y="121" width="8" height="7" fill={C.aqua} /><rect x="66" y="121" width="8" height="7" fill={C.aqua} />
+        </g>
+        <Tag x={316} y={186} text="學校" />
+      </g>
+      {/* 串聯線，第三拍資源沿線流進社團 */}
+      <Link d={paths.gold} cls="l2" moving={moving} dots={2} color={C.lime} />
+      <Link d={paths.teal} cls="l2" moving={moving} dots={2} color={C.lime} />
+      <Link d={paths.school} cls="l2" moving={moving} dots={2} color={C.lime} />
+      <g className="ms-flow">{moving && ([[paths.gold, C.gold], [paths.teal, C.aqua], [paths.school, C.lilac]] as [string, string][]).flatMap(([d, col], j) => [0, 1, 2].map(i => (
+        <circle key={j + '-' + i} r="3.8" fill={col}><animateMotion dur="2s" begin={-(i * 0.66 + j * 0.2) + 's'} repeatCount="indefinite" path={d} /></circle>
+      )))}</g>
+      <Badge x={180} y={52} id="cl-logo" cls="b2" />
+      {/* 你們的社團 */}
+      {[154, 180, 206].map((x, i) => <Person key={x} x={x} y={top(M, x)} s={0.32} col={C.salmon} item={i === 1 ? 'flag' : null} arms={i === 1 ? 'up' : 'down'} smileOn="on3" cls={'kid' + (i % 2 ? ' k2' : '')} glow="cl-glow" />)}
+      <Tag x={180} y={188} text="你們的社團" />
+      <Bubble x={180} y={112} text="缺講師、缺物資、缺合作學校……" cls="b1" />
+      <Bubble x={180} y={112} text="這次，不用自己扛了！" cls="b3 last" bg={C.lime} />
     </g>
   )
 }

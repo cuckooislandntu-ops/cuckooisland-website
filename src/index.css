@@ -749,6 +749,7 @@ details.hb-help { padding: 0; }
 
 /* ================= 需求媒合 =================
    三個角色的代表色沿用首頁「一次服務的三個面向」：贊助單位＝金黃、教育組織＝水藍；學校用首頁孩子的淡紫。 */
+.role-club { --role: #F4A7A0; }
 .role-school { --role: #B7A6D9; }
 .role-company { --role: #F7C948; }
 .role-org { --role: #6FCFD5; }
@@ -787,7 +788,7 @@ details.hb-help { padding: 0; }
 
 .ms * { transition-property: transform, opacity; transition-duration: .8s; transition-timing-function: cubic-bezier(.3, .7, .3, 1); }
 .ms.rewind * { transition-duration: .4s !important; transition-delay: 0s !important; }
-.ms.rewind .ms-club, .ms.rewind .ms-photo { animation: none !important; }
+.ms.rewind .ms-crew, .ms.rewind .ms-photo { animation: none !important; }
 .ms-sea { animation: ms-drift 5s ease-in-out infinite alternate; }
 @keyframes ms-drift { to { transform: translateX(-14px); } }
 .ms-dash { animation: ms-dash 1.2s linear infinite; }
@@ -829,7 +830,7 @@ details.hb-help { padding: 0; }
 .ms.on3 .kid.late { opacity: 1; transition-delay: .9s; }
 
 /* 學校：社團沿著串聯線來到學校，站到孩子後面 */
-.ms-school.on3 .ms-club { transform: translate(-160px, 22px); animation: ms-cross 1.8s cubic-bezier(.45, .05, .35, 1) both; }
+.ms-school.on3 .ms-crew { transform: translate(-160px, 22px); animation: ms-cross 1.8s cubic-bezier(.45, .05, .35, 1) both; }
 @keyframes ms-cross { 0% { transform: none; } 50% { transform: translate(-80px, -36px); } 100% { transform: translate(-160px, 22px); } }
 .ms-school.on3 .l2 { opacity: .4; transition-delay: 1.6s; }
 
@@ -910,3 +911,36 @@ details.hb-help { padding: 0; }
 @media (prefers-reduced-motion: reduce) { .sf-result { animation: none; } }
 .partner-list li { align-content: start; }
 .partner-sheet > div > a.btn { display: inline-flex; padding: 0 22px; }
+/* 社團：其他角色先在遠處，第二拍亮起來 */
+.ms-club .ms-src { opacity: .45; }
+.ms-club.on2 .ms-src { opacity: 1; }
+.ms-club.on3 .l2 { opacity: .5; }
+
+/* ================= 膠囊分頁（PillTabs.tsx） =================
+   深色滑塊滑到選中的選項，帶一點回彈；文字顏色跟著換。 */
+.pill-tabs { position: relative; display: grid; width: 100%; padding: 4px; gap: 0; border-radius: 18px; background: var(--paper-2); isolation: isolate; }
+.pill-thumb { position: absolute; left: 0; top: 0; z-index: 0; border-radius: 14px; background: var(--ink); box-shadow: 3px 4px 0 rgba(35, 31, 53, .16); pointer-events: none; will-change: transform; }
+.pill-tabs.ready .pill-thumb { transition: transform .42s cubic-bezier(.34, 1.4, .5, 1), opacity .2s; }
+.pill-tab { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 6px; border: 0; border-radius: 14px; background: transparent; color: var(--ink-soft); font-family: var(--sans); font-size: 15px; font-weight: 700; white-space: nowrap; cursor: pointer; transition: color .25s; -webkit-tap-highlight-color: transparent; }
+.pill-tab[data-state="active"] { color: var(--lime); }
+.pill-tab:not([data-state="active"]):hover { color: var(--ink); }
+.pill-tab:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
+.pill-tab:active .role-dot { transform: scale(.8); }
+.pill-tab .role-dot { transition: transform .2s; }
+@media (max-width: 400px) { .role-tabs .pill-tab { font-size: 14px; } .role-tabs .role-dot { width: 8px; height: 8px; margin-right: 5px; } }
+/* 切換後的內容淡入 */
+[role="tabpanel"][data-state="active"] { animation: panel-in .38s cubic-bezier(.3, .7, .3, 1); }
+@keyframes panel-in { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) {
+  .pill-tabs.ready .pill-thumb { transition: none; }
+  [role="tabpanel"][data-state="active"] { animation: none; }
+}
+
+/* 需求媒合：頁面流程 */
+.roles { display: grid; gap: 14px; scroll-margin-top: 84px; }
+.roles h2 { font-size: clamp(22px, 6vw, 28px); }
+.role-cta { display: grid; gap: 10px; }
+@media (min-width: 560px) { .role-cta { display: flex; flex-wrap: wrap; } .role-cta .btn { padding: 0 22px; } }
+.role-others { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
+.role-others > span { width: 100%; font-size: 14px; color: var(--ink-soft); }
+.role-others .chip { min-height: 44px; }

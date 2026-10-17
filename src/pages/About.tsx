@@ -5,7 +5,8 @@ import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { PageShell } from '@/components/Chrome'
 import Construction from '@/components/Construction'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
+import { PillTab, PillTabsList } from '@/components/PillTabs'
 import { to } from '@/lib/site'
 
 const HOLES = [
@@ -43,8 +44,6 @@ function Fact({ q, a, tint, i }: { q: string; a: ReactNode; tint: string; i: num
   )
 }
 
-const tabsListCls = 'grid w-full grid-cols-3 h-auto p-1 rounded-2xl bg-[#F3E2B8]'
-const tabCls = 'min-h-[44px] rounded-xl text-[15px] font-bold data-[state=active]:bg-[#231F35] data-[state=active]:text-[#D6EC6E]'
 
 export default function About() {
   const [tab, setTab] = useState('story')
@@ -62,11 +61,11 @@ export default function About() {
     <PageShell kind="about" title="關於布穀島社" tint="#E6F1B5" lede="一群也在社團裡扛過的人，想把一座座孤島，連成島鏈。">
       <Tabs value={tab} onValueChange={change} style={{ display: 'grid', gap: 30 }}>
         <div className="about-tabs">
-          <TabsList className={tabsListCls} aria-label="關於我們的分頁">
-            <TabsTrigger value="story" className={tabCls}>我們的故事</TabsTrigger>
-            <TabsTrigger value="team" className={tabCls}>團隊成員</TabsTrigger>
-            <TabsTrigger value="thanks" className={tabCls}>感謝名單</TabsTrigger>
-          </TabsList>
+          <PillTabsList cols={3} aria-label="關於我們的分頁">
+            <PillTab value="story">我們的故事</PillTab>
+            <PillTab value="team">團隊成員</PillTab>
+            <PillTab value="thanks">感謝名單</PillTab>
+          </PillTabsList>
         </div>
         <TabsContent value="story" className="mt-0" style={{ display: 'grid', gap: 30 }}>
         <figure className="vision">
