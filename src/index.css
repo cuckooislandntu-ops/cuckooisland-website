@@ -728,3 +728,10 @@ details.hb-help { padding: 0; }
 
 /* 關於我們的分頁 */
 .about-tabs { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 60px); z-index: 5; margin: -6px 0 0; padding: 8px 0; background: var(--paper); background-image: var(--grain); background-size: 256px 256px; }
+
+/* 手冊封面圖（後台「經營手冊 → 封面圖」） */
+.hb-cover-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.hb-cover.on-img { background: linear-gradient(180deg, rgba(255, 253, 246, .9) 0, rgba(255, 253, 246, 0) 34%, rgba(255, 253, 246, 0) 58%, rgba(255, 253, 246, .92) 80%); }
+.hb-cover.hidden-text { display: none; }
+.hb-book button:has(.hb-cover-img)::before { opacity: .25; }
+.hb-spine { z-index: 2; } .hb-cover { z-index: 1; } .hb-cover-new { z-index: 3; }

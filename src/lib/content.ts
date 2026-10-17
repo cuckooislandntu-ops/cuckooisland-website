@@ -30,7 +30,7 @@ export type Event = {
 }
 
 export type HandbookFile = { title: string; url: string; date: string; scenes: string[] }
-export type Chapter = { title: string; tag: string; desc: string; points: string[]; files: HandbookFile[] }
+export type Chapter = { title: string; tag: string; desc: string; points: string[]; files: HandbookFile[]; cover: string; coverText: boolean }
 const data = raw as unknown as { ENTRIES: Entry[]; CLUBS: Club[]; POSTS: Post[]; EVENTS: Event[]; SETTINGS: { joinFormUrl: string; joinFormEmbed: string; handbookUrl: string; chapters: Chapter[] } }
 
 export const ENTRIES = data.ENTRIES

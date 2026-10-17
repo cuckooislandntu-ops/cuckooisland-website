@@ -1,6 +1,6 @@
 // 經營手冊頁：「教育服務性社團生存指南」
 // ① 夜晚的荒島封面（火堆旁讀手冊的人、用炭畫上笑臉的椰子朋友）
-// ② 書櫃：點章節名稱或左右滑動，一本一章；每章底下是一份份 Google 文件（後台「網站設定 → 經營手冊章節」編輯）
+// ② 書櫃：點章節名稱或左右滑動，一本一章；每章底下是一份份 Google 文件（後台「經營手冊」編輯，可換封面圖）
 // ③ 使用說明
 // 手冊內容只放在 Google 雲端給會員看，這裡只有章節名稱和連結。
 import { useEffect, useRef, useState } from 'react'
@@ -14,12 +14,12 @@ import { to } from '@/lib/site'
 const RM = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
 export const DEFAULT_CHAPTERS: Chapter[] = [
-  { title: '招生與幹部培訓', tag: '生火', desc: '怎麼找到人、怎麼留住人。', points: ['招生文案與社博擺攤', '幹部分工怎麼排', '新幹部培訓流程'], files: [] },
-  { title: '經費申請與核銷', tag: '找水源', desc: '補助計畫、預算表、收據整理。', points: ['常見的補助與贊助管道', '預算表怎麼編', '核銷與收據整理'], files: [] },
-  { title: '教案與課程設計', tag: '搭營地', desc: '從教學目標到教案，附範本。', points: ['教學目標怎麼訂', '教案寫法與範本', '試教與修改'], files: [] },
-  { title: '營隊安全與保險', tag: '避開危險', desc: '行前檢核、緊急應變、保險。', points: ['行前安全檢核表', '受傷、走失時怎麼處理', '保險怎麼保、保多少'], files: [] },
-  { title: '與服務學校溝通', tag: '打信號', desc: '從第一次聯絡，到活動結束後的回饋。', points: ['第一封聯絡信怎麼寫', '行前要確認的事', '結束後的感謝與回饋'], files: [] },
-  { title: '交接', tag: '留地圖', desc: '這一屆該留下什麼給下一屆。', points: ['交接清單', '帳號、檔案與財產', '寫給下一屆的話'], files: [] },
+  { title: '招生與幹部培訓', tag: '生火', desc: '怎麼找到人、怎麼留住人。', points: ['招生文案與社博擺攤', '幹部分工怎麼排', '新幹部培訓流程'], files: [], cover: '', coverText: true },
+  { title: '經費申請與核銷', tag: '找水源', desc: '補助計畫、預算表、收據整理。', points: ['常見的補助與贊助管道', '預算表怎麼編', '核銷與收據整理'], files: [], cover: '', coverText: true },
+  { title: '教案與課程設計', tag: '搭營地', desc: '從教學目標到教案，附範本。', points: ['教學目標怎麼訂', '教案寫法與範本', '試教與修改'], files: [], cover: '', coverText: true },
+  { title: '營隊安全與保險', tag: '避開危險', desc: '行前檢核、緊急應變、保險。', points: ['行前安全檢核表', '受傷、走失時怎麼處理', '保險怎麼保、保多少'], files: [], cover: '', coverText: true },
+  { title: '與服務學校溝通', tag: '打信號', desc: '從第一次聯絡，到活動結束後的回饋。', points: ['第一封聯絡信怎麼寫', '行前要確認的事', '結束後的感謝與回饋'], files: [], cover: '', coverText: true },
+  { title: '交接', tag: '留地圖', desc: '這一屆該留下什麼給下一屆。', points: ['交接清單', '帳號、檔案與財產', '寫給下一屆的話'], files: [], cover: '', coverText: true },
 ]
 const COVERS = ['#F06A5A', '#F7C948', '#9EB14F', '#4FB5C0', '#B7A6D9', '#F4A7A0']
 
@@ -375,10 +375,11 @@ function Shelf({ chapters, innerRef, onNoUrl }: { chapters: Chapter[]; innerRef:
               <button type="button" onClick={() => goTo(i, { reveal: i === active })} aria-label={`第 ${i + 1} 章：${c.title}${c.files.length ? `，${c.files.length} 份檔案` : ''}`} aria-current={i === active || undefined} tabIndex={i === active ? 0 : -1}>
                 <span className="hb-spine" aria-hidden="true" />
                 {c.files.some(f => isNew(f.date)) && <span className="hb-cover-new" aria-hidden="true">新</span>}
-                <span className="hb-cover" aria-hidden="true">
+                {c.cover && <img className="hb-cover-img" src={c.cover} alt="" loading="lazy" decoding="async" draggable={false} />}
+                <span className={'hb-cover' + (c.cover ? ' on-img' : '') + (c.cover && !c.coverText ? ' hidden-text' : '')} aria-hidden="true">
                   <span className="hb-no">{String(i + 1).padStart(2, '0')}</span>
                   {c.tag && <span className="hb-tag">{c.tag}</span>}
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{ICONS[look(c, i)]}</svg>
+                  {c.cover ? <span /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{ICONS[look(c, i)]}</svg>}
                   <span className="hb-ttl">{c.title}</span>
                   <span className="hb-imprint"><span>生存指南・布穀島社</span>{c.files.length > 0 && <span>{c.files.length} 份</span>}</span>
                 </span>
@@ -418,7 +419,7 @@ function Shelf({ chapters, innerRef, onNoUrl }: { chapters: Chapter[]; innerRef:
           <p className="hb-note">會員限定：請用申請加入時留的 Google 帳號登入。</p>
         </div>
       )}
-      <EditLink collection="settings" id="site" label="在後台編輯章節與檔案" />
+      <EditLink collection="handbook" label="在後台編輯章節、封面與檔案" />
     </section>
   )
 }

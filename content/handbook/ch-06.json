@@ -1,0 +1,15 @@
+{
+  "published": true,
+  "order": 6,
+  "title": "交接",
+  "tag": "留地圖",
+  "desc": "這一屆該留下什麼給下一屆。",
+  "points": [
+    "交接清單",
+    "帳號、檔案與財產",
+    "寫給下一屆的話"
+  ],
+  "cover": "",
+  "coverText": true,
+  "files": []
+}

@@ -144,20 +144,25 @@ const EVENTS = readDir('events').filter(({ file, data }) => (str(data.title) && 
 // ---------- 網站設定 ----------
 let SETTINGS = {}
 try { SETTINGS = JSON.parse(fs.readFileSync(path.join(CONTENT, 'settings.json'), 'utf8')) } catch (e) { warn('content/settings.json', `讀不到（${e.message}），使用預設值`) }
-// 經營手冊書櫃的章節：後台沒填就用網站預設（src/pages/Handbook.tsx 的 DEFAULT_CHAPTERS）
-const chapters = (Array.isArray(SETTINGS.chapters) ? SETTINGS.chapters : []).map((c, i) => {
+// ---------- 經營手冊 ----------
+// 書櫃上的書：後台「經營手冊」一章一筆（content/handbook/）。沒有的話用舊的 settings.chapters，再沒有就用網站預設（src/pages/Handbook.tsx 的 DEFAULT_CHAPTERS）
+function chapter(c, file, i) {
+  const name = str(c?.title) || `第 ${i + 1} 章`
   const files = (Array.isArray(c?.files) ? c.files : []).map(f => ({ title: str(f?.title), url: str(f?.url), date: date(f?.date),
     scenes: (Array.isArray(f?.scenes) ? f.scenes : []).map(str).filter(Boolean) })).filter(f => {
     if (f.title && f.url) return true
-    if (f.title || f.url) warn('content/settings.json', `手冊「${str(c?.title)}」有一份檔案缺少${f.title ? '網址' : '名稱'}，已略過`)
+    if (f.title || f.url) warn(file, `手冊「${name}」有一份檔案缺少${f.title ? '網址' : '名稱'}，已略過`)
     return false
   })
   if (!files.length && str(c?.url)) files.push({ title: str(c?.title), url: str(c.url), date: '', scenes: [] }) // 舊格式：一章一個網址
   const ch = { title: str(c?.title), tag: str(c?.tag), desc: str(c?.desc), files,
-    points: (Array.isArray(c?.points) ? c.points : typeof c?.points === 'string' ? c.points.split(/[\n,，、]/) : []).map(str).filter(Boolean) }
-  if (!ch.title) warn('content/settings.json', `手冊第 ${i + 1} 章沒有章節名稱，已略過`)
+    points: (Array.isArray(c?.points) ? list(c.points) : typeof c?.points === 'string' ? c.points.split(/[\n,，、]/).map(str).filter(Boolean) : []),
+    cover: media(c?.cover, file), coverText: c?.coverText !== false }
+  if (!ch.title) warn(file, `手冊第 ${i + 1} 章沒有章節名稱，已略過`)
   return ch
-}).filter(c => c.title)
+}
+const fromAdmin = readDir('handbook').sort((x, y) => (Number(x.data.order) || 999) - (Number(y.data.order) || 999)).map(({ file, data }, i) => chapter(data, file, i))
+const chapters = (fromAdmin.length ? fromAdmin : (Array.isArray(SETTINGS.chapters) ? SETTINGS.chapters : []).map((c, i) => chapter(c, 'content/settings.json', i))).filter(c => c.title)
 SETTINGS = { joinFormUrl: str(SETTINGS.joinFormUrl) || 'https://forms.gle/Qm3Nj9ytpMLVAHbWA', joinFormEmbed: str(SETTINGS.joinFormEmbed), handbookUrl: str(SETTINGS.handbookUrl), chapters }
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true })
