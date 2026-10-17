@@ -34,7 +34,7 @@ export default function Join() {
     <PageShell kind="join" title="加入布穀島" tint="#F9D3C9"
       lede="島鏈計畫會員申請。每個服務性社團都是一座島，加入島鏈，讓資源流通、經驗傳遞，一起發揮 1+1>2 的影響力。">
       <ol className="flow-steps" aria-label="申請流程">
-        <li>填寫申請表單，約 3 分鐘</li>
+        <li>填寫申請表單，約 15 分鐘</li>
         <li>填寫社團訪談文件</li>
         <li>布穀島夥伴聯絡確認，正式加入島鏈</li>
       </ol>

@@ -153,7 +153,7 @@ export default function Home({ onTone }: { onTone: (t: 'light' | 'dark') => void
               <p className="vision">願有一天，每座投入教育的島嶼，都能突破圈層限制，形成彼此支持的島鏈。</p>
               <h2>成為島鏈的一份子</h2>
               <ol className="join-steps">
-                <li><b>填寫會員申請表單</b><span>約 3 分鐘，社團、資源單位或個人都可以申請。</span></li>
+                <li><b>填寫會員申請表單</b><span>約 15 分鐘，社團、資源單位或個人都可以申請。</span></li>
                 <li><b>填寫社團訪談文件</b><span>分享你們的做法和真正需要的支持，經你們審稿後才會公開。</span></li>
                 <li><b>正式加入島鏈</b><span>收到整理好的教案、贊助資訊與講師名單，也能看到其他社團的經驗整理。</span></li>
               </ol>
