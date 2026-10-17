@@ -741,3 +741,8 @@ details.hb-help { padding: 0; }
 .stage-count { margin: 0; display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 14px 7px; border-radius: 18px; background: var(--cream); color: var(--ink);
   font-size: 14px; box-shadow: var(--shadow-riso); }
 .stage-count b { font-family: var(--kai); font-size: 26px; line-height: 1.15; font-variant-numeric: tabular-nums; text-align: right; transition: color .5s; }
+
+/* 首頁最後的加入區：先對社團說話，其他人一行帶過 */
+.panel-lede { margin: 6px 0 0; font-size: 16px; line-height: 1.7; color: var(--ink-soft); }
+.panel-others { margin: 2px 0 0; padding-top: 12px; border-top: 1px solid rgba(35, 31, 53, .12); font-size: 14.5px; color: var(--ink-soft); }
+.panel-others a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; }

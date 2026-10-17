@@ -151,16 +151,18 @@ export default function Home({ onTone }: { onTone: (t: 'light' | 'dark') => void
           <div className="copy">
             <div className="panel rv">
               <p className="vision">願有一天，每座投入教育的島嶼，都能突破圈層限制，形成彼此支持的島鏈。</p>
-              <h2>成為島鏈的一份子</h2>
+              <h2>你在教育服務性社團嗎？</h2>
+              <p className="panel-lede">帶營隊、課輔、偏鄉或國際教育服務的社團，歡迎一起加入島鏈。</p>
               <ol className="join-steps">
-                <li><b>填寫會員申請表單</b><span>約 15 分鐘，社團、資源單位或個人都可以申請。</span></li>
+                <li><b>填寫會員申請表單</b><span>約 15 分鐘，由社團幹部代表填寫。</span></li>
                 <li><b>填寫社團訪談文件</b><span>分享你們的做法和真正需要的支持，經你們審稿後才會公開。</span></li>
                 <li><b>正式加入島鏈</b><span>收到整理好的教案、贊助資訊與講師名單，也能看到其他社團的經驗整理。</span></li>
               </ol>
               <div className="btns">
-                <a className="btn primary" href={to('join')}>申請加入島鏈</a>
+                <a className="btn primary" href={to('join')}>替社團申請加入</a>
                 <a className="btn ghost" href={to('resources')}>先逛逛資料庫</a>
               </div>
+              <p className="panel-others">是資源單位、講師或個人？也可以<a href={to('join')}>申請加入</a>，或到<a href={to('match')}>需求媒合</a>提供資源。</p>
               <p style={{ margin: 0 }}><a className="ig" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a><a className="about-link" href={to('about')}>認識布穀島社</a></p>
             </div>
           </div>
