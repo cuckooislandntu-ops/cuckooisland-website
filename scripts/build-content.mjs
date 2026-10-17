@@ -132,12 +132,21 @@ const POSTS = readDir('posts').filter(({ file, data }) => str(data.title) || (wa
   }
 }).sort((a, b) => (b.date || '0').localeCompare(a.date || '0') || b.id.localeCompare(a.id))
 
+// ---------- 活動 ----------
+const md = (v, file) => { let h = marked.parse(str(v)); if (INLINE) h = h.replace(/src="(\/[^"]+)"/g, (_, s) => `src="${media(s, file)}"`); return h }
+const EVENTS = readDir('events').filter(({ file, data }) => (str(data.title) && date(data.date)) || (warn(file, '沒有活動名稱或日期，已略過'), false)).map(({ key, file, data: d }) => ({
+  id: /^event-[a-z0-9-]+$/.test(key) ? key : 'event-' + key.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+  title: str(d.title), ep: str(d.ep), type: str(d.type) || '活動', date: date(d.date), time: str(d.time), place: str(d.place),
+  audience: str(d.audience), quota: str(d.quota), fee: str(d.fee), signupUrl: str(d.signupUrl), deadline: date(d.deadline),
+  sum: str(d.sum), cover: media(d.cover, file), html: md(d.body, file), recap: md(d.recap, file),
+})).sort((a, b) => b.date.localeCompare(a.date))
+
 // ---------- 網站設定 ----------
 let SETTINGS = {}
 try { SETTINGS = JSON.parse(fs.readFileSync(path.join(CONTENT, 'settings.json'), 'utf8')) } catch (e) { warn('content/settings.json', `讀不到（${e.message}），使用預設值`) }
-SETTINGS = { joinFormUrl: str(SETTINGS.joinFormUrl) || 'https://forms.gle/Qm3Nj9ytpMLVAHbWA', joinFormEmbed: str(SETTINGS.joinFormEmbed) }
+SETTINGS = { joinFormUrl: str(SETTINGS.joinFormUrl) || 'https://forms.gle/Qm3Nj9ytpMLVAHbWA', joinFormEmbed: str(SETTINGS.joinFormEmbed), handbookUrl: str(SETTINGS.handbookUrl) }
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true })
-fs.writeFileSync(OUT, `// 自動產生的檔案，請不要手動修改：內容請到網站的 /admin 編輯（原始資料在 content/ 資料夾）。\nexport default ${JSON.stringify({ ENTRIES, CLUBS, POSTS, SETTINGS })}\n`)
-console.log(`content: ${ENTRIES.length} 筆資源、${CLUBS.length} 個社團、${POSTS.length} 篇專欄${INLINE ? '（內嵌圖片）' : ''}`)
+fs.writeFileSync(OUT, `// 自動產生的檔案，請不要手動修改：內容請到網站的 /admin 編輯（原始資料在 content/ 資料夾）。\nexport default ${JSON.stringify({ ENTRIES, CLUBS, POSTS, EVENTS, SETTINGS })}\n`)
+console.log(`content: ${ENTRIES.length} 筆資源、${CLUBS.length} 個社團、${POSTS.length} 篇專欄、${EVENTS.length} 場活動${INLINE ? '（內嵌圖片）' : ''}`)
 if (warnings.length) console.warn('注意：\n' + warnings.join('\n'))

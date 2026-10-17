@@ -37,6 +37,7 @@ media_libraries:
 collections:
   # ---------------- 資料庫 ----------------
   - name: teach
+    editor: { preview: false }
     label: 教學資源
     label_singular: 教學資源
     description: 教案、學習單、教學影片等可以直接拿來用的教學資源平台。
@@ -48,7 +49,7 @@ collections:
     identifier_field: title
     slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
     summary: "{{title}}（{{sub}}）"
-    sortable_fields: [added, title, sub]
+    sortable_fields: { fields: [added, title, sub], default: { field: added, direction: descending } }
     view_groups:
       - { label: 分類, field: sub }
     fields:
@@ -67,7 +68,8 @@ collections:
         date_format: YYYY-MM-DD
         time_format: false
         required: false
-        hint: 資料庫首頁的「最新登錄」依這個日期排序。沒填的話用新增那天。
+        default: "{{now}}"
+        hint: 資料庫首頁的「最新登錄」依這個日期排序，新增時預設為今天。
       - { name: title, label: 名稱, widget: string }
       - name: sub
         label: 分類
@@ -103,6 +105,7 @@ collections:
           - { name: os, label: 小編 OS, widget: text, required: false }
 
   - name: sponsor
+    editor: { preview: false }
     label: 贊助資源
     label_singular: 贊助資源
     description: 基金會、企業、政府的補助與贊助公告。
@@ -114,7 +117,7 @@ collections:
     identifier_field: title
     slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
     summary: "{{title}}"
-    sortable_fields: [added, title]
+    sortable_fields: { fields: [added, title], default: { field: added, direction: descending } }
     view_groups:
       - { label: 類型, field: sub }
     fields:
@@ -131,6 +134,7 @@ collections:
       - { name: source, label: 資料來源, widget: string, required: false, hint: 例如：中國醫藥大學服務學習組公告 }
 
   - name: lecturers
+    editor: { preview: false }
     label: 講師
     label_singular: 講師
     description: 社團可以透過布穀島社邀請的講師。
@@ -142,6 +146,7 @@ collections:
     identifier_field: title
     slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
     summary: "{{title}}｜{{headline}}"
+    sortable_fields: { fields: [added, title], default: { field: added, direction: descending } }
     media_folder: /public/uploads/lecturers
     public_folder: /uploads/lecturers
     fields:
@@ -174,6 +179,7 @@ collections:
       - { name: url, label: 聯絡或個人頁連結, widget: string, required: false }
 
   - name: activities
+    editor: { preview: false }
     label: 團隊活動
     label_singular: 團隊活動
     description: 破冰、暖身、團隊凝聚的活動帶領指南。
@@ -185,6 +191,7 @@ collections:
     identifier_field: title
     slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
     summary: "{{title}}（{{sub}}）"
+    sortable_fields: { fields: [added, title, sub], default: { field: added, direction: descending } }
     fields:
       - *published
       - *added
@@ -224,6 +231,7 @@ collections:
           - { name: url, label: 連結, widget: string }
 
   - name: templates
+    editor: { preview: false }
     label: 模板
     label_singular: 模板
     description: 同意書、企劃書、預算表等可以下載修改的範本。
@@ -235,6 +243,7 @@ collections:
     identifier_field: title
     slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
     summary: "{{title}}"
+    sortable_fields: { fields: [added, title], default: { field: added, direction: descending } }
     media_folder: /public/uploads/templates
     public_folder: /uploads/templates
     fields:
@@ -258,6 +267,7 @@ collections:
 
   # ---------------- 社團地圖 ----------------
   - name: clubs
+    editor: { preview: false }
     label: 社團
     label_singular: 社團
     description: 社團的基本資料、服務據點和亮點，會出現在社團地圖，也會自動帶進《布穀好朋友》文章。社團的故事、理念和服務介紹，請寫在「專欄文章」。
@@ -323,7 +333,8 @@ collections:
     summary: "{{date}}｜{{title}}"
     media_folder: /public/uploads/posts
     public_folder: /uploads/posts
-    sortable_fields: [date, title]
+    sortable_fields: { fields: [date, title], default: { field: date, direction: descending } }
+    preview_path: "/#{{slug}}"
     view_groups:
       - { label: 系列, field: series }
     fields:
@@ -343,7 +354,7 @@ collections:
         required: false
         hint: 《布穀好朋友》才需要選。選了以後，文章會自動帶出這個社團的小檔案、服務據點和亮點（在「社團」裡編輯），你只要在下面的內文寫服務介紹、理念和故事。
       - { name: ep, label: 集數, widget: string, required: false, hint: 例如：EP.7 }
-      - { name: date, label: 發布日期, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false }
+      - { name: date, label: 發布日期, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, default: "{{now}}" }
       - { name: title, label: 標題, widget: string }
       - { name: hook, label: 開場一句, widget: string, required: false, hint: 標題下方的小字。 }
       - { name: sum, label: 卡片摘要, widget: text, hint: 專欄列表卡片上的一兩句話。 }
@@ -368,15 +379,65 @@ collections:
       - { name: credit, label: 作者與設計, widget: string, required: false, hint: "例如：內容：偉齡｜設計：偉齡" }
       - { name: ig, label: IG 原始貼文連結, widget: string, required: false }
 
+  # ---------------- 活動 ----------------
+  - name: events
+    label: 活動
+    label_singular: 活動
+    description: 交流小聚、培訓等活動。活動日期一過，網站會自動把它移到「活動紀錄」；有報名連結且還沒截止，會顯示「報名中」。活動結束後，在「活動紀錄」欄補照片和心得。
+    folder: content/events
+    format: json
+    extension: json
+    create: true
+    delete: true
+    identifier_field: title
+    slug: "event-{{year}}{{month}}{{day}}-{{hour}}{{minute}}"
+    summary: "{{date}}｜{{title}}"
+    sortable_fields: { fields: [date, title], default: { field: date, direction: descending } }
+    preview_path: "/#{{slug}}"
+    media_folder: /public/uploads/events
+    public_folder: /uploads/events
+    fields:
+      - { name: published, label: 上架, widget: boolean, default: true, hint: 取消勾選就會從網站上隱藏，但資料不會刪除。 }
+      - { name: title, label: 活動名稱, widget: string }
+      - name: type
+        label: 活動類型
+        widget: select
+        options: [交流小聚, 幹部培訓, 講座, 聯合活動, 工作坊, 其他]
+        default: 交流小聚
+      - { name: ep, label: 系列編號, widget: string, required: false, hint: 例如：CUCKOO ACTIVITY EP.2 }
+      - { name: date, label: 活動日期, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, default: "{{now}}" }
+      - { name: time, label: 時間, widget: string, required: false, hint: 例如：13:30–16:30 }
+      - { name: place, label: 地點, widget: string, required: false }
+      - { name: audience, label: 對象, widget: text, required: false }
+      - { name: quota, label: 名額, widget: string, required: false, hint: 例如：16 位 }
+      - { name: fee, label: 費用, widget: string, required: false, hint: 例如：免費 }
+      - { name: signupUrl, label: 報名連結, widget: string, required: false, hint: 填了才會出現「立即報名」按鈕，例如 Google 表單連結。 }
+      - { name: deadline, label: 報名截止日, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false, hint: 過了這天，報名按鈕會自動消失。沒填就開放到活動當天。 }
+      - { name: sum, label: 一句話簡介, widget: text, hint: 顯示在活動列表卡片上。 }
+      - { name: cover, label: 封面圖, widget: image, required: false, hint: 活動海報或照片。 }
+      - name: body
+        label: 活動介紹
+        widget: richtext
+        required: false
+        editor_components: [photo, photo-row, hr]
+        hint: 活動流程、亮點、注意事項。插入照片：工具列「Insert」→「照片」或「並排照片」。
+      - name: recap
+        label: 活動紀錄（活動結束後補）
+        widget: richtext
+        required: false
+        editor_components: [photo, photo-row, hr]
+        hint: 活動照片、參與社團的心得。活動結束後，這段會顯示在活動頁最上面。
+
   # ---------------- 網站設定 ----------------
   - name: settings
     label: 網站設定
     editor: { preview: false }
     files:
       - name: site
-        label: 加入會員表單
+        label: 表單與手冊連結
         file: content/settings.json
         format: json
         fields:
           - { name: joinFormUrl, label: 會員申請表單連結, widget: string, hint: "Google 表單的分享連結，例如 https://forms.gle/..." }
+          - { name: handbookUrl, label: 經營手冊網址（選填）, widget: string, required: false, hint: 填了以後，經營手冊頁的「打開經營手冊」按鈕會直接連過去。 }
           - { name: joinFormEmbed, label: 表單嵌入網址（選填）, widget: string, required: false, hint: "在 Google 表單按「傳送 → <> 嵌入 HTML」，複製 iframe 裡 src=\"...\" 的網址貼在這裡，加入會員頁就會直接嵌入表單。" }

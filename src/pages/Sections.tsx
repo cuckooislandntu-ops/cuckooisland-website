@@ -1,8 +1,9 @@
 import { Suspense, lazy, useState } from 'react'
 import { Empty, PageShell } from '@/components/Chrome'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { CLUBS, POSTS, REGION_LABEL, SERIES_INFO } from '@/lib/content'
-import type { Region, Series } from '@/lib/content'
+import { CLUBS, EVENTS, POSTS, REGION_LABEL, SERIES_INFO, SETTINGS, STATUS_LABEL, eventStatus, weekday } from '@/lib/content'
+import type { Event, Region, Series } from '@/lib/content'
+import EditLink from '@/components/EditLink'
 
 const tabsListCls = 'grid w-full h-auto p-1 rounded-2xl bg-[#F3E2B8]'
 const tabCls = 'min-h-[44px] rounded-xl text-[15px] font-bold data-[state=active]:bg-[#231F35] data-[state=active]:text-[#D6EC6E]'
@@ -57,6 +58,7 @@ export function ClubMap() {
               {c.ig ? <a className="ig club-ig" href={`https://www.instagram.com/${c.ig}/`} target="_blank" rel="noopener noreferrer"><IG />@{c.ig}</a> : <span />}
               {post && <a className="open-link" href={'#' + post.id}>完整介紹</a>}
             </div>
+            <EditLink collection="clubs" id={c.id} label="編輯社團資料" />
           </article>
         ) })}
         <Empty title="你們的社團也想出現在這裡？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="#join">申請加入島鏈</a>}>
@@ -83,8 +85,11 @@ export function Handbook() {
       <div className="sheet" style={{ display: 'grid', gap: 12 }}>
         <h2>打開手冊</h2>
         <p className="section-lede" style={{ marginTop: 0 }}>手冊放在線上，隨時更新。會員可以留言補充自己社團的做法。</p>
-        <button className="btn primary" type="button" onClick={() => setMsg('手冊網址還沒設定，上線時這顆按鈕會直接打開手冊。')}>打開經營手冊</button>
+        {SETTINGS.handbookUrl
+          ? <a className="btn primary" href={SETTINGS.handbookUrl} target="_blank" rel="noopener noreferrer">打開經營手冊</a>
+          : <button className="btn primary" type="button" onClick={() => setMsg('手冊網址還沒設定，上線時這顆按鈕會直接打開手冊。')}>打開經營手冊</button>}
         <p className="status" role="status" aria-live="polite">{msg}</p>
+        <EditLink collection="settings" id="site" label="在後台設定手冊網址" />
       </div>
       <div>
         <h2>手冊裡有什麼</h2>
@@ -105,37 +110,47 @@ export function Handbook() {
 }
 
 /* ---------- 活動 ---------- */
+function EventCard({ e }: { e: Event }) {
+  const st = eventStatus(e)
+  return (
+    <a className="event event-link" href={'#' + e.id}>
+      <div className="event-date"><b>{+e.date.slice(5, 7)}/{+e.date.slice(8, 10)}</b><span>{e.date.slice(0, 4)} · {weekday(e.date)}</span></div>
+      <div>
+        <div className="entry-top"><span className={'cat-badge st-' + st}>{STATUS_LABEL[st]}</span><span className="sub-tag">{e.type}</span>{e.ep && <span className="sub-tag">{e.ep}</span>}</div>
+        <h3>{e.title}</h3>
+        {e.sum && <p className="entry-desc">{e.sum}</p>}
+        <dl className="facts">
+          {e.time && <><dt>時間</dt><dd>{e.time}</dd></>}
+          {e.place && <><dt>地點</dt><dd>{e.place}</dd></>}
+        </dl>
+        <span className="read-more">{st === 'open' ? '看詳情與報名' : st === 'past' ? (e.recap ? '看活動紀錄' : '看活動資訊') : '看活動詳情'}<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 3l5 5-5 5" /></svg></span>
+      </div>
+    </a>
+  )
+}
+
 export function Events() {
+  const coming = EVENTS.filter(e => eventStatus(e) !== 'past').sort((a, b) => a.date.localeCompare(b.date))
+  const past = EVENTS.filter(e => eventStatus(e) === 'past')
   return (
     <PageShell kind="events" title="活動" tint="#DDD3F0" lede="交流小聚、幹部培訓與聯合活動的報名資訊，以及過去活動的紀錄。">
-      <Tabs defaultValue="open">
+      <Tabs defaultValue={coming.length ? 'open' : 'past'}>
         <TabsList className={tabsListCls + ' grid-cols-2'}>
-          <TabsTrigger value="open" className={tabCls}>報名中</TabsTrigger>
+          <TabsTrigger value="open" className={tabCls}>報名中・即將舉行</TabsTrigger>
           <TabsTrigger value="past" className={tabCls}>活動紀錄</TabsTrigger>
         </TabsList>
-        <TabsContent value="open" className="mt-5">
-          <Empty title="目前沒有開放報名的活動" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer">追蹤 IG，第一時間收到通知</a>}>
+        <TabsContent value="open" className="mt-5" style={{ display: 'grid', gap: 12 }}>
+          {coming.map(e => <EventCard key={e.id} e={e} />)}
+          {coming.length === 0 && <Empty title="目前沒有開放報名的活動" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer">追蹤 IG，第一時間收到通知</a>}>
             新活動會先公布在 IG @cuckoo_island。每場活動都會寫清楚時間、地點、適合對象和報名方式。
-          </Empty>
+          </Empty>}
         </TabsContent>
         <TabsContent value="past" className="mt-5" style={{ display: 'grid', gap: 12 }}>
-          <article className="event">
-            <div className="event-date"><b>4/26</b><span>2026 · 日</span></div>
-            <div>
-              <div className="entry-top"><span className="sub-tag">CUCKOO ACTIVITY EP.1</span><span className="sub-tag">已結束</span></div>
-              <h3>布穀島社交流小聚</h3>
-              <p className="entry-desc">一場屬於教育服務性社團的溫暖交流，全程免費，還有小禮物。</p>
-              <dl className="facts">
-                <dt>時間</dt><dd>13:30–16:30</dd>
-                <dt>地點</dt><dd>台大第二活動中心 701 教室</dd>
-                <dt>對象</dt><dd>台大、師大、台科大教育服務性社團的現任或曾任幹部，辦理國小、國中教育服務營隊的社團</dd>
-                <dt>名額</dt><dd>16 位</dd>
-              </dl>
-            </div>
-          </article>
-          <p className="status">之後會在這裡補上活動照片與參與社團的心得。</p>
+          {past.map(e => <EventCard key={e.id} e={e} />)}
+          {past.length === 0 && <p className="status">還沒有活動紀錄。</p>}
         </TabsContent>
       </Tabs>
+      <EditLink collection="events" label="在後台新增或編輯活動" />
     </PageShell>
   )
 }

@@ -1,5 +1,6 @@
 import { PageShell } from '@/components/Chrome'
 import { SETTINGS } from '@/lib/content'
+import EditLink from '@/components/EditLink'
 
 // 會員申請用的 Google 表單（加入布穀島｜島鏈計畫會員申請）：在 /admin 的「網站設定」修改。
 // 要直接嵌入表單：在 Google 表單按「傳送 → <> 嵌入 HTML」，把 iframe 的 src 貼到「表單嵌入網址」。
@@ -44,6 +45,7 @@ export default function Join() {
           ? <iframe className="form-embed" src={JOIN_FORM_EMBED} title="島鏈計畫會員申請表單" loading="lazy">載入中…</iframe>
           : null}
         <a className="btn primary" href={JOIN_FORM_URL} target="_blank" rel="noopener noreferrer">填寫會員申請表單</a>
+        <EditLink collection="settings" id="site" label="在後台改表單連結" />
         <p className="status" style={{ margin: 0 }}>表單會在新分頁開啟，是 Google 表單。</p>
       </div>
 

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ENTRIES, newestFirst } from '@/lib/content'
+import { CAT_COLLECTION, ENTRIES, newestFirst } from '@/lib/content'
+import EditLink from '@/components/EditLink'
 import type { Cat, Entry } from '@/lib/content'
 
 const PERSONA: Record<Cat, { label: string; bg: string; badge: string; lines: string[]; subs: string[] }> = {
@@ -184,6 +185,7 @@ function LecturerCard({ e, fresh }: { e: Entry; fresh?: boolean }) {
         <span className="host">邀請請透過布穀島社聯繫</span>
         <a className="open-link" href="#match">邀請講師</a>
       </div>
+      <EditLink collection="lecturers" id={e.id} label="編輯" />
     </article>
   )
 }
@@ -220,6 +222,7 @@ export function EntryCard({ e, fresh }: { e: Entry; fresh?: boolean }) {
         {e.file && <a className="open-link" href={e.file.href} download={e.file.name}>下載範本<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M8 2v8M4.5 6.5L8 10l3.5-3.5M3 13h10" /></svg></a>}
         {e.url && <a className="open-link" href={e.url} target="_blank" rel="noopener noreferrer">開啟資源<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M9 3h4v4M13 3L7 9M12 10v3H3V4h3" /></svg></a>}
       </div>
+      <EditLink collection={CAT_COLLECTION[e.cat]} id={e.id} label="編輯" />
     </article>
   )
 }

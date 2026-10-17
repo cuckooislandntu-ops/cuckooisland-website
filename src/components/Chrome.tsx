@@ -4,7 +4,7 @@ import type { RouteId } from '@/lib/site'
 import type { ReactElement, ReactNode } from 'react'
 
 export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' | 'dark' }) {
-  const route = (raw.startsWith('post-') ? 'column' : raw) as RouteId
+  const route = (raw.startsWith('post-') ? 'column' : raw.startsWith('event-') ? 'events' : raw) as RouteId
   const onHome = raw === ''
   return (
     <header className={'bar' + (onHome ? (tone === 'dark' ? ' dark' : '') : ' solid')}>

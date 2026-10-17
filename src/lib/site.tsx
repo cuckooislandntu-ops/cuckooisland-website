@@ -26,7 +26,7 @@ export const href = (id: RouteId) => (id ? '#' + id : '#')
 // a route is a page id, or an article id like "post-friends-1" (plain #anchors survive in shared artifact links)
 function read(): string {
   const h = location.hash.replace(/^#\/?/, '')
-  if (/^post-[a-z0-9-]+$/.test(h)) return h
+  if (/^(post|event)-[a-z0-9-]+$/.test(h)) return h
   return ALL_ROUTES.some(r => r.id === h) ? h : ''
 }
 
