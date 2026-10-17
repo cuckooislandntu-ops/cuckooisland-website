@@ -236,7 +236,8 @@ body, .hero-band, .article-head, .db-stage, .cat-bar, .bar.solid { background-im
 .stage-box { position: relative; margin-top: 4px; }
 .mascot-btn { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
 .mascot { display: block; width: 100%; max-width: 480px; height: auto; margin-left: auto; }
-.speech { position: absolute; left: 0; top: 14px; max-width: 58%; min-height: 3.2em; background: var(--cream); color: var(--ink); border-radius: 18px; padding: 10px 14px;
+.stage-side { position: absolute; left: 0; top: 14px; max-width: 58%; display: grid; gap: 12px; justify-items: start; pointer-events: none; }
+.speech { position: relative; min-height: 3.2em; background: var(--cream); color: var(--ink); border-radius: 18px; padding: 10px 14px;
   font-size: 15.5px; line-height: 1.55; box-shadow: var(--shadow-riso); pointer-events: none; }
 .speech::after { content: ""; position: absolute; right: -10px; top: 26px; border: 8px solid transparent; border-left: 12px solid var(--cream); border-right: 0; }
 .caret { display: inline-block; width: 2px; height: 1em; background: var(--ink); vertical-align: -2px; margin-left: 2px; animation: caret 1s steps(2) infinite; }
@@ -735,3 +736,8 @@ details.hb-help { padding: 0; }
 .hb-cover.hidden-text { display: none; }
 .hb-book button:has(.hb-cover-img)::before { opacity: .25; }
 .hb-spine { z-index: 2; } .hb-cover { z-index: 1; } .hb-cover-new { z-index: 3; }
+
+/* 資料庫：人物旁邊的數量 */
+.stage-count { margin: 0; display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 14px 7px; border-radius: 18px; background: var(--cream); color: var(--ink);
+  font-size: 14px; box-shadow: var(--shadow-riso); }
+.stage-count b { font-family: var(--kai); font-size: 26px; line-height: 1.15; font-variant-numeric: tabular-nums; text-align: right; transition: color .5s; }

@@ -44,6 +44,20 @@ function useTalk(cat: Cat) {
   return { shown: line.slice(0, n), line, talking: n < line.length, next }
 }
 
+// 人物旁邊的數量：換類別時從 0 數上去（減少動態時直接顯示）
+function useCountUp(n: number) {
+  const [v, setV] = useState(n)
+  useEffect(() => {
+    if (RM) { setV(n); return }
+    let raf = 0; const t0 = performance.now(), dur = 520
+    const step = (t: number) => { const k = Math.min(1, (t - t0) / dur); setV(Math.round(n * (1 - Math.pow(1 - k, 3)))); if (k < 1) raf = requestAnimationFrame(step) }
+    raf = requestAnimationFrame(step)
+    return () => cancelAnimationFrame(raf)
+  }, [n])
+  return v
+}
+const countOf = (c: Cat) => (c === 'all' ? ENTRIES.length : ENTRIES.filter(e => e.cat === c).length)
+
 function Mascot({ cat, talking }: { cat: Cat; talking: boolean }) {
   const ink = '#231F35', skin = '#F6C7A8', cream = '#FFFDF6'
   const body: Record<Cat, string> = { all: '#9EB14F', teach: '#4FB5C0', sponsor: '#2D3A63', lecturer: '#8E7CC3', activity: '#F08A3E', template: '#D9737F' }
@@ -234,6 +248,7 @@ export default function Resources() {
   const [sub, setSub] = useState<string | null>(null)
   const talk = useTalk(cat)
   const p = PERSONA[cat]
+  const total = countOf(cat), shownCount = useCountUp(total)
   useEffect(() => { setQ(''); setSub(null) }, [cat])
 
   const latest = useMemo(() => [...ENTRIES].sort(newestFirst).slice(0, 6), [])
@@ -251,7 +266,12 @@ export default function Resources() {
             <button type="button" className="mascot-btn" onClick={talk.next} aria-label="換一句話">
               <Mascot cat={cat} talking={talk.talking} />
             </button>
-            <div className="speech" aria-hidden="true">{talk.shown}<span className="caret" /></div>
+            <div className="stage-side">
+              <div className="speech" aria-hidden="true">{talk.shown}<span className="caret" /></div>
+              <p className="stage-count" aria-label={`${cat === 'all' ? '全部' : p.label}共 ${total} 筆`}>
+                <b style={{ color: p.badge, minWidth: `${String(total).length * 0.62}em` }}>{shownCount}</b><span>筆{cat === 'all' ? '資源' : p.label}</span>
+              </p>
+            </div>
             <p className="sr-only" role="status">{talk.line}</p>
           </div>
         </div>
