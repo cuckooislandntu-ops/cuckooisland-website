@@ -29,7 +29,9 @@ export type Event = {
   signupUrl: string; deadline: string; sum: string; cover: string; html: string; recap: string
 }
 
-const data = raw as unknown as { ENTRIES: Entry[]; CLUBS: Club[]; POSTS: Post[]; EVENTS: Event[]; SETTINGS: { joinFormUrl: string; joinFormEmbed: string; handbookUrl: string } }
+export type HandbookFile = { title: string; url: string; date: string; scenes: string[] }
+export type Chapter = { title: string; tag: string; desc: string; points: string[]; files: HandbookFile[] }
+const data = raw as unknown as { ENTRIES: Entry[]; CLUBS: Club[]; POSTS: Post[]; EVENTS: Event[]; SETTINGS: { joinFormUrl: string; joinFormEmbed: string; handbookUrl: string; chapters: Chapter[] } }
 
 export const ENTRIES = data.ENTRIES
 export const CLUBS = data.CLUBS

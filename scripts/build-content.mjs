@@ -144,7 +144,21 @@ const EVENTS = readDir('events').filter(({ file, data }) => (str(data.title) && 
 // ---------- 網站設定 ----------
 let SETTINGS = {}
 try { SETTINGS = JSON.parse(fs.readFileSync(path.join(CONTENT, 'settings.json'), 'utf8')) } catch (e) { warn('content/settings.json', `讀不到（${e.message}），使用預設值`) }
-SETTINGS = { joinFormUrl: str(SETTINGS.joinFormUrl) || 'https://forms.gle/Qm3Nj9ytpMLVAHbWA', joinFormEmbed: str(SETTINGS.joinFormEmbed), handbookUrl: str(SETTINGS.handbookUrl) }
+// 經營手冊書櫃的章節：後台沒填就用網站預設（src/pages/Handbook.tsx 的 DEFAULT_CHAPTERS）
+const chapters = (Array.isArray(SETTINGS.chapters) ? SETTINGS.chapters : []).map((c, i) => {
+  const files = (Array.isArray(c?.files) ? c.files : []).map(f => ({ title: str(f?.title), url: str(f?.url), date: date(f?.date),
+    scenes: (Array.isArray(f?.scenes) ? f.scenes : []).map(str).filter(Boolean) })).filter(f => {
+    if (f.title && f.url) return true
+    if (f.title || f.url) warn('content/settings.json', `手冊「${str(c?.title)}」有一份檔案缺少${f.title ? '網址' : '名稱'}，已略過`)
+    return false
+  })
+  if (!files.length && str(c?.url)) files.push({ title: str(c?.title), url: str(c.url), date: '', scenes: [] }) // 舊格式：一章一個網址
+  const ch = { title: str(c?.title), tag: str(c?.tag), desc: str(c?.desc), files,
+    points: (Array.isArray(c?.points) ? c.points : typeof c?.points === 'string' ? c.points.split(/[\n,，、]/) : []).map(str).filter(Boolean) }
+  if (!ch.title) warn('content/settings.json', `手冊第 ${i + 1} 章沒有章節名稱，已略過`)
+  return ch
+}).filter(c => c.title)
+SETTINGS = { joinFormUrl: str(SETTINGS.joinFormUrl) || 'https://forms.gle/Qm3Nj9ytpMLVAHbWA', joinFormEmbed: str(SETTINGS.joinFormEmbed), handbookUrl: str(SETTINGS.handbookUrl), chapters }
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true })
 fs.writeFileSync(OUT, `// 自動產生的檔案，請不要手動修改：內容請到網站的 /admin 編輯（原始資料在 content/ 資料夾）。\nexport default ${JSON.stringify({ ENTRIES, CLUBS, POSTS, EVENTS, SETTINGS })}\n`)

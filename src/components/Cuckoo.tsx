@@ -2,6 +2,7 @@
 // 鳥出現時按 O 打開叫聲（預設靜音），再按一次 O 關掉。
 // 中文輸入法開著時 C、O 也有效（看實體按鍵，不看輸入的字）。
 // 手機沒有鍵盤：連點三下左上角的 Logo 也能叫出來，牠會飛到手指點的地方。
+// 碰到標了 data-cuckoo-hot 的東西（經營手冊頁的火堆）會說「燙不到我！」，並對那個元素送出 cuckoo:hot 事件。
 import { useEffect, useRef, useState } from 'react'
 
 const RM = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -66,6 +67,7 @@ export default function Cuckoo() {
   const [chirp, setChirp] = useState(false)
   const [sound, setSound] = useState(false)
   const [tip, setTip] = useState('')
+  const [hot, setHot] = useState(0)
   const onRef = useRef(false), soundRef = useRef(false)
   onRef.current = on; soundRef.current = sound
   const el = useRef<HTMLDivElement>(null)
@@ -100,11 +102,13 @@ export default function Cuckoo() {
     // enter from the top-left corner
     pos.current = { x: -60, y: 80 }
     target.current = { x: innerWidth / 2, y: innerHeight / 2 }
-    let raf = 0, last = 0, flapT = 0, shut = 0
+    let raf = 0, last = 0, flapT = 0, shut = 0, checkT = 0
+    let touching: Element | null = null
+    const tell = (t: Element, on: boolean) => t.dispatchEvent(new CustomEvent('cuckoo:hot', { bubbles: true, detail: { touching: on } }))
     const move = (e: PointerEvent) => { target.current = { x: e.clientX, y: e.clientY } }
     const click = (e: PointerEvent) => {
       target.current = { x: e.clientX, y: e.clientY }
-      setSay(s => s + 1); setChirp(true); setTip('')
+      setSay(s => s + 1); setChirp(true); setTip(''); setHot(0)
       if (soundRef.current) cuckooCall()
       clearTimeout(shut); shut = window.setTimeout(() => setChirp(false), 380)
     }
@@ -118,23 +122,41 @@ export default function Cuckoo() {
       const speed = Math.hypot(dx, dy)
       flapT += dt
       if (flapT > (speed > 30 ? 90 : 420)) { flapT = 0; setFlap(f => !f) }
+      // 每 80ms 檢查一次有沒有碰到會燙的東西；只看鳥身體中間，碰到才算數
+      checkT += dt
+      if (checkT > 80 && el.current) {
+        checkT = 0
+        const b = el.current.getBoundingClientRect(), cx = b.left + b.width / 2, cy = b.top + b.height * .6, rx = b.width * .3, ry = b.height * .3
+        let hit: Element | null = null
+        document.querySelectorAll('[data-cuckoo-hot]').forEach(h => {
+          const r = h.getBoundingClientRect()
+          if (!hit && r.width && cx + rx > r.left && cx - rx < r.right && cy + ry > r.top && cy - ry < r.bottom) hit = h
+        })
+        if (hit !== touching) {
+          if (touching) tell(touching, false)
+          if (hit) { tell(hit, true); setHot(n => n + 1); setTip('') }
+          touching = hit
+        }
+      }
       if (el.current) el.current.style.transform = `translate(${p.x - 48}px, ${p.y - 36}px) scaleX(${face.current}) rotate(${Math.max(-12, Math.min(12, dy * 0.08))}deg)`
       raf = requestAnimationFrame(loop)
     }
     raf = requestAnimationFrame(loop)
     addEventListener('pointermove', move); addEventListener('pointerdown', click)
-    return () => { cancelAnimationFrame(raf); clearTimeout(shut); removeEventListener('pointermove', move); removeEventListener('pointerdown', click) }
+    return () => { cancelAnimationFrame(raf); clearTimeout(shut); if (touching) tell(touching, false); removeEventListener('pointermove', move); removeEventListener('pointerdown', click) }
   }, [on])
 
   useEffect(() => { if (!on) { setSound(false); setTip('') } else setTip('按 O 打開叫聲') }, [on])
   useEffect(() => { if (!tip) return; const t = setTimeout(() => setTip(''), 1800); return () => clearTimeout(t) }, [tip])
+  useEffect(() => { if (!hot) return; const t = setTimeout(() => setHot(0), 1600); return () => clearTimeout(t) }, [hot])
 
   if (!on) return null
   return (
     <div ref={el} className="cuckoo" role="img" aria-label="布穀鳥彩蛋：點一下牠會說布穀，按 C 讓牠飛走">
       <Bird flap={flap} chirp={chirp} />
-      {tip && <span key={'t' + tip} className="cuckoo-say cuckoo-tip" style={{ transform: `scaleX(${face.current})` }}>{tip}</span>}
-      {!tip && say > 0 && <span key={say} className="cuckoo-say" style={{ transform: `scaleX(${face.current})` }}>布穀！</span>}
+      {hot > 0 && <span key={'h' + hot} className="cuckoo-say cuckoo-hot" style={{ transform: `scaleX(${face.current})` }}>燙不到我！</span>}
+      {!hot && tip && <span key={'t' + tip} className="cuckoo-say cuckoo-tip" style={{ transform: `scaleX(${face.current})` }}>{tip}</span>}
+      {!hot && !tip && say > 0 && <span key={say} className="cuckoo-say" style={{ transform: `scaleX(${face.current})` }}>布穀！</span>}
     </div>
   )
 }

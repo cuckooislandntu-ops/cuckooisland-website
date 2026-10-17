@@ -439,5 +439,33 @@ collections:
         format: json
         fields:
           - { name: joinFormUrl, label: 會員申請表單連結, widget: string, hint: "Google 表單的分享連結，例如 https://forms.gle/..." }
-          - { name: handbookUrl, label: 經營手冊網址（選填）, widget: string, required: false, hint: 填了以後，經營手冊頁的「打開經營手冊」按鈕會直接連過去。 }
+          - { name: handbookUrl, label: 經營手冊資料夾網址（選填）, widget: string, required: false, hint: 放所有手冊檔案的 Google 雲端資料夾。經營手冊頁的「打開手冊」按鈕會連過去。 }
           - { name: joinFormEmbed, label: 表單嵌入網址（選填）, widget: string, required: false, hint: "在 Google 表單按「傳送 → <> 嵌入 HTML」，複製 iframe 裡 src=\"...\" 的網址貼在這裡，加入會員頁就會直接嵌入表單。" }
+          - label: 經營手冊章節（選填）
+            name: chapters
+            widget: list
+            required: false
+            hint: 經營手冊頁「書櫃」上的書，一本一章，可拖曳排序。留空就用網站預設的六章。章節與檔案名稱會公開在網站上，手冊內容本身不要寫在這裡。
+            summary: "{{fields.title}}"
+            fields:
+              - { name: title, label: 章節名稱, widget: string, hint: 例如「招生與幹部培訓」 }
+              - { name: tag, label: 封面小標（選填）, widget: string, required: false, hint: 生存技能的比喻，兩三個字，例如「生火」「找水源」 }
+              - { name: desc, label: 一句話說明, widget: string, required: false }
+              - { name: points, label: 這一章有什麼（選填）, widget: list, required: false, hint: 一項一行，三項左右最好讀 }
+              - label: 這一章的檔案
+                name: files
+                widget: list
+                required: false
+                hint: 一個內容一份 Google 文件，一份一行，可拖曳排序。還沒有檔案時，網站會顯示上面的「這一章有什麼」。
+                summary: "{{fields.title}}"
+                fields:
+                  - { name: title, label: 檔案名稱, widget: string, hint: 例如「社博擺攤檢查表」 }
+                  - { name: url, label: 檔案網址, widget: string, hint: 在 Google 文件按「共用 → 複製連結」貼上 }
+                  - { name: date, label: 新增或大改的日期（選填）, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false, hint: 30 天內的檔案會標「新」，也會排進「最近新增」。 }
+                  - label: 適合的情境（選填）
+                    name: scenes
+                    widget: select
+                    multiple: true
+                    required: false
+                    hint: 手冊頁的「依情境找」會把同一個情境的檔案集合在一起，可以跨章節。要新增情境請 Claude 改 public/admin/config.yml。
+                    options: [第一次當幹部, 招生季, 寫補助計畫, 營隊前一個月, 營隊前一週, 營隊當天, 活動結束後, 要交接了]

@@ -1,7 +1,7 @@
 import { Suspense, lazy, useState } from 'react'
 import { Empty, PageShell } from '@/components/Chrome'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { CLUBS, EVENTS, POSTS, REGION_LABEL, SERIES_INFO, SETTINGS, STATUS_LABEL, eventStatus, weekday } from '@/lib/content'
+import { CLUBS, EVENTS, POSTS, REGION_LABEL, SERIES_INFO, STATUS_LABEL, eventStatus, weekday } from '@/lib/content'
 import type { Event, Region, Series } from '@/lib/content'
 import EditLink from '@/components/EditLink'
 import { to } from '@/lib/site'
@@ -65,46 +65,6 @@ export function ClubMap() {
         <Empty title="你們的社團也想出現在這裡？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={to('join')}>申請加入島鏈</a>}>
           申請加入島鏈時填寫社團訪談文件，經你們審稿後，我們會把社團整理到地圖上，也寫成《布穀好朋友》專欄。
         </Empty>
-      </div>
-    </PageShell>
-  )
-}
-
-/* ---------- 經營手冊 ---------- */
-const CHAPTERS = [
-  ['招生與幹部培訓', '怎麼找到人、怎麼留住人'],
-  ['經費申請與核銷', '補助計畫、預算表、收據整理'],
-  ['教案與課程設計', '從目標到教案，附範本'],
-  ['營隊安全與保險', '行前檢核、緊急應變、保險'],
-  ['與服務學校溝通', '第一次聯絡到活動結束後的回饋'],
-  ['交接', '這一屆該留下什麼給下一屆'],
-]
-export function Handbook() {
-  const [msg, setMsg] = useState('')
-  return (
-    <PageShell kind="handbook" title="社團經營手冊" tint="#E6F1B5" lede="把一屆屆累積下來的做法整理成手冊，接手的人不用從零開始。">
-      <div className="sheet" style={{ display: 'grid', gap: 12 }}>
-        <h2>打開手冊</h2>
-        <p className="section-lede" style={{ marginTop: 0 }}>手冊放在線上，隨時更新。會員可以留言補充自己社團的做法。</p>
-        {SETTINGS.handbookUrl
-          ? <a className="btn primary" href={SETTINGS.handbookUrl} target="_blank" rel="noopener noreferrer">打開經營手冊</a>
-          : <button className="btn primary" type="button" onClick={() => setMsg('手冊網址還沒設定，上線時這顆按鈕會直接打開手冊。')}>打開經營手冊</button>}
-        <p className="status" role="status" aria-live="polite">{msg}</p>
-        <EditLink collection="settings" id="site" label="在後台設定手冊網址" />
-      </div>
-      <div>
-        <h2>手冊裡有什麼</h2>
-        <p className="section-lede">預計的章節，內容會依各社團的經驗持續補充。</p>
-        <ol className="toc" style={{ marginTop: 14 }}>
-          {CHAPTERS.map(([t, d], i) => <li key={t}><i>第 {i + 1} 章</i><div><b>{t}</b><span>{d}</span></div></li>)}
-        </ol>
-      </div>
-      <div>
-        <h2>怎麼用最順手</h2>
-        <div className="paths" style={{ marginTop: 14 }}>
-          <div className="path" style={{ background: 'var(--cream)', boxShadow: 'var(--shadow-riso)' }}><h3>遇到問題時查</h3><p>依情境找章節，例如「第一次寫補助計畫」或「營隊前一週」。</p></div>
-          <div className="path" style={{ background: 'var(--cream)', boxShadow: 'var(--shadow-riso)' }}><h3>直接拿範本</h3><p>預算表、家長同意書、交接清單，下載後改成自己社團的版本。</p></div>
-        </div>
       </div>
     </PageShell>
   )

@@ -7,7 +7,7 @@ export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' 
   const route = (raw.startsWith('post-') ? 'column' : raw.startsWith('event-') ? 'events' : raw) as RouteId
   const onHome = raw === ''
   return (
-    <header className={'bar' + (onHome ? (tone === 'dark' ? ' dark' : '') : ' solid')}>
+    <header className={'bar' + (onHome ? (tone === 'dark' ? ' dark' : '') : ' solid') + (route === 'handbook' ? ' night' : '')}>
       <a className="brand" href={to('')} aria-label="布穀島社首頁"><Logo />布穀島社</a>
       <div className="bar-actions">
         {route !== 'join' && <a className="pill" href={to('join')}>加入會員</a>}
