@@ -746,3 +746,167 @@ details.hb-help { padding: 0; }
 .panel-lede { margin: 6px 0 0; font-size: 16px; line-height: 1.7; color: var(--ink-soft); }
 .panel-others { margin: 2px 0 0; padding-top: 12px; border-top: 1px solid rgba(35, 31, 53, .12); font-size: 14.5px; color: var(--ink-soft); }
 .panel-others a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+/* ================= 需求媒合 =================
+   三個角色的代表色沿用首頁「一次服務的三個面向」：贊助單位＝金黃、教育組織＝水藍；學校用首頁孩子的淡紫。 */
+.role-school { --role: #B7A6D9; }
+.role-company { --role: #F7C948; }
+.role-org { --role: #6FCFD5; }
+.path-more { justify-self: start; min-height: 40px; padding: 0; border: 0; background: none; cursor: pointer; font-family: var(--sans); text-align: left; font-size: 14.5px; color: var(--ink); text-decoration: underline; text-decoration-color: var(--brand); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.path-more.on-dark { color: var(--cream); text-decoration-color: var(--lime); }
+.path-more + .path-more { margin-top: -6px; }
+.role-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 7px; flex: none; }
+
+.partner-sheet { display: grid; gap: 16px; padding: 24px 18px 22px; border-radius: 26px; }
+.partner-sheet > h3 { font-size: clamp(21px, 5.6vw, 26px); line-height: 1.45; }
+.partner-lede { margin: -6px 0 0; font-size: 15.5px; line-height: 1.75; color: var(--ink-soft); }
+.partner-list { list-style: none; margin: 0; padding: 0; display: grid; }
+@media (min-width: 640px) { .partner-list { grid-template-columns: 1fr 1fr; column-gap: 24px; } }
+.partner-list li { display: grid; grid-template-columns: 18px 1fr; gap: 2px 8px; padding: 14px 0; border-top: 1px solid rgba(35, 31, 53, .12); }
+.partner-list li::before { content: ""; grid-row: span 2; width: 10px; height: 10px; border-radius: 50%; background: var(--role); margin-top: 9px; }
+.partner-list b { font-family: var(--kai); font-weight: 400; font-size: 18px; }
+.partner-list span { font-size: 14.5px; color: var(--ink-soft); line-height: 1.7; }
+
+/* 三拍動畫（畫面在 MatchScene.tsx） */
+.ms-wrap { display: grid; gap: 14px; }
+@media (min-width: 760px) { .ms-wrap { grid-template-columns: 1.4fr 1fr; align-items: center; gap: 22px; } }
+.ms-stage { position: relative; border-radius: 22px; overflow: hidden; box-shadow: var(--shadow-riso); background: #1A1B30; }
+.ms { display: block; width: 100%; height: auto; }
+.ms-text { font-family: var(--sans); fill: var(--ink); }
+.ms-side { display: grid; gap: 6px; align-content: center; }
+.ms-toggle { justify-self: start; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px 0 12px; border-radius: 999px; border: 0; background: transparent; box-shadow: inset 0 0 0 1.5px rgba(35, 31, 53, .3); color: var(--ink); font-family: var(--sans); font-size: 14px; cursor: pointer; }
+.ms-toggle svg { width: 14px; height: 14px; }
+.ms-beats { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.ms-beats button { position: relative; width: 100%; min-height: 44px; display: grid; grid-template-columns: 30px 1fr; column-gap: 10px; text-align: left; padding: 8px 4px 10px; border: 0; background: none; color: var(--ink); font-family: var(--sans); cursor: pointer; opacity: .5; transition: opacity .35s; }
+.ms-beats button[aria-current="step"] { opacity: 1; }
+.ms-beats i { grid-row: span 2; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--brand); color: var(--cream); font-style: normal; font-size: 14px; margin-top: 2px; }
+.ms-beats b { font-family: var(--kai); font-weight: 400; font-size: 17px; line-height: 1.45; }
+.ms-beats span { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
+.ms-timer { grid-column: 2; display: block; height: 3px; margin-top: 8px; border-radius: 2px; background: var(--role, var(--brand)); transform-origin: 0 50%; animation: ms-timer linear forwards; }
+@keyframes ms-timer { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.ms * { transition-property: transform, opacity; transition-duration: .8s; transition-timing-function: cubic-bezier(.3, .7, .3, 1); }
+.ms.rewind * { transition-duration: .4s !important; transition-delay: 0s !important; }
+.ms.rewind .ms-club, .ms.rewind .ms-photo { animation: none !important; }
+.ms-sea { animation: ms-drift 5s ease-in-out infinite alternate; }
+@keyframes ms-drift { to { transform: translateX(-14px); } }
+.ms-dash { animation: ms-dash 1.2s linear infinite; }
+@keyframes ms-dash { to { stroke-dashoffset: -20; } }
+.ms-float { animation: ms-float 2.6s ease-in-out infinite alternate; }
+@keyframes ms-float { to { transform: translateY(-5px) rotate(6deg); } }
+.ms-pennant { transform-box: fill-box; transform-origin: 50% 0; animation: ms-swing 1.6s ease-in-out infinite alternate; }
+@keyframes ms-swing { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
+
+/* 背景：第三拍轉成黎明 */
+.ms-dawn { opacity: 0; transition-duration: 1.8s !important; }
+.ms.on3 .ms-dawn { opacity: 1; transition-delay: .6s; }
+.ms.on3 .ms-stars { opacity: 0; transition-duration: 1.4s; }
+.ms.on3 .ms-halo { opacity: .35; transition-duration: 1.4s; }
+
+/* 誰在哪一拍出現：b1／b2／b3；泡泡與 only 標籤只停留在自己那一拍 */
+.ms .b1, .ms .b2, .ms .b3, .ms .l2, .ms .l3, .ms-flow, .ms-spark { opacity: 0; }
+.ms.on1 .b1, .ms.on2 .b2, .ms.on3 .b3, .ms.on2 .l2, .ms.on3 .l3, .ms.on3 .ms-flow { opacity: 1; }
+.ms.on2 .ms-bubble.b1, .ms.on2 .only.b1, .ms.on3 .ms-bubble.b2, .ms.on3 .only.b2 { opacity: 0; transition-delay: 0s; }
+.ms .late { transition-delay: 1.3s; }
+.ms .last { transition-delay: 3.9s; }
+.ms-bubble { transform-box: fill-box; transform-origin: 50% 100%; transform: scale(.3); transition-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+.ms.on1 .ms-bubble.b1, .ms.on2 .ms-bubble.b2, .ms.on3 .ms-bubble.b3 { transform: none; }
+.ms.on2 .ms-bubble.b1, .ms.on3 .ms-bubble.b2 { transform: scale(.3); }
+.ms-badge { transform-box: fill-box; transform-origin: 50% 50%; transform: scale(.4); transition-timing-function: cubic-bezier(.34, 1.56, .64, 1); }
+.ms.on2 .ms-badge { transform: none; transition-delay: .3s; }
+
+/* 人物：表情、光暈、跳躍 */
+.ms-face-smile { opacity: 0; }
+.ms .happy .ms-face-smile, .ms.on3 .warms .ms-face-smile { opacity: 1; }
+.ms .happy .ms-face-flat, .ms.on3 .warms .ms-face-flat { opacity: 0; }
+.ms.on3 .warms .ms-face-smile, .ms.on3 .warms .ms-face-flat { transition-delay: 1.4s; }
+.ms-glow { opacity: 0; }
+.ms.on3 .kid .ms-glow { opacity: 1; transition-delay: 1.4s; }
+.ms.on3 .kid { animation: ms-hop .42s 1.6s cubic-bezier(.3, 0, .6, 1) infinite alternate; }
+.ms.on3 .kid.k2 { animation-delay: 1.8s; }
+@keyframes ms-hop { to { transform: translateY(-30px); } }
+.ms .kid.late { opacity: 0; }
+.ms.on3 .kid.late { opacity: 1; transition-delay: .9s; }
+
+/* 學校：社團沿著串聯線來到學校，站到孩子後面 */
+.ms-school.on3 .ms-club { transform: translate(-160px, 22px); animation: ms-cross 1.8s cubic-bezier(.45, .05, .35, 1) both; }
+@keyframes ms-cross { 0% { transform: none; } 50% { transform: translate(-80px, -36px); } 100% { transform: translate(-160px, 22px); } }
+.ms-school.on3 .l2 { opacity: .4; transition-delay: 1.6s; }
+
+/* 企業：資源沿線流到營隊，照片飛回企業 */
+.ms-company.on3 .ms-props { opacity: .3; }
+.ms-photo { opacity: 0; transform: translate(262px, 116px) scale(.4); }
+.ms-company.on3 .ms-photo { opacity: 1; transform: translate(132px, 124px) rotate(-8deg); animation: ms-photo 2.2s 1.7s cubic-bezier(.45, .05, .35, 1) both; }
+@keyframes ms-photo { 0% { opacity: 0; transform: translate(262px, 116px) scale(.4); } 15% { opacity: 1; transform: translate(262px, 100px) scale(1); } 100% { opacity: 1; transform: translate(132px, 124px) rotate(-8deg); } }
+
+/* 教育組織：那份教案移到布穀島社，變成營隊版，再交給社團 */
+.ms-sheet { transform: translate(150px, 116px); }
+.ms-org.on2 .ms-sheet { transform: translate(202px, 98px) scale(1.15); transition-duration: 1.2s; }
+.ms-org.on3 .ms-sheet { transform: translate(230px, 126px) scale(.62); transition-duration: 1.4s; }
+.ms-sheet .camp { opacity: 0; }
+.ms-org.on2 .ms-sheet .camp { opacity: 1; transition-delay: 1.2s; }
+.ms-org.on2 .ms-sheet .lesson { opacity: 0; transition-delay: 1s; }
+.ms-org.on2 .ms-spark { opacity: 1; transition-delay: .9s; animation: ms-twinkle .6s 1s ease-in-out infinite alternate; }
+.ms-org.on3 .ms-spark { opacity: 0; transition-delay: 0s; }
+@keyframes ms-twinkle { to { opacity: .3; } }
+.ms-org.on3 .l2 { opacity: .35; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ms *, .ms.rewind * { transition: none !important; animation: none !important; }
+  .ms-timer { display: none; }
+}
+
+/* 學校營隊需求表單（原型）：與首頁加入區的面板、步驟編號一致 */
+.sf-open { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.sf-open .btn { padding: 0 22px; }
+.sf-open span { font-size: 14px; color: var(--ink-soft); }
+.sf-wrap { display: grid; gap: 14px; padding-top: 20px; border-top: 1px solid rgba(35, 31, 53, .12); }
+.sf-title { font-size: clamp(21px, 5.6vw, 26px); }
+.sf { display: grid; gap: 6px; }
+.sf-proto { justify-self: start; margin: 0; padding: 3px 12px; border-radius: 999px; background: var(--lime); font-size: 13px; }
+.sf-step { display: grid; gap: 16px; padding: 18px 0 20px; border-bottom: 1px solid rgba(35, 31, 53, .12); }
+.sf-step h4 { display: flex; align-items: center; gap: 10px; margin: 0; font-family: var(--kai); font-weight: 400; font-size: 19px; }
+.sf-step h4 i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--brand); color: var(--cream); font-style: normal; font-family: var(--sans); font-size: 14px; }
+.sf-field, .sf-group { display: grid; gap: 6px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.sf-field label, .sf-group legend { font-size: 15px; padding: 0; }
+.sf-group legend { margin-bottom: 6px; }
+.sf-field label em, .sf-group legend em { margin-left: 6px; font-style: normal; font-size: 12.5px; color: #A3301F; }
+.sf-field label em.opt, .sf-group legend em.opt { color: var(--ink-soft); }
+.sf-hint { margin: -2px 0 2px; font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); }
+.sf-field input, .sf-field select, .sf-field textarea { width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 14px; border: 1.5px solid rgba(35, 31, 53, .22); background: var(--paper); color: var(--ink); font: inherit; font-size: 16px; transition: border-color .2s, background-color .2s; }
+.sf-field input:focus, .sf-field select:focus, .sf-field textarea:focus { background: var(--cream); border-color: var(--ink); }
+.sf-field textarea { min-height: 112px; resize: vertical; line-height: 1.6; }
+.sf-field ::placeholder { color: #7A7590; }
+.sf-field [aria-invalid="true"] { border-color: #A3301F; }
+.sf-field select:focus-visible { outline: 3px solid var(--coral); outline-offset: 3px; }
+.sf-group:focus { outline: none; }
+.sf-group .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.sf-group .chip { min-height: 44px; gap: 6px; }
+.sf-group .chip svg { width: 15px; height: 15px; color: var(--lime); }
+.sf-submit { display: grid; gap: 8px; justify-items: start; padding-top: 14px; }
+.sf-submit .btn { padding: 0 24px; }
+
+/* 需求卡：像首頁的米白面板，頂端是一座小島 */
+.sf-result { display: grid; gap: 14px; outline: none; animation: sf-in .5s cubic-bezier(.3, .7, .3, 1); }
+@keyframes sf-in { from { opacity: 0; transform: translateY(12px); } }
+.sf-card { border-radius: 22px; overflow: hidden; background: var(--cream); box-shadow: var(--shadow-riso); }
+.sf-card-art { display: block; width: 100%; height: auto; }
+.sf-card-body { padding: 4px 18px 18px; }
+.sf-card-top { display: grid; gap: 4px; padding-bottom: 12px; border-bottom: 1px solid rgba(35, 31, 53, .12); }
+.sf-card-top h4 { margin: 0; font-family: var(--kai); font-weight: 400; font-size: 22px; }
+.sf-card-top p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.sf-card dl { display: grid; grid-template-columns: 1fr; gap: 0 14px; margin: 4px 0 0; }
+@media (min-width: 560px) { .sf-card dl { grid-template-columns: 7.5em 1fr; } }
+.sf-card dt { font-size: 13px; color: var(--ink-soft); padding-top: 10px; }
+.sf-card dd { margin: 0; font-size: 15px; padding-top: 4px; }
+@media (min-width: 560px) { .sf-card dd { padding-top: 9px; } }
+.sf-card dd small { display: block; font-size: 13px; color: var(--ink-soft); }
+.sf-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.sf-tags span { font-size: 13px; padding: 2px 10px; border-radius: 999px; background: var(--paper-2); }
+.sf-card-foot { margin: 14px 0 0; font-size: 13px; color: var(--ink-soft); }
+.sf-next { margin: 0; font-size: 15px; line-height: 1.75; color: var(--ink-soft); }
+.sf-actions { display: grid; gap: 10px; }
+@media (min-width: 560px) { .sf-actions { display: flex; flex-wrap: wrap; } .sf-actions .btn { padding: 0 22px; } }
+@media (prefers-reduced-motion: reduce) { .sf-result { animation: none; } }
+.partner-list li { align-content: start; }
+.partner-sheet > div > a.btn { display: inline-flex; padding: 0 22px; }

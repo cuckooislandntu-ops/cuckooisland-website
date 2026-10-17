@@ -5,6 +5,8 @@ import { CLUBS, EVENTS, POSTS, REGION_LABEL, SERIES_INFO, STATUS_LABEL, eventSta
 import type { Event, Region, Series } from '@/lib/content'
 import EditLink from '@/components/EditLink'
 import { to } from '@/lib/site'
+import MatchScene, { type Beat } from '@/components/MatchScene'
+import SchoolCampForm from '@/components/SchoolCampForm'
 
 const tabsListCls = 'grid w-full h-auto p-1 rounded-2xl bg-[#F3E2B8]'
 const tabCls = 'min-h-[44px] rounded-xl text-[15px] font-bold data-[state=active]:bg-[#231F35] data-[state=active]:text-[#D6EC6E]'
@@ -146,26 +148,126 @@ export function Column() {
 }
 
 /* ---------- 需求媒合 ---------- */
+/* 三個角色：學校、企業、教育組織。每個分頁有一段三拍的動畫（beats）、合作重點（items）。文字直接改這裡；
+   動畫畫面在 src/components/MatchScene.tsx，學校的需求表單在 src/components/SchoolCampForm.tsx。 */
+const PARTNERS = {
+  school: {
+    tab: '給學校',
+    title: '想讓孩子有一場營隊？說說你們的需要',
+    lede: '全台有上千個教育服務性社團，每年寒暑假都在找願意一起合作的學校。告訴我們方便的時間、想要的主題和孩子的樣子，我們幫你找到合適的社團。',
+    beats: [
+      { h: '學校舉手', p: '填下方便的時間、想要的主題和孩子的樣子。' },
+      { h: '布穀島社配對', p: '從島鏈的社團裡，找地區、時間和主題都合適的。' },
+      { h: '社團帶營隊來', p: '雙方討論細節後，社團帶著準備好的營隊抵達。' },
+    ],
+    items: [
+      { h: '不用自己一間間找', p: '學校只要說清楚需要什麼，布穀島社會從島鏈的社團裡找合適的對象，再介紹你們認識。' },
+      { h: '營隊依孩子設計', p: '社團會依年級、人數、孩子的興趣和需要留意的地方設計活動，混齡也可以。' },
+      { h: '學校負擔不大', p: '多數社團自行準備教案、教材與人力；學校可以視情況提供場地、午餐或住宿等協助。' },
+    ],
+    note: '每個社團的服務方式、地區與費用不同，配對時會先說明清楚，再由學校決定。',
+  },
+  company: {
+    tab: '給企業',
+    title: '和社團合作，讓 CSR 落在真實的服務現場',
+    lede: '教育服務性社團每年寒暑假都在偏鄉、部落和各地國小帶營隊。企業的投入，可以直接變成孩子身邊的一場營隊、一份教材、一段陪伴。',
+    beats: [
+      { h: '企業提出資源', p: '經費、物資，或想帶著員工一起當志工。' },
+      { h: '找到合適的社團', p: '依地區、服務對象和時間，配對到對的社團。' },
+      { h: '營隊發生，成果回來', p: '資源用在孩子身上，紀錄與回饋送回企業。' },
+    ],
+    items: [
+      { h: '具體的社會責任', p: '贊助營隊經費、物資或場地，每一筆都對應到一個社團、一個服務地點和一群孩子，不只是捐款數字。' },
+      { h: '員工志工合作', p: '企業若有員工志工或志工時數的規劃，可以和社團一起設計：營隊的專業分享、職涯講座、陪伴活動，或在社團行前培訓擔任講師。' },
+      { h: '成果看得見', p: '社團可以提供服務紀錄、照片與孩子的回饋，方便放進 ESG 或永續報告、內部分享與對外溝通。' },
+      { h: '一次找到多個社團', p: '透過布穀島社，不必一間一間聯絡，就能依地區、服務對象和時間找到適合長期合作的社團。' },
+    ],
+    note: '合作細節（形式、時數、成果怎麼紀錄）會在媒合時和社團一起確認。',
+  },
+  org: {
+    tab: '給教育組織',
+    title: '讓你們的教材與資源，走進更多營隊',
+    lede: '許多優秀的教案與教材是為學校課堂設計的；社團則常常需要好資源，卻不知道去哪裡找。我們幫兩邊接上線。',
+    beats: [
+      { h: '課堂教案', p: '原本為 40 分鐘、同一個年級的課堂設計。' },
+      { h: '一起改成營隊版', p: '布穀島社和組織一起調整成混齡、時間更短的活動。' },
+      { h: '走進營隊', p: '社團把教案帶到各地營隊，孩子用得上。' },
+    ],
+    items: [
+      { h: '資源被實際用上', p: '社團會把教材帶進營隊，服務偏鄉與各地的孩子，讓資源觸及原本接觸不到的地方，發揮更大的影響力。' },
+      { h: '協助改成營隊版本', p: '營隊常是混齡、時間更短、活動更密集。布穀島社可以和組織一起，把課堂教案調整成適合營隊的形式。' },
+      { h: '來自現場的回饋', p: '社團用過之後，會整理孩子的反應和帶活動時遇到的狀況，回饋給組織作為改版參考。' },
+      { h: '被更多社團看見', p: '資源可以收錄進布穀島社的資料庫，或寫成《布可不資道》專欄，讓全台的社團幹部找得到、用得上。' },
+    ],
+    note: '教案調整需要組織同意，改編後的版本也會標註原始出處。',
+  },
+} as const
+type PartnerKey = keyof typeof PARTNERS
+const ROLE_KEYS = Object.keys(PARTNERS) as PartnerKey[]
+// 與首頁「一次服務的三個面向」同色：贊助單位金黃、教育組織水藍；學校用首頁孩子的淡紫
+const ROLE_COLOR: Record<PartnerKey, string> = { school: '#B7A6D9', company: '#F7C948', org: '#6FCFD5' }
+const IG_LINK = 'https://www.instagram.com/cuckoo_island/'
+
+function ForPartners({ role, setRole }: { role: PartnerKey; setRole: (r: PartnerKey) => void }) {
+  const [formOpen, setFormOpen] = useState(false)
+  return (
+    <section id="for-partners" style={{ display: 'grid', gap: 12, scrollMarginTop: 90 }}>
+      <h2>三種角色，一起把營隊帶到孩子身邊</h2>
+      <p className="section-lede" style={{ marginTop: -6 }}>學校、企業和教育組織，各自可以怎麼和教育服務性社團合作。</p>
+      <Tabs value={role} onValueChange={v => setRole(v as PartnerKey)}>
+        <TabsList className={tabsListCls + ' grid-cols-3'}>
+          {ROLE_KEYS.map(k => <TabsTrigger key={k} value={k} className={tabCls}><i className="role-dot" style={{ background: ROLE_COLOR[k] }} aria-hidden="true" />{PARTNERS[k].tab}</TabsTrigger>)}
+        </TabsList>
+        {ROLE_KEYS.map(k => { const d = PARTNERS[k]; return (
+          <TabsContent key={k} value={k} className="mt-5">
+            <div className={"sheet partner-sheet role-" + k}>
+              <h3>{d.title}</h3>
+              <p className="partner-lede">{d.lede}</p>
+              <MatchScene role={k} beats={d.beats as unknown as Beat[]} label={d.tab + '的合作流程：' + d.beats.map(b => b.h).join('、')} />
+              <ul className="partner-list">
+                {d.items.map(it => <li key={it.h}><b>{it.h}</b><span>{it.p}</span></li>)}
+              </ul>
+              <p className="status">{d.note}</p>
+              {k === 'school'
+                ? (formOpen
+                    ? <div className="sf-wrap"><h3 className="sf-title">學校營隊需求</h3><SchoolCampForm /></div>
+                    : <div className="sf-open"><button className="btn primary" type="button" aria-expanded={false} onClick={() => setFormOpen(true)}>填寫營隊需求</button><span>約 3 分鐘，四個段落，填完會產生一張需求卡</span></div>)
+                : <div><a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={IG_LINK} target="_blank" rel="noopener noreferrer">到 IG 私訊聊聊合作</a></div>}
+            </div>
+          </TabsContent>
+        ) })}
+      </Tabs>
+    </section>
+  )
+}
+
 export function Match() {
   const [msg, setMsg] = useState('')
-  const soon = () => setMsg('媒合表單準備中，上線後填完就會由布穀島社協助配對。')
+  const [role, setRole] = useState<PartnerKey>(() => {
+    try { const r = new URLSearchParams(window.location.search).get('role'); return r && r in PARTNERS ? (r as PartnerKey) : 'school' } catch { return 'school' }
+  })
+  const soon = () => setMsg('社團的媒合表單準備中，上線前可以先到 IG 私訊我們。')
+  const goRole = (r: PartnerKey) => { setRole(r); setTimeout(() => document.getElementById('for-partners')?.scrollIntoView({ behavior: 'smooth' }), 30) }
   return (
     <PageShell kind="match" title="服務需求媒合" tint="#BFE3E6" lede="社團、學校和資源單位，在這裡找到彼此。">
       <div className="paths">
         <div className="path" style={{ background: 'var(--ink)', color: 'var(--cream)' }}>
           <h3 style={{ color: 'var(--lime)' }}>我需要幫忙</h3>
           <p>給社團或服務學校。</p>
-          <ul><li>缺講師、缺志工</li><li>缺物資、器材或場地</li><li>想找可以合作的社團</li></ul>
-          <button className="btn" style={{ background: 'var(--lime)', color: 'var(--ink)', marginTop: 6 }} type="button" onClick={soon}>提出需求</button>
+          <ul><li>缺講師、缺志工</li><li>缺物資、器材或場地</li><li>學校想辦一場營隊</li></ul>
+          <button className="path-more on-dark" type="button" onClick={() => goRole('school')}>學校：填寫營隊需求</button>
+          <button className="btn" style={{ background: 'var(--lime)', color: 'var(--ink)', marginTop: 6 }} type="button" onClick={soon}>社團：提出需求</button>
         </div>
         <div className="path" style={{ background: 'var(--cream)', boxShadow: 'var(--shadow-riso)' }}>
           <h3>我可以提供</h3>
-          <p>給資源單位、講師或個人。</p>
-          <ul><li>經費、物資、場地</li><li>專業分享或培訓</li><li>長期合作的機會</li></ul>
-          <button className="btn primary" style={{ marginTop: 6 }} type="button" onClick={soon}>提供資源</button>
+          <p>給企業、教育組織、講師或個人。</p>
+          <ul><li>經費、物資、場地</li><li>教案、教材或專業分享</li><li>員工志工與長期合作</li></ul>
+          <button className="path-more" type="button" onClick={() => goRole('company')}>企業的合作方式</button>
+          <button className="path-more" type="button" onClick={() => goRole('org')}>教育組織的合作方式</button>
         </div>
       </div>
       <p className="status" role="status" aria-live="polite">{msg}</p>
+      <ForPartners role={role} setRole={setRole} />
       <div>
         <h2>媒合怎麼進行</h2>
         <ol className="steps" style={{ marginTop: 12 }}>
