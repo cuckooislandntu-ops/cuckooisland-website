@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label'
 import { CAT_COLLECTION, ENTRIES, newestFirst } from '@/lib/content'
 import EditLink from '@/components/EditLink'
 import type { Cat, Entry } from '@/lib/content'
+import { to } from '@/lib/site'
 
 const PERSONA: Record<Cat, { label: string; bg: string; badge: string; lines: string[]; subs: string[] }> = {
   all: { label: '總覽', bg: '#E6F1B5', badge: '#6E8C25', subs: [],
@@ -183,7 +184,7 @@ function LecturerCard({ e, fresh }: { e: Entry; fresh?: boolean }) {
       {l.career.length > 3 && <button type="button" className="guide-toggle" aria-expanded={all} onClick={() => setAll(!all)}>{all ? '收起經歷' : `看全部經歷（${l.career.length}）`}</button>}
       <div className="entry-foot">
         <span className="host">邀請請透過布穀島社聯繫</span>
-        <a className="open-link" href="#match">邀請講師</a>
+        <a className="open-link" href={to('match')}>邀請講師</a>
       </div>
       <EditLink collection="lecturers" id={e.id} label="編輯" />
     </article>
@@ -304,14 +305,14 @@ export default function Resources() {
               {list.map(e => <EntryCard key={e.id} e={e} />)}
               {list.length === 0 && (ENTRIES.some(e => e.cat === cat)
                 ? <div className="empty"><h3>沒有符合的資料</h3><p>換個關鍵字，或點「全部」看這一類的所有資料。</p></div>
-                : <div className="empty"><h3>{p.label}資料整理中</h3><p>這一類還沒有登錄資料。認識合適的{cat === 'lecturer' ? '講師' : '單位'}，歡迎推薦給我們。</p><a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="#match">推薦給布穀島社</a></div>)}
+                : <div className="empty"><h3>{p.label}資料整理中</h3><p>這一類還沒有登錄資料。認識合適的{cat === 'lecturer' ? '講師' : '單位'}，歡迎推薦給我們。</p><a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={to('match')}>推薦給布穀島社</a></div>)}
             </div>
           </div>
         )}
         <div className="sheet" style={{ display: 'grid', gap: 8 }}>
           <h2>有資源想分享？</h2>
           <p className="section-lede" style={{ marginTop: 0 }}>加入島鏈後，可以把你們的教案、講師或贊助資訊分享進資料庫。你分享一份，其他社團就少準備一份。</p>
-          <a className="btn primary" href="#join">申請加入島鏈</a>
+          <a className="btn primary" href={to('join')}>申請加入島鏈</a>
         </div>
       </div></div>
     </main>

@@ -1,6 +1,7 @@
 import { PageShell } from '@/components/Chrome'
 import { SETTINGS } from '@/lib/content'
 import EditLink from '@/components/EditLink'
+import { to } from '@/lib/site'
 
 // 會員申請用的 Google 表單（加入布穀島｜島鏈計畫會員申請）：在 /admin 的「網站設定」修改。
 // 要直接嵌入表單：在 Google 表單按「傳送 → <> 嵌入 HTML」，把 iframe 的 src 貼到「表單嵌入網址」。
@@ -68,7 +69,7 @@ export default function Join() {
         <h2>填寫社團訪談文件的小提醒</h2>
         <p className="section-lede" style={{ marginTop: 0 }}>訪談文件的內容，經你們審稿後，會整理成社團地圖和專欄《布穀好朋友》裡的介紹。</p>
         <ul className="tips">{TIPS.map(t => <li key={t}>{t}</li>)}</ul>
-        <a className="link-plain" href="#post-friends-1">看看《布穀好朋友》寫成的樣子</a>
+        <a className="link-plain" href={to('post-friends-1')}>看看《布穀好朋友》寫成的樣子</a>
       </div>
 
       <div className="paths">

@@ -2,6 +2,7 @@
 import { useLightbox } from '@/components/Lightbox'
 import EditLink from '@/components/EditLink'
 import { EVENTS, STATUS_LABEL, eventStatus, fmtDate, weekday } from '@/lib/content'
+import { to } from '@/lib/site'
 
 export default function EventPage({ id }: { id: string }) {
   const lb = useLightbox()
@@ -11,7 +12,7 @@ export default function EventPage({ id }: { id: string }) {
       <main className="page" id="main"><div className="content"><div className="content-inner">
         <h1 style={{ fontSize: 26 }}>找不到這場活動</h1>
         <p className="section-lede">這場活動可能已經移除，回活動頁看看其他活動吧。</p>
-        <a className="btn primary" href="#events">回到活動</a>
+        <a className="btn primary" href={to('events')}>回到活動</a>
       </div></div></main>
     )
   }
@@ -20,7 +21,7 @@ export default function EventPage({ id }: { id: string }) {
     <main className="page" id="main">
       <header className="article-head" style={{ backgroundColor: '#DDD3F0' }}>
         <div className="article-inner">
-          <a className="back" href="#events">
+          <a className="back" href={to('events')}>
             <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 3L5 8l5 5" /></svg>活動
           </a>
           <div className="entry-top" style={{ marginTop: 14 }}>
@@ -58,7 +59,7 @@ export default function EventPage({ id }: { id: string }) {
           {st === 'past' && !e.recap && <p className="status">活動照片和參與社團的心得整理中。</p>}
 
           <div className="article-actions">
-            <a className="btn ghost" href="#events">看其他活動</a>
+            <a className="btn ghost" href={to('events')}>看其他活動</a>
             <a className="ig" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer">新活動會先公布在 IG @cuckoo_island</a>
           </div>
           <EditLink collection="events" id={e.id} label="在後台編輯這場活動" float />

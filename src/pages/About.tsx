@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { PageShell } from '@/components/Chrome'
+import { to } from '@/lib/site'
 
 const HOLES = [
   { n: '①', t: '社團與社團之間', d: '彼此搶社員、搶合作機構和贊助，經驗留在各自的社辦裡。' },
@@ -102,8 +103,8 @@ export default function About() {
         <h2>這座島還在長大</h2>
         <p>如果你也在社團裡扛著，歡迎一起來。</p>
         <div className="btns" style={{ marginTop: 6 }}>
-          <a className="btn primary" href="#join">申請加入島鏈</a>
-          <a className="btn ghost" href="#resources">先逛逛資料庫</a>
+          <a className="btn primary" href={to('join')}>申請加入島鏈</a>
+          <a className="btn ghost" href={to('resources')}>先逛逛資料庫</a>
         </div>
       </section>
     </PageShell>

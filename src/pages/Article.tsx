@@ -2,6 +2,7 @@ import { useLightbox } from '@/components/Lightbox'
 import { CLUBS, ENTRIES, POSTS, REGION_LABEL, SERIES_INFO, fmtDate } from '@/lib/content'
 import { EntryCard } from '@/pages/Resources'
 import EditLink from '@/components/EditLink'
+import { to } from '@/lib/site'
 
 const IG = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
 
@@ -14,7 +15,7 @@ export default function Article({ id }: { id: string }) {
       <main className="page" id="main"><div className="content"><div className="content-inner">
         <h1 style={{ fontSize: 26 }}>找不到這篇文章</h1>
         <p className="section-lede">這篇文章可能已經移除，回專欄看看其他文章吧。</p>
-        <a className="btn primary" href="#column">回到專欄</a>
+        <a className="btn primary" href={to('column')}>回到專欄</a>
       </div></div></main>
     )
   }
@@ -27,7 +28,7 @@ export default function Article({ id }: { id: string }) {
     <main className="page" id="main">
       <header className="article-head" style={{ backgroundColor: info.tint }}>
         <div className="article-inner">
-          <a className="back" href="#column">
+          <a className="back" href={to('column')}>
             <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 3L5 8l5 5" /></svg>專欄
           </a>
           <div className="entry-top" style={{ marginTop: 14 }}>
@@ -66,7 +67,7 @@ export default function Article({ id }: { id: string }) {
             </section>}
             {post.closing && <blockquote>{post.closing}</blockquote>}
             <div className="article-actions">
-              <a className="btn primary" href="#map">在社團地圖上看{club.name.replace('台大', '')}</a>
+              <a className="btn primary" href={to('map')}>在社團地圖上看{club.name.replace('台大', '')}</a>
               {club.ig && <a className="ig" href={`https://www.instagram.com/${club.ig}/`} target="_blank" rel="noopener noreferrer"><IG />@{club.ig}</a>}
             </div>
           </>}
@@ -79,13 +80,13 @@ export default function Article({ id }: { id: string }) {
             </section>}
             {post.closing && <blockquote>{post.closing}</blockquote>}
             <div className="article-actions">
-              <a className="btn primary" href={res.length ? '#resources' : '#column'}>{res.length ? '到資料庫找更多資源' : '看更多專欄文章'}</a>
+              <a className="btn primary" href={to(res.length ? 'resources' : 'column')}>{res.length ? '到資料庫找更多資源' : '看更多專欄文章'}</a>
             </div>
           </>}
 
           <nav className="article-nav" aria-label="其他文章">
-            {newer ? <a href={'#' + newer.id}><span>較新的文章</span><b>{newer.title}</b></a> : <span />}
-            {older ? <a href={'#' + older.id} className="right"><span>較早的文章</span><b>{older.title}</b></a> : <span />}
+            {newer ? <a href={to(newer.id)}><span>較新的文章</span><b>{newer.title}</b></a> : <span />}
+            {older ? <a href={to(older.id)} className="right"><span>較早的文章</span><b>{older.title}</b></a> : <span />}
           </nav>
           <a className="ig" href={post.ig || 'https://www.instagram.com/cuckoo_island/'} target="_blank" rel="noopener noreferrer"><IG />{post.ig ? '在 IG 看原始貼文' : '在 IG @cuckoo_island 看更多'}</a>
         </div>

@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { CLUBS, EVENTS, POSTS, REGION_LABEL, SERIES_INFO, SETTINGS, STATUS_LABEL, eventStatus, weekday } from '@/lib/content'
 import type { Event, Region, Series } from '@/lib/content'
 import EditLink from '@/components/EditLink'
+import { to } from '@/lib/site'
 
 const tabsListCls = 'grid w-full h-auto p-1 rounded-2xl bg-[#F3E2B8]'
 const tabCls = 'min-h-[44px] rounded-xl text-[15px] font-bold data-[state=active]:bg-[#231F35] data-[state=active]:text-[#D6EC6E]'
@@ -56,12 +57,12 @@ export function ClubMap() {
             {c.partial && <p className="status">這個社團的介紹還在整理，內容可能不完整。</p>}
             <div className="entry-foot">
               {c.ig ? <a className="ig club-ig" href={`https://www.instagram.com/${c.ig}/`} target="_blank" rel="noopener noreferrer"><IG />@{c.ig}</a> : <span />}
-              {post && <a className="open-link" href={'#' + post.id}>完整介紹</a>}
+              {post && <a className="open-link" href={to(post.id)}>完整介紹</a>}
             </div>
             <EditLink collection="clubs" id={c.id} label="編輯社團資料" />
           </article>
         ) })}
-        <Empty title="你們的社團也想出現在這裡？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="#join">申請加入島鏈</a>}>
+        <Empty title="你們的社團也想出現在這裡？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={to('join')}>申請加入島鏈</a>}>
           申請加入島鏈時填寫社團訪談文件，經你們審稿後，我們會把社團整理到地圖上，也寫成《布穀好朋友》專欄。
         </Empty>
       </div>
@@ -113,7 +114,7 @@ export function Handbook() {
 function EventCard({ e }: { e: Event }) {
   const st = eventStatus(e)
   return (
-    <a className="event event-link" href={'#' + e.id}>
+    <a className="event event-link" href={to(e.id)}>
       <div className="event-date"><b>{+e.date.slice(5, 7)}/{+e.date.slice(8, 10)}</b><span>{e.date.slice(0, 4)} · {weekday(e.date)}</span></div>
       <div>
         <div className="entry-top"><span className={'cat-badge st-' + st}>{STATUS_LABEL[st]}</span><span className="sub-tag">{e.type}</span>{e.ep && <span className="sub-tag">{e.ep}</span>}</div>
@@ -168,7 +169,7 @@ export function Column() {
       </div>
       <div className="entries">
         {list.map(p => (
-          <a key={p.id} className="entry post-card" href={'#' + p.id}>
+          <a key={p.id} className="entry post-card" href={to(p.id)}>
             {p.cover && <img className="post-cover" src={p.cover} alt="" loading="lazy" />}
             <div className="entry-top"><span className="cat-badge" style={{ background: SERIES_INFO[p.series].color }}>{p.series} {p.ep}</span>{p.date && <span className="sub-tag">{+p.date.slice(5, 7)} 月 {+p.date.slice(8)} 日</span>}</div>
             <h3>{p.title}</h3>
@@ -177,7 +178,7 @@ export function Column() {
           </a>
         ))}
       </div>
-      <Empty title="想寫你們社團的故事？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href="#join">申請加入島鏈</a>}>
+      <Empty title="想寫你們社團的故事？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={to('join')}>申請加入島鏈</a>}>
         帶營隊時印象最深的一刻、社團撐過的難關、交接時想對學弟妹說的話，都歡迎寫下來。
       </Empty>
     </PageShell>

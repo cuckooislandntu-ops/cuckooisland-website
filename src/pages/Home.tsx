@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { startStory } from '@/story/engine'
-import { Logo } from '@/lib/site'
+import { Logo, to } from '@/lib/site'
 
 const Chevron = () => <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
 
@@ -111,19 +111,19 @@ export default function Home({ onTone }: { onTone: (t: 'light' | 'dark') => void
               <svg viewBox="0 0 26 26" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"><path d="M3 5h13v8H9l-4 3v-3H3z" /><path d="M19 9h4v8h-2v3l-4-3h-6v-2" /></svg>
               <h3>交流經驗</h3>
               <p>寫下你們社團的做法、踩過的坑，在交流會和專欄裡分享。下一屆、隔壁校的社團，都能少走一段路。</p>
-              <div className="go"><a href="#column">讀專欄</a><a href="#events">看活動</a></div>
+              <div className="go"><a href={to('column')}>讀專欄</a><a href={to('events')}>看活動</a></div>
             </div>
             <div className="route">
               <svg viewBox="0 0 26 26" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"><path d="M13 7c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V6c-3-1-6-1-9 1z" /><path d="M13 7v14" /></svg>
               <h3>共享資源</h3>
               <p>你上傳一份教案，就能用到其他社團的教案、講師名單與贊助資訊。</p>
-              <div className="go"><a href="#resources">查資料庫</a><a href="#handbook">翻手冊</a></div>
+              <div className="go"><a href={to('resources')}>查資料庫</a><a href={to('handbook')}>翻手冊</a></div>
             </div>
             <div className="route">
               <svg viewBox="0 0 26 26" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M13 23V11" /><path d="M13 14c0-4 3-7 8-7 0 5-3 7-8 7z" /><path d="M13 17c0-3-2-6-7-6 0 4 2 6 7 6z" /></svg>
               <h3>一起成長</h3>
               <p>缺講師、缺物資時提出需求；有餘力時，也去接住別人的需求。</p>
-              <div className="go"><a href="#match">需求媒合</a><a href="#map">社團地圖</a></div>
+              <div className="go"><a href={to('match')}>需求媒合</a><a href={to('map')}>社團地圖</a></div>
             </div>
           </div>
         </section>
@@ -158,10 +158,10 @@ export default function Home({ onTone }: { onTone: (t: 'light' | 'dark') => void
                 <li><b>正式加入島鏈</b><span>收到整理好的教案、贊助資訊與講師名單，也能看到其他社團的經驗整理。</span></li>
               </ol>
               <div className="btns">
-                <a className="btn primary" href="#join">申請加入島鏈</a>
-                <a className="btn ghost" href="#resources">先逛逛資料庫</a>
+                <a className="btn primary" href={to('join')}>申請加入島鏈</a>
+                <a className="btn ghost" href={to('resources')}>先逛逛資料庫</a>
               </div>
-              <p style={{ margin: 0 }}><a className="ig" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a><a className="about-link" href="#about">認識布穀島社</a></p>
+              <p style={{ margin: 0 }}><a className="ig" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a><a className="about-link" href={to('about')}>認識布穀島社</a></p>
             </div>
           </div>
         </section>

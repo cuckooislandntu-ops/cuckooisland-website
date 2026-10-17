@@ -1,5 +1,5 @@
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { ALL_ROUTES, Logo, NAV, href } from '@/lib/site'
+import { ALL_ROUTES, Logo, NAV, to } from '@/lib/site'
 import type { RouteId } from '@/lib/site'
 import type { ReactElement, ReactNode } from 'react'
 
@@ -8,9 +8,9 @@ export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' 
   const onHome = raw === ''
   return (
     <header className={'bar' + (onHome ? (tone === 'dark' ? ' dark' : '') : ' solid')}>
-      <a className="brand" href="#" aria-label="布穀島社首頁"><Logo />布穀島社</a>
+      <a className="brand" href={to('')} aria-label="布穀島社首頁"><Logo />布穀島社</a>
       <div className="bar-actions">
-        {route !== 'join' && <a className="pill" href="#join">加入會員</a>}
+        {route !== 'join' && <a className="pill" href={to('join')}>加入會員</a>}
         <Sheet>
           <SheetTrigger asChild>
             <button className="menu-btn" type="button" aria-label="開啟選單">
@@ -28,7 +28,7 @@ export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' 
                   <h2>{g.group}</h2>
                   {g.items.map(it => (
                     <SheetClose asChild key={it.id || 'home'}>
-                      <a className="nav-link" href={href(it.id)} aria-current={route === it.id ? 'page' : undefined}>
+                      <a className="nav-link" href={to(it.id)} aria-current={route === it.id ? 'page' : undefined}>
                         <b>{it.label}</b><span>{it.desc}</span>
                       </a>
                     </SheetClose>
@@ -47,10 +47,10 @@ export function Footer() {
   return (
     <footer className="foot">
       <div className="foot-inner">
-        <a className="brand" href="#" style={{ color: 'var(--cream)' }}><Logo />布穀島社</a>
+        <a className="brand" href={to('')} style={{ color: 'var(--cream)' }}><Logo />布穀島社</a>
         <nav aria-label="網站地圖">
           <ul className="sitemap">
-            {ALL_ROUTES.map(r => <li key={r.id || 'home'}><a href={href(r.id)}>{r.label}</a></li>)}
+            {ALL_ROUTES.map(r => <li key={r.id || 'home'}><a href={to(r.id)}>{r.label}</a></li>)}
           </ul>
         </nav>
         <a className="ig" aria-label="布穀島社 Instagram：@cuckoo_island" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a>

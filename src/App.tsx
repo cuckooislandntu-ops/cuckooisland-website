@@ -17,7 +17,7 @@ export default function App() {
   const route = useRoute()
   const [tone, setTone] = useState<'light' | 'dark'>('light')
 
-  useEffect(() => { const post = POSTS.find(p => p.id === route) || EVENTS.find(e => e.id === route); document.title = post ? `${post.title}｜布穀島社` : route ? `${TITLES[route] || '專欄'}｜布穀島社` : '布穀島社' }, [route])
+  useEffect(() => { const post = POSTS.find(p => p.id === route) || EVENTS.find(e => e.id === route); document.title = post ? `${post.title}｜布穀島社` : route ? `${TITLES[route] || '專欄'}｜布穀島社` : '布穀島社｜串聯全台教育服務性社團' }, [route])
   useEffect(() => {
     // fine paper grain, one device pixel per speck; used as a background layer (--grain), never on top of content
     const dpr = Math.min(3, Math.max(1, Math.round(devicePixelRatio || 1))), size = 256
