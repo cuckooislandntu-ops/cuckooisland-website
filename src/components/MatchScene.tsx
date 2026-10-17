@@ -424,7 +424,7 @@ function OrgScene({ moving }: { moving: boolean }) {
       <Tag x={150} y={142} text="課堂 40 分鐘" cls="b1 only" />
       <Tag x={192} y={128} text="營隊版・混齡・短時" cls="b2 only late" />
       <Bubble x={98} y={98} text="這些教案，誰用得上？" cls="b1" />
-      <Bubble x={304} y={114} text="大孩子小孩子都能玩！" cls="b3 last" bg={C.lime} />
+      <Bubble x={304} y={114} text="教案影響力UP！" cls="b3 last" bg={C.lime} />
     </g>
   )
 }
