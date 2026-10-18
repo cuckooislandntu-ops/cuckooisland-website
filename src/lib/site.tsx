@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { LOGO_SRC } from './logo'
 
-export type RouteId = '' | 'about' | 'join' | 'resources' | 'map' | 'handbook' | 'events' | 'column' | 'match' | 'member'
+export type RouteId = '' | 'about' | 'join' | 'resources' | 'map' | 'handbook' | 'events' | 'column' | 'match' | 'member' | 'privacy'
 
 export const NAV: { group: string; items: { id: RouteId; label: string; desc: string }[] }[] = [
   { group: '認識布穀島', items: [
@@ -27,7 +27,7 @@ export const ALL_ROUTES = NAV.flatMap(g => g.items)
 declare const __PATH_ROUTES__: boolean
 export const PATH_ROUTES = typeof __PATH_ROUTES__ !== 'undefined' && __PATH_ROUTES__
 
-const PAGE_IDS = new Set<string>(ALL_ROUTES.map(r => r.id))
+const PAGE_IDS = new Set<string>([...ALL_ROUTES.map(r => r.id), 'privacy']) // privacy：隱私權政策，不放選單，頁尾有連結
 const isRoute = (id: string) => PAGE_IDS.has(id) || /^(post|event)-[a-z0-9-]+$/.test(id)
 
 /** link to a page id ('', 'join', …), an article ('post-friends-1' → /column/friends-1) or an event ('event-…' → /events/…) */

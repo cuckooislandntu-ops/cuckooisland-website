@@ -1024,3 +1024,8 @@ details.hb-help { padding: 0; }
   .mb-rays { opacity: 1; }
   .mb-guide .mb-eyes g g { transition: none; }
 }
+.fine a { color: inherit; text-underline-offset: 3px; }
+.policy h2 { font-size: 21px; margin-top: 6px; }
+.policy p, .policy li { font-size: 15px; line-height: 1.85; }
+.policy ul { margin: 6px 0 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.policy section { display: grid; gap: 6px; }

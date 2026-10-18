@@ -73,7 +73,7 @@ export function Footer() {
           </ul>
         </nav>
         <a className="ig" aria-label="布穀島社 Instagram：@cuckoo_island" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a>
-        <p className="fine">串聯全台教育服務性社團。© 2026 布穀島社</p>
+        <p className="fine">串聯全台教育服務性社團。© 2026 布穀島社　<a href={to('privacy')}>隱私權政策</a></p>
       </div>
     </footer>
   )

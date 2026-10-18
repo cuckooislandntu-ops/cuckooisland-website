@@ -6,7 +6,7 @@
     { "source": "/admin", "destination": "/admin/", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/:page(about|join|resources|map|handbook|events|column|match|member)", "destination": "/p/:page.html" },
+    { "source": "/:page(about|join|resources|map|handbook|events|column|match|member|privacy)", "destination": "/p/:page.html" },
     { "source": "/column/:slug", "destination": "/p/column/:slug.html" },
     { "source": "/events/:slug", "destination": "/p/events/:slug.html" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
