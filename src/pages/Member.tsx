@@ -15,10 +15,30 @@ import {
 } from '@/lib/member'
 import type { DirectoryEntry, EditableProfile, MemberPost, Profile } from '@/lib/member'
 
-const OTHER = '__other'
 const IG = 'https://www.instagram.com/cuckoo_island/'
-const clubOf = (p: Pick<Profile, 'club_id' | 'club_name'>) => CLUBS.find(c => c.id === p.club_id)?.name || p.club_name
-const hasClub = (p: Profile) => !!((p.club_id || p.club_name) && p.contact_method && p.contact_value)
+const clubOf = (p: Pick<Profile, 'club_id' | 'club_name'>) => p.club_name || CLUBS.find(c => c.id === p.club_id)?.name || ''
+const schoolOf = (p: Pick<Profile, 'club_id' | 'school'>) => p.school || CLUBS.find(c => c.id === p.club_id)?.school || ''
+// 社團地圖上同名的社團（名錄卡片連到地圖介紹、頭像沒圖時用地圖顏色）
+const mapClub = (p: Pick<Profile, 'club_id' | 'club_name'>) => CLUBS.find(c => c.id === p.club_id) || CLUBS.find(c => c.name === p.club_name.trim())
+
+/** 社團身分：頭像在左，右邊上面是學校或單位（小、灰），下面是社團全名（大、黑）。名錄、歡迎詞、之後的留言都用這個。 */
+export function ClubIdentity({ p, size = 'md', suffix, as: H = 'h3' }: {
+  p: Pick<Profile, 'club_id' | 'club_name' | 'school' | 'avatar_url'>; size?: 'sm' | 'md' | 'lg'; suffix?: ReactNode; as?: 'h2' | 'h3' | 'p'
+}) {
+  const name = clubOf(p), school = schoolOf(p), c = mapClub(p)
+  return (
+    <div className={'club-id ' + size}>
+      {p.avatar_url
+        ? <img src={p.avatar_url} alt="" loading="lazy" referrerPolicy="no-referrer" />
+        : <span className="club-id-initial" aria-hidden="true" style={c ? { background: c.color } : undefined}>{name.slice(0, 1) || '社'}</span>}
+      <div>
+        {school && <p className="club-id-school">{school}</p>}
+        <H className="club-id-name">{name}{suffix}</H>
+      </div>
+    </div>
+  )
+}
+const hasClub = (p: Profile) => !!(clubOf(p) && p.contact_method && p.contact_value)
 
 export default function Member() {
   const m = useMember()
@@ -115,11 +135,9 @@ function Approved({ profile }: { profile: Profile }) {
   return (
     <>
       <div className="mb-hello">
-        {profile.avatar_url && <img src={profile.avatar_url} alt="" width={48} height={48} referrerPolicy="no-referrer" />}
-        <div>
-          <h2>{clubOf(profile)}，歡迎回來</h2>
-          <Who email={profile.email} />
-        </div>
+        <p className="mb-hello-hi">歡迎回來</p>
+        <ClubIdentity p={profile} size="lg" as="h2" />
+        <Who email={profile.email} />
       </div>
       <a className="mb-hb-link" href={to('handbook')}>
         <b>經營手冊</b><span>每一章的檔案都打開了</span>
@@ -177,7 +195,7 @@ function Directory({ me }: { me: string }) {
   const types = useMemo(() => [...new Set((data || []).flatMap(d => d.service_types || []))], [data])
   const list = useMemo(() => {
     const k = q.trim().toLowerCase()
-    return (data || []).filter(d => (!type || d.service_types?.includes(type)) && (!k || [clubOf(d), d.school, ...(d.service_types || [])].some(t => t?.toLowerCase().includes(k))))
+    return (data || []).filter(d => (!type || d.service_types?.includes(type)) && (!k || [clubOf(d), schoolOf(d), ...(d.service_types || [])].some(t => t?.toLowerCase().includes(k))))
   }, [data, q, type])
   if (error) return <p className="field-error">{error}</p>
   if (!data) return <p className="status">讀取中⋯</p>
@@ -198,17 +216,10 @@ function Directory({ me }: { me: string }) {
         : <ul className="mb-people">
             {list.map(d => {
               const href = contactHref(d.contact_method, d.contact_value)
-              const club = CLUBS.find(c => c.id === d.club_id)
-              const name = clubOf(d)
+              const club = mapClub(d)
               return (
                 <li key={d.id} className="sheet">
-                  <div className="mb-person-top">
-                    <span className="mb-initial" aria-hidden="true" style={club ? { background: club.color } : undefined}>{name.slice(0, 1)}</span>
-                    <div>
-                      <h3>{name}{d.id === me && <small>（你們）</small>}</h3>
-                      {(d.school || club?.school) && <p>{d.school || club?.school}</p>}
-                    </div>
-                  </div>
+                  <ClubIdentity p={d} suffix={d.id === me ? <small>（你們）</small> : null} />
                   {d.service_types?.length > 0 && <p className="sf-tags">{d.service_types.map(t => <span key={t}>{t}</span>)}</p>}
                   {d.contact_method && d.contact_value && (
                     <p className="mb-contact">
@@ -229,40 +240,32 @@ function Directory({ me }: { me: string }) {
 /* ---------- 社團資料表單 ---------- */
 function ProfileForm({ profile, submitLabel }: { profile: Profile; submitLabel: string }) {
   const known = (t: string) => SERVICE_TYPES.includes(t)
+  const allowed = (m: string) => CONTACTS.some(c => c.id === m)
   const [f, setF] = useState<EditableProfile>(() => ({
-    club_id: profile.club_id, club_name: profile.club_name, school: profile.school, service_types: profile.service_types || [],
-    contact_method: profile.contact_method, contact_value: profile.contact_value, show_in_directory: profile.show_in_directory,
+    club_id: profile.club_id, club_name: clubOf(profile), school: schoolOf(profile), service_types: profile.service_types || [],
+    // LINE、電話不再開放，舊資料要重選
+    contact_method: allowed(profile.contact_method) ? profile.contact_method : '', contact_value: allowed(profile.contact_method) ? profile.contact_value : '',
+    show_in_directory: profile.show_in_directory,
   }))
-  const [club, setClub] = useState(() => profile.club_id && CLUBS.some(c => c.id === profile.club_id) ? profile.club_id : profile.club_name ? OTHER : '')
   const [otherType, setOtherType] = useState(() => (profile.service_types || []).filter(t => !known(t)).join('、'))
   const [errs, setErrs] = useState<Record<string, string>>({})
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
   const up = <K extends keyof EditableProfile>(k: K, v: EditableProfile[K]) => { setF(s => ({ ...s, [k]: v })); setMsg('') }
-  const clubs = useMemo(() => [...CLUBS].sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant')), [])
   const hint = CONTACTS.find(c => c.id === f.contact_method)?.hint
   const toggleType = (t: string) => up('service_types', f.service_types.includes(t) ? f.service_types.filter(x => x !== t) : [...f.service_types, t])
-
-  const pickClub = (v: string) => {
-    setClub(v); setMsg('')
-    const c = CLUBS.find(x => x.id === v)
-    setF(s => ({
-      ...s, club_id: c ? c.id : '', club_name: c ? '' : s.club_name, school: c ? c.school : s.school,
-      // 選了地圖上的社團，帶入它的服務形式（還沒選過的話）
-      service_types: c && !s.service_types.length ? c.types.filter(known) : s.service_types,
-    }))
-  }
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     const extra = otherType.split(/[、,，\s]+/).map(t => t.trim()).filter(Boolean)
+    const name = f.club_name.trim()
     const v: EditableProfile = {
-      ...f, club_name: club === OTHER ? f.club_name.trim() : '', club_id: club === OTHER ? '' : club, school: f.school.trim(),
+      ...f, club_name: name, school: f.school.trim(), club_id: CLUBS.find(c => c.name === name)?.id || '',
       service_types: [...f.service_types.filter(known), ...extra.filter(t => !known(t))], contact_value: f.contact_value.trim(),
     }
     const er: Record<string, string> = {}
-    if (!club) er.club = '請選擇社團；不在名單上的話選「其他」。'
-    else if (club === OTHER && !v.club_name) er.club_name = '請填社團全名。'
+    if (!v.school) er.school = '請填學校或單位。'
+    if (!v.club_name) er.club_name = '請填社團全名。'
     if (!v.service_types.length) er.service_types = '至少選一種服務性質。'
     if (!v.contact_method) er.contact_method = '請選一種聯絡方式。'
     else if (!v.contact_value) er.contact_value = '請填聯絡資訊。'
@@ -285,26 +288,20 @@ function ProfileForm({ profile, submitLabel }: { profile: Profile; submitLabel: 
     <form className="sheet mb-form" onSubmit={submit} noValidate>
       <h2>社團資料</h2>
       <div className="sf-field">
-        <label htmlFor="pf-club">社團名稱<em>必填</em></label>
-        <select id="pf-club" value={club} onChange={e => pickClub(e.target.value)} {...inv('club')}>
-          <option value="">請選擇</option>
-          {clubs.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          <option value={OTHER}>其他（不在名單上）</option>
-        </select>
-        {fieldErr('club')}
+        <label htmlFor="pf-school">學校或單位<em>必填</em></label>
+        <input id="pf-school" value={f.school} onChange={e => up('school', e.target.value)} placeholder="例如：國立臺灣大學" autoComplete="organization" {...inv('school')} />
+        {fieldErr('school')}
       </div>
-      {club === OTHER && (
-        <>
-          <div className="sf-field">
-            <label htmlFor="pf-club_name">社團全名<em>必填</em></label>
-            <input id="pf-club_name" value={f.club_name} onChange={e => up('club_name', e.target.value)} placeholder="例如：國立臺灣大學陽光椰子社會服務社" {...inv('club_name')} />
-            {fieldErr('club_name')}
-          </div>
-          <div className="sf-field">
-            <label htmlFor="pf-school">學校<em className="opt">選填</em></label>
-            <input id="pf-school" value={f.school} onChange={e => up('school', e.target.value)} autoComplete="organization" />
-          </div>
-        </>
+      <div className="sf-field">
+        <label htmlFor="pf-club_name">社團全名<em>必填</em></label>
+        <input id="pf-club_name" value={f.club_name} onChange={e => up('club_name', e.target.value)} placeholder="例如：臺大陽光椰子社會服務社" {...inv('club_name')} />
+        {fieldErr('club_name')}
+      </div>
+      {(f.club_name.trim() || f.school.trim()) && (
+        <div className="mb-preview" aria-hidden="true">
+          <p className="sf-hint" style={{ margin: 0 }}>在名錄和留言會這樣顯示</p>
+          <ClubIdentity p={{ ...profile, club_id: '', club_name: f.club_name.trim() || '社團全名', school: f.school.trim() }} size="sm" as="p" />
+        </div>
       )}
       <fieldset className="sf-group" id="pf-service_types" tabIndex={-1} {...inv('service_types')}>
         <legend>服務性質<em>必填，可複選</em></legend>
@@ -319,7 +316,7 @@ function ProfileForm({ profile, submitLabel }: { profile: Profile; submitLabel: 
       </fieldset>
       <fieldset className="sf-group" id="pf-contact_method" tabIndex={-1} {...inv('contact_method')}>
         <legend>聯絡方式<em>必填</em></legend>
-        <p className="sf-hint">其他會員社團和布穀島夥伴會用這個方式聯絡你們，建議填社團的公開帳號。</p>
+        <p className="sf-hint">其他會員社團和布穀島夥伴會用這個方式聯絡你們，請填社團的公開帳號。</p>
         <div className="chips" role="radiogroup" aria-label="聯絡方式">
           {CONTACTS.map(c => (
             <button key={c.id} type="button" role="radio" className="chip" aria-checked={f.contact_method === c.id}
@@ -332,7 +329,7 @@ function ProfileForm({ profile, submitLabel }: { profile: Profile; submitLabel: 
         <div className="sf-field">
           <label htmlFor="pf-contact_value">{contactLabel(f.contact_method)}<em>必填</em></label>
           <input id="pf-contact_value" value={f.contact_value} onChange={e => up('contact_value', e.target.value)} placeholder={hint}
-            inputMode={f.contact_method === 'phone' ? 'tel' : f.contact_method === 'email' ? 'email' : undefined} {...inv('contact_value')} />
+            inputMode={f.contact_method === 'email' ? 'email' : undefined} {...inv('contact_value')} />
           {fieldErr('contact_value')}
         </div>
       )}

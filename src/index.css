@@ -1034,3 +1034,21 @@ details.hb-help { padding: 0; }
 .mb-denied span { font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
 .mb-denied a { color: var(--ink); }
 .mb-out-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* 社團身分（ClubIdentity）：頭像＋右側「學校或單位（小、灰、在上）／社團全名（大、黑）」，名錄、歡迎詞、留言共用 */
+.club-id { display: grid; grid-template-columns: var(--av) 1fr; gap: 12px; align-items: center; --av: 44px; }
+.club-id.sm { --av: 36px; gap: 10px; }
+.club-id.lg { --av: 56px; gap: 14px; }
+.club-id > img, .club-id-initial { width: var(--av); height: var(--av); border-radius: 50%; object-fit: cover; box-shadow: 3px 3px 0 rgba(35, 31, 53, .12); }
+.club-id-initial { display: grid; place-items: center; background: var(--salmon); color: var(--ink); font-family: var(--kai); font-size: calc(var(--av) * .42); }
+.club-id > div { min-width: 0; display: grid; gap: 1px; }
+.club-id-school { margin: 0; font-size: 13px; line-height: 1.4; color: var(--ink-soft); }
+.club-id-name { margin: 0; font-family: var(--kai); font-weight: 400; font-size: 19px; line-height: 1.35; color: var(--ink); overflow-wrap: anywhere; }
+.club-id.sm .club-id-school { font-size: 12px; }
+.club-id.sm .club-id-name { font-size: 16px; }
+.club-id.lg .club-id-school { font-size: 14px; }
+.club-id.lg .club-id-name { font-size: clamp(21px, 5.6vw, 26px); }
+.club-id-name small { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); margin-left: 4px; }
+.mb-hello { display: grid; gap: 8px; }
+.mb-hello-hi { margin: 0; font-size: 14px; color: var(--leaf); }
+.mb-preview { display: grid; gap: 8px; padding: 12px 14px; border-radius: 14px; background: var(--paper); }

@@ -156,14 +156,14 @@ export async function fetchHandbook(): Promise<{ files: HandbookRow[]; folder: s
 
 // ---------- 聯絡方式 ----------
 export const CONTACTS: { id: Exclude<ContactMethod, ''>; label: string; hint: string }[] = [
-  { id: 'line', label: 'LINE', hint: 'LINE ID，或 LINE 的加好友連結' },
-  { id: 'ig', label: 'Instagram', hint: '帳號，例如 @cuckoo_island' },
-  { id: 'email', label: 'Email', hint: '例如 name@gmail.com' },
-  { id: 'phone', label: '電話', hint: '手機號碼' },
-  { id: 'fb', label: 'Facebook', hint: '個人或粉專的網址' },
-  { id: 'other', label: '其他', hint: '寫下怎麼找到你們，例如 Discord 帳號' },
+  { id: 'ig', label: 'Instagram', hint: '社團帳號，例如 @cuckoo_island' },
+  { id: 'email', label: 'Email', hint: '社團信箱，例如 club@gmail.com' },
+  { id: 'fb', label: 'Facebook', hint: '粉專網址' },
+  { id: 'other', label: '其他', hint: '寫下怎麼找到你們' },
 ]
-export const contactLabel = (m: ContactMethod) => CONTACTS.find(c => c.id === m)?.label || ''
+// LINE、電話已經不開放選，但舊資料仍照樣顯示
+const LABELS: Record<string, string> = { line: 'LINE', phone: '電話', ig: 'Instagram', email: 'Email', fb: 'Facebook', other: '其他' }
+export const contactLabel = (m: ContactMethod) => LABELS[m] || ''
 /** 把聯絡方式變成可以點的連結；沒辦法變成連結的就回傳空字串 */
 export function contactHref(m: ContactMethod, v: string): string {
   const t = v.trim()
