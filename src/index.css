@@ -1029,3 +1029,8 @@ details.hb-help { padding: 0; }
 .policy p, .policy li { font-size: 15px; line-height: 1.85; }
 .policy ul { margin: 6px 0 0; padding-left: 1.2em; display: grid; gap: 4px; }
 .policy section { display: grid; gap: 6px; }
+.mb-denied { display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; background: #FBE3DF; border-left: 4px solid var(--coral); }
+.mb-denied b { font-family: var(--kai); font-weight: 400; font-size: 17px; }
+.mb-denied span { font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
+.mb-denied a { color: var(--ink); }
+.mb-out-actions { display: flex; flex-wrap: wrap; gap: 10px; }

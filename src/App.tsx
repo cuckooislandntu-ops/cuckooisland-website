@@ -11,10 +11,11 @@ import About from '@/pages/About'
 import EventPage from '@/pages/EventPage'
 import Member from '@/pages/Member'
 import Privacy from '@/pages/Privacy'
+import Logout from '@/pages/Logout'
 import Cuckoo from '@/components/Cuckoo'
 import { EVENTS, POSTS } from '@/lib/content'
 
-const TITLES: Record<string, string> = { '': '布穀島社', about: '關於我們', join: '加入會員', resources: '資料庫', map: '社團地圖', handbook: '經營手冊', events: '活動', column: '專欄', match: '需求媒合', member: '會員專區', privacy: '隱私權政策' }
+const TITLES: Record<string, string> = { '': '布穀島社', about: '關於我們', join: '加入會員', resources: '資料庫', map: '社團地圖', handbook: '經營手冊', events: '活動', column: '專欄', match: '需求媒合', member: '會員專區', privacy: '隱私權政策', logout: '已登出' }
 
 export default function App() {
   const route = useRoute()
@@ -44,6 +45,7 @@ export default function App() {
       {route === 'match' && <Match />}
       {route === 'member' && <Member />}
       {route === 'privacy' && <Privacy />}
+      {route === 'logout' && <Logout />}
       {route.startsWith('post-') && <Article key={route} id={route} />}
       {route.startsWith('event-') && <EventPage key={route} id={route} />}
       <Footer />

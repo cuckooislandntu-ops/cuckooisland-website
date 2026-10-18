@@ -32,6 +32,7 @@ const PAGES = [
   { id: 'events', title: `活動｜${NAME}`, desc: '布穀島社的交流活動報名資訊與活動紀錄。' },
   { id: 'column', title: `專欄｜${NAME}`, desc: '布穀島社專欄：《布穀好朋友》社團介紹、《布可不資道》教學資源評比，以及服務故事與經驗分享。' },
   { id: 'member', title: `會員專區｜${NAME}`, desc: '布穀島社島鏈會員專區：用 Google 帳號登入，查看會員公告、會員名錄與經營手冊檔案。', noindex: true },
+  { id: 'logout', title: `已登出｜${NAME}`, desc: '你已經登出布穀島社會員專區。', noindex: true },
   { id: 'privacy', title: `隱私權政策｜${NAME}`, desc: '布穀島社網站如何蒐集、使用與保護會員登入資料與個人檔案。' },
   { id: 'match', title: `需求媒合｜${NAME}`, desc: '社團提出需求、企業與教育組織提供資源：企業 CSR 與員工志工合作、教案改編成營隊版本，布穀島社協助教育服務性社團與資源單位媒合。' },
 ]
@@ -118,6 +119,7 @@ fs.writeFileSync(path.join(DIST, 'robots.txt'), `User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /member
+Disallow: /logout
 
 Sitemap: ${SITE}/sitemap.xml
 `)

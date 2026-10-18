@@ -68,7 +68,7 @@ export default function Handbook() {
 
   return (
     <main className="page hb" id="main">
-      <Hero gate={gate} onShelf={toShelf} onMsg={setMsg} msg={msg || (m.error && access === 'out' ? m.error : '')} />
+      <Hero gate={gate} onShelf={toShelf} onMsg={setMsg} msg={msg || (m.error && access === 'out' ? (m.error === 'NOT_ALLOWED' ? '這個 Google 帳號還沒有被核可，請改用申請時留的帳號登入。' : m.error) : '')} />
       <Shelf chapters={chapters} innerRef={shelfRef} gate={gate} />
       <Guide />
     </main>

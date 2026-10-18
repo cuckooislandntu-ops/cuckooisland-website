@@ -15,11 +15,13 @@ export const MEMBER_ENABLED = typeof __PATH_ROUTES__ !== 'undefined' && __PATH_R
 export type ContactMethod = '' | 'line' | 'ig' | 'email' | 'phone' | 'fb' | 'other'
 export type Profile = {
   id: string; email: string; status: 'pending' | 'approved' | 'suspended'
-  name: string; club_id: string; club_name: string; school: string; club_role: string
-  contact_method: ContactMethod; contact_value: string; bio: string; show_in_directory: boolean; avatar_url: string
+  name: string; club_id: string; club_name: string; school: string; service_types: string[]
+  contact_method: ContactMethod; contact_value: string; show_in_directory: boolean; avatar_url: string
 }
-export type EditableProfile = Pick<Profile, 'name' | 'club_id' | 'club_name' | 'school' | 'club_role' | 'contact_method' | 'contact_value' | 'bio' | 'show_in_directory'>
-export type DirectoryEntry = Pick<Profile, 'id' | 'name' | 'club_id' | 'club_name' | 'school' | 'club_role' | 'contact_method' | 'contact_value' | 'bio' | 'avatar_url'>
+// 會員資料以社團為單位：社團、服務性質、聯絡方式
+export type EditableProfile = Pick<Profile, 'club_id' | 'club_name' | 'school' | 'service_types' | 'contact_method' | 'contact_value' | 'show_in_directory'>
+export type DirectoryEntry = Pick<Profile, 'id' | 'club_id' | 'club_name' | 'school' | 'service_types' | 'contact_method' | 'contact_value' | 'avatar_url'>
+export const SERVICE_TYPES = ['營隊', '課輔', '線上課輔', '平日服務', '偏鄉服務', '國際服務']
 export type MemberPost = { id: number; title: string; body: string; link_url: string; link_label: string; pinned: boolean; created_at: string }
 export type HandbookRow = { chapter: number; title: string; url: string; date: string | null; scenes: string[]; sort: number }
 
@@ -48,7 +50,17 @@ async function loadProfile(session: Session | null) {
   // 第一次登入時，資料庫會自動建立檔案；偶爾慢一點，就再試一次
   for (let i = 0; i < 3; i++) {
     const { data, error } = await c.from('profiles').select('*').eq('id', session.user.id).maybeSingle()
-    if (data) { set({ ready: true, session, profile: data as Profile }); return }
+    if (data) {
+      const p = data as Profile
+      // 只有核可名單上的帳號能用：沒開通的帳號直接登出（正常情況下 Supabase 的 hook 已經在 Google 登入時擋掉了）
+      if (p.status !== 'approved') {
+        await c.auth.signOut()
+        set({ ready: true, session: null, profile: null, error: p.status === 'suspended' ? 'SUSPENDED' : 'NOT_ALLOWED' })
+        return
+      }
+      set({ ready: true, session, profile: { ...p, service_types: p.service_types || [] } })
+      return
+    }
     if (error) { set({ ready: true, session, profile: null, error: '讀不到你的會員資料，請重新整理再試一次。' }); return }
     await new Promise(r => setTimeout(r, 700))
   }
@@ -63,7 +75,13 @@ function start() {
   // Google 登入失敗時，網址會帶著錯誤訊息回來
   const q = new URLSearchParams(location.search)
   const err = q.get('error_description') || q.get('error')
-  if (err) set({ error: '登入沒有成功，請再試一次。' + (/access_denied/.test(err) ? '' : `（${err}）`) })
+  if (err) {
+    // 不在核可名單上（supabase/setup.sql 的 hook_allowlist_signup）時，Supabase 可能把人送回首頁；帶著訊息轉到會員專區
+    if (!/^\/(member|handbook)\/?$/.test(location.pathname)) { location.replace('/member' + location.search); return }
+    set({ error: /not_allowlisted|hook/i.test(err)
+      ? 'NOT_ALLOWED'
+      : '登入沒有成功，請再試一次。' + (/access_denied/.test(err) ? '' : `（${err}）`) })
+  }
   const clean = () => {
     const u = new URL(location.href)
     if (!['code', 'error', 'error_code', 'error_description', 'state'].some(k => u.searchParams.has(k))) return
@@ -108,7 +126,7 @@ export async function saveProfile(p: EditableProfile): Promise<string> {
   if (!c || !id) return '請先登入。'
   const { data, error } = await c.from('profiles').update(p).eq('id', id).select('*').single()
   if (error) return '存檔沒有成功：' + error.message
-  set({ profile: data as Profile })
+  set({ profile: { ...(data as Profile), service_types: (data as Profile).service_types || [] } })
   return ''
 }
 
@@ -143,7 +161,7 @@ export const CONTACTS: { id: Exclude<ContactMethod, ''>; label: string; hint: st
   { id: 'email', label: 'Email', hint: '例如 name@gmail.com' },
   { id: 'phone', label: '電話', hint: '手機號碼' },
   { id: 'fb', label: 'Facebook', hint: '個人或粉專的網址' },
-  { id: 'other', label: '其他', hint: '寫下怎麼找到你，例如 Discord 帳號' },
+  { id: 'other', label: '其他', hint: '寫下怎麼找到你們，例如 Discord 帳號' },
 ]
 export const contactLabel = (m: ContactMethod) => CONTACTS.find(c => c.id === m)?.label || ''
 /** 把聯絡方式變成可以點的連結；沒辦法變成連結的就回傳空字串 */

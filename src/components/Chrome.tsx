@@ -2,20 +2,21 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTi
 import { ALL_ROUTES, Logo, NAV, to } from '@/lib/site'
 import type { RouteId } from '@/lib/site'
 import type { ReactElement, ReactNode } from 'react'
-import { useMember } from '@/lib/member'
+import { isApproved, useMember } from '@/lib/member'
+import { CLUBS } from '@/lib/content'
 
 export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' | 'dark' }) {
   const route = (raw.startsWith('post-') ? 'column' : raw.startsWith('event-') ? 'events' : raw) as RouteId
   const onHome = raw === ''
   const m = useMember()
-  const signedIn = !!m.session
+  const signedIn = isApproved(m) // 只有核可的會員帳號會停在登入狀態
+  const clubName = m.profile ? CLUBS.find(c => c.id === m.profile!.club_id)?.name || m.profile.club_name : ''
   return (
     <header className={'bar' + (onHome ? (tone === 'dark' ? ' dark' : '') : ' solid') + (route === 'handbook' ? ' night' : '')}>
       <a className="brand" href={to('')} aria-label="布穀島社首頁"><Logo />布穀島社</a>
       <div className="bar-actions">
         {signedIn
-          ? <MeButton name={m.profile?.name || m.session?.user.user_metadata?.full_name || ''} avatar={m.profile?.avatar_url || ''}
-              pending={!!m.profile && m.profile.status !== 'approved'} current={route === 'member'} />
+          ? <MeButton name={clubName || m.profile?.name || ''} avatar={m.profile?.avatar_url || ''} current={route === 'member'} />
           : route !== 'join' && <a className="pill" href={to('join')}>加入會員</a>}
         <Sheet>
           <SheetTrigger asChild>
@@ -41,6 +42,14 @@ export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' 
                   ))}
                 </div>
               ))}
+              {signedIn && (
+                <div className="nav-group">
+                  <h2>帳號</h2>
+                  <SheetClose asChild>
+                    <a className="nav-link" href={to('logout')}><b>登出</b><span>{m.session?.user.email}</span></a>
+                  </SheetClose>
+                </div>
+              )}
             </nav>
           </SheetContent>
         </Sheet>
@@ -50,14 +59,13 @@ export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' 
 }
 
 // 登入後，頁首的「加入會員」換成自己的頭像，點了到會員專區
-function MeButton({ name, avatar, pending, current }: { name: string; avatar: string; pending: boolean; current: boolean }) {
-  const label = `會員專區${name ? `（${name}）` : ''}${pending ? '，帳號審核中' : ''}`
+function MeButton({ name, avatar, current }: { name: string; avatar: string; current: boolean }) {
+  const label = `會員專區${name ? `（${name}）` : ''}`
   return (
-    <a className={'me' + (pending ? ' pending' : '')} href={to('member')} aria-label={label} title={label} aria-current={current ? 'page' : undefined}>
+    <a className="me" href={to('member')} aria-label={label} title={label} aria-current={current ? 'page' : undefined}>
       {avatar
         ? <img src={avatar} alt="" width={38} height={38} referrerPolicy="no-referrer" decoding="async" />
         : <span aria-hidden="true">{(name || '我').slice(0, 1)}</span>}
-      {pending && <i aria-hidden="true" />}
     </a>
   )
 }
@@ -99,6 +107,8 @@ export function HeroArt({ kind }: { kind: RouteId }) {
     events: <><path d="M124 112l26-58 26 58z" fill="#4FB5C0" /><path d="M150 82l8 30h-16z" fill="#1D4A5E" />{person(196, 112, '#F7C948', .9)}<path d="M150 54V26" stroke={ink} strokeWidth="2.5" /><path d="M150 26l26 7-26 8z" fill="#F06A5A" /></>,
     column: <><rect x="104" y="40" width="88" height="40" rx="20" fill={sh} transform="translate(3 3)" /><rect x="104" y="40" width="88" height="40" rx="20" fill="#FFFDF6" /><path d="M120 80l-4 14 18-14z" fill="#FFFDF6" /><path d="M120 56h56M120 66h36" stroke={ink} strokeWidth="3" strokeLinecap="round" />{person(214, 112, '#B7A6D9', .9)}</>,
     member: <><rect x="122" y="44" width="76" height="54" rx="8" fill={sh} transform="translate(4 3)" /><rect x="122" y="44" width="76" height="54" rx="8" fill="#FFFDF6" /><circle cx="144" cy="66" r="9" fill="#F4A7A0" /><path d="M132 88c2-8 7-11 12-11s10 3 12 11z" fill="#F4A7A0" /><path d="M162 62h26M162 72h20M162 82h24" stroke={ink} strokeWidth="3" strokeLinecap="round" /><rect x="152" y="36" width="16" height="12" rx="3" fill="#6E8C25" />{person(220, 112, '#B7A6D9', .85)}</>,
+    logout: <><g transform="translate(206 0)"><path d="M-30 112h60l-10 12h-40z" fill={sh} transform="translate(3 2)" /><path d="M-30 112h60l-10 12h-40z" fill="#C9955A" /><path d="M0 112V58" stroke={ink} strokeWidth="2.5" /><path d="M2 60l28 46H2z" fill="#FFFDF6" /><path d="M-2 66l-22 40h22z" fill="#F4A7A0" /></g>{person(136, 112, '#F7C948', .85)}<path d="M146 98l14-18" stroke="#F7C948" strokeWidth="7" strokeLinecap="round" /><circle cx="161" cy="78" r="4.5" fill="#F6C7A8" /></>,
+    privacy: <><rect x="134" y="66" width="52" height="44" rx="8" fill={sh} transform="translate(4 3)" /><rect x="134" y="66" width="52" height="44" rx="8" fill="#B7A6D9" /><path d="M146 66v-10a14 14 0 0 1 28 0v10" fill="none" stroke={ink} strokeWidth="6" /><circle cx="160" cy="84" r="5" fill={ink} /><path d="M160 86v10" stroke={ink} strokeWidth="4" strokeLinecap="round" /></>,
     match: <>{person(104, 104, '#F7C948', .85)}{person(216, 104, '#F4A7A0', .85)}<path d="M120 64Q160 22 200 64" fill="none" stroke="#D6EC6E" strokeWidth="6" strokeLinecap="round" /><circle cx="160" cy="43" r="6" fill={ink} /></>,
   }
   return (
