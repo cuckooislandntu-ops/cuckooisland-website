@@ -16,11 +16,16 @@ export type ContactMethod = '' | 'line' | 'ig' | 'email' | 'phone' | 'fb' | 'oth
 export type Profile = {
   id: string; email: string; status: 'pending' | 'approved' | 'suspended'
   name: string; club_id: string; club_name: string; school: string; service_types: string[]
-  contact_method: ContactMethod; contact_value: string; show_in_directory: boolean; avatar_url: string
+  contacts: Contact[]; contact_method: ContactMethod; contact_value: string; show_in_directory: boolean; avatar_url: string
 }
+export type Contact = { method: ContactMethod; value: string }
 // 會員資料以社團為單位：社團、服務性質、聯絡方式
-export type EditableProfile = Pick<Profile, 'club_id' | 'club_name' | 'school' | 'service_types' | 'contact_method' | 'contact_value' | 'show_in_directory'>
-export type DirectoryEntry = Pick<Profile, 'id' | 'club_id' | 'club_name' | 'school' | 'service_types' | 'contact_method' | 'contact_value' | 'avatar_url'>
+export type EditableProfile = Pick<Profile, 'club_id' | 'club_name' | 'school' | 'service_types' | 'contacts' | 'contact_method' | 'contact_value' | 'show_in_directory'>
+export type DirectoryEntry = Pick<Profile, 'id' | 'club_id' | 'club_name' | 'school' | 'service_types' | 'contacts' | 'contact_method' | 'contact_value' | 'avatar_url'>
+/** 社團的所有聯絡方式；舊資料只有 contact_method/contact_value 一組 */
+export const contactsOf = (p: Pick<Profile, 'contacts' | 'contact_method' | 'contact_value'>): Contact[] =>
+  Array.isArray(p.contacts) && p.contacts.length ? p.contacts.filter(c => c?.method && c?.value)
+    : p.contact_method && p.contact_value ? [{ method: p.contact_method, value: p.contact_value }] : []
 export const SERVICE_TYPES = ['營隊', '課輔', '線上課輔', '平日服務', '偏鄉服務', '國際服務']
 export type MemberPost = { id: number; title: string; body: string; link_url: string; link_label: string; pinned: boolean; created_at: string }
 export type HandbookRow = { chapter: number; title: string; url: string; date: string | null; scenes: string[]; sort: number }

@@ -11,9 +11,9 @@ import { PillTab, PillTabsList } from '@/components/PillTabs'
 import { CLUBS } from '@/lib/content'
 import { to } from '@/lib/site'
 import {
-  CONTACTS, MEMBER_ENABLED, SERVICE_TYPES, contactHref, contactLabel, fetchDirectory, fetchPosts, isApproved, saveProfile, signIn, useMember,
+  CONTACTS, MEMBER_ENABLED, SERVICE_TYPES, contactHref, contactsOf, contactLabel, fetchDirectory, fetchPosts, isApproved, saveProfile, signIn, useMember,
 } from '@/lib/member'
-import type { DirectoryEntry, EditableProfile, MemberPost, Profile } from '@/lib/member'
+import type { Contact, ContactMethod, DirectoryEntry, EditableProfile, MemberPost, Profile } from '@/lib/member'
 
 const IG = 'https://www.instagram.com/cuckoo_island/'
 const clubOf = (p: Pick<Profile, 'club_id' | 'club_name'>) => p.club_name || CLUBS.find(c => c.id === p.club_id)?.name || ''
@@ -38,7 +38,7 @@ export function ClubIdentity({ p, size = 'md', suffix, as: H = 'h3' }: {
     </div>
   )
 }
-const hasClub = (p: Profile) => !!(clubOf(p) && p.contact_method && p.contact_value)
+const hasClub = (p: Profile) => !!(clubOf(p) && contactsOf(p).length)
 
 export default function Member() {
   const m = useMember()
@@ -215,17 +215,23 @@ function Directory({ me }: { me: string }) {
         ? <Empty title={q || type ? '找不到符合的社團' : '名錄還是空的'}>{q || type ? '換個關鍵字或服務性質試試。' : '會員社團登入、填好資料後就會出現在這裡。'}</Empty>
         : <ul className="mb-people">
             {list.map(d => {
-              const href = contactHref(d.contact_method, d.contact_value)
-              const club = mapClub(d)
+              const club = mapClub(d), contacts = contactsOf(d)
               return (
                 <li key={d.id} className="sheet">
                   <ClubIdentity p={d} suffix={d.id === me ? <small>（你們）</small> : null} />
                   {d.service_types?.length > 0 && <p className="sf-tags">{d.service_types.map(t => <span key={t}>{t}</span>)}</p>}
-                  {d.contact_method && d.contact_value && (
-                    <p className="mb-contact">
-                      <span>{contactLabel(d.contact_method)}</span>
-                      {href ? <a href={href} target="_blank" rel="noopener noreferrer">{d.contact_value}</a> : <b>{d.contact_value}</b>}
-                    </p>
+                  {contacts.length > 0 && (
+                    <ul className="mb-contacts">
+                      {contacts.map((c, i) => {
+                        const href = contactHref(c.method, c.value)
+                        return (
+                          <li key={i} className="mb-contact">
+                            <span>{contactLabel(c.method)}</span>
+                            {href ? <a href={href} target="_blank" rel="noopener noreferrer">{c.value}</a> : <b>{c.value}</b>}
+                          </li>
+                        )
+                      })}
+                    </ul>
                   )}
                   {club && <a className="link-plain" href={to('map')}>在社團地圖看介紹</a>}
                 </li>
@@ -241,38 +247,43 @@ function Directory({ me }: { me: string }) {
 function ProfileForm({ profile, submitLabel }: { profile: Profile; submitLabel: string }) {
   const known = (t: string) => SERVICE_TYPES.includes(t)
   const allowed = (m: string) => CONTACTS.some(c => c.id === m)
-  const [f, setF] = useState<EditableProfile>(() => ({
+  const [f, setF] = useState<Omit<EditableProfile, 'contacts' | 'contact_method' | 'contact_value'>>(() => ({
     club_id: profile.club_id, club_name: clubOf(profile), school: schoolOf(profile), service_types: profile.service_types || [],
-    // LINE、電話不再開放，舊資料要重選
-    contact_method: allowed(profile.contact_method) ? profile.contact_method : '', contact_value: allowed(profile.contact_method) ? profile.contact_value : '',
     show_in_directory: profile.show_in_directory,
   }))
+  // 聯絡方式可以複選：picked 是選了哪幾種（依選的順序），vals 是每一種填的內容。LINE、電話不再開放，舊資料要改選。
+  const [picked, setPicked] = useState<ContactMethod[]>(() => contactsOf(profile).map(c => c.method).filter(allowed))
+  const [vals, setVals] = useState<Record<string, string>>(() => Object.fromEntries(contactsOf(profile).filter(c => allowed(c.method)).map(c => [c.method, c.value])))
+  const togglePick = (m: ContactMethod) => { setPicked(p => p.includes(m) ? p.filter(x => x !== m) : [...p, m]); setMsg('') }
   const [otherType, setOtherType] = useState(() => (profile.service_types || []).filter(t => !known(t)).join('、'))
   const [errs, setErrs] = useState<Record<string, string>>({})
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
-  const up = <K extends keyof EditableProfile>(k: K, v: EditableProfile[K]) => { setF(s => ({ ...s, [k]: v })); setMsg('') }
-  const hint = CONTACTS.find(c => c.id === f.contact_method)?.hint
+  const up = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => { setF(s => ({ ...s, [k]: v })); setMsg('') }
   const toggleType = (t: string) => up('service_types', f.service_types.includes(t) ? f.service_types.filter(x => x !== t) : [...f.service_types, t])
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     const extra = otherType.split(/[、,，\s]+/).map(t => t.trim()).filter(Boolean)
     const name = f.club_name.trim()
+    const order = CONTACTS.map(c => c.id).filter(m => picked.includes(m))
+    const contacts: Contact[] = order.map(m => ({ method: m, value: (vals[m] || '').trim() }))
+    const filled = contacts.filter(c => c.value)
     const v: EditableProfile = {
       ...f, club_name: name, school: f.school.trim(), club_id: CLUBS.find(c => c.name === name)?.id || '',
-      service_types: [...f.service_types.filter(known), ...extra.filter(t => !known(t))], contact_value: f.contact_value.trim(),
+      service_types: [...f.service_types.filter(known), ...extra.filter(t => !known(t))],
+      contacts: filled, contact_method: filled[0]?.method || '', contact_value: filled[0]?.value || '',
     }
     const er: Record<string, string> = {}
     if (!v.school) er.school = '請填學校或單位。'
     if (!v.club_name) er.club_name = '請填社團全名。'
     if (!v.service_types.length) er.service_types = '至少選一種服務性質。'
-    if (!v.contact_method) er.contact_method = '請選一種聯絡方式。'
-    else if (!v.contact_value) er.contact_value = '請填聯絡資訊。'
+    if (!picked.length) er.contacts = '至少選一種聯絡方式。'
+    else { const empty = contacts.find(c => !c.value); if (empty) er['c_' + empty.method] = `請填${contactLabel(empty.method)}，或取消選取。` }
     setErrs(er)
     if (Object.keys(er).length) {
       setMsg('還有欄位沒填好。')
-      document.getElementById('pf-' + Object.keys(er)[0])?.focus()
+      document.getElementById('pf-' + Object.keys(er)[0].replace(/^c_/, 'contact-'))?.focus()
       return
     }
     setBusy(true)
@@ -294,7 +305,7 @@ function ProfileForm({ profile, submitLabel }: { profile: Profile; submitLabel: 
       </div>
       <div className="sf-field">
         <label htmlFor="pf-club_name">社團全名<em>必填</em></label>
-        <input id="pf-club_name" value={f.club_name} onChange={e => up('club_name', e.target.value)} placeholder="例如：臺大陽光椰子社會服務社" {...inv('club_name')} />
+        <input id="pf-club_name" value={f.club_name} onChange={e => up('club_name', e.target.value)} placeholder="例如：陽光椰子社會服務社" {...inv('club_name')} />
         {fieldErr('club_name')}
       </div>
       {(f.club_name.trim() || f.school.trim()) && (
@@ -314,25 +325,22 @@ function ProfileForm({ profile, submitLabel }: { profile: Profile; submitLabel: 
         </div>
         {fieldErr('service_types')}
       </fieldset>
-      <fieldset className="sf-group" id="pf-contact_method" tabIndex={-1} {...inv('contact_method')}>
-        <legend>聯絡方式<em>必填</em></legend>
-        <p className="sf-hint">其他會員社團和布穀島夥伴會用這個方式聯絡你們，請填社團的公開帳號。</p>
-        <div className="chips" role="radiogroup" aria-label="聯絡方式">
-          {CONTACTS.map(c => (
-            <button key={c.id} type="button" role="radio" className="chip" aria-checked={f.contact_method === c.id}
-              onClick={() => up('contact_method', c.id)}>{c.label}</button>
-          ))}
+      <fieldset className="sf-group" id="pf-contacts" tabIndex={-1} {...inv('contacts')}>
+        <legend>聯絡方式<em>必填，可複選</em></legend>
+        <p className="sf-hint">其他會員社團和布穀島夥伴會用這些方式聯絡你們，請填社團的公開帳號。</p>
+        <div className="chips">
+          {CONTACTS.map(c => <button key={c.id} type="button" className="chip" aria-pressed={picked.includes(c.id)} onClick={() => togglePick(c.id)}>{c.label}</button>)}
         </div>
-        {fieldErr('contact_method')}
+        {fieldErr('contacts')}
       </fieldset>
-      {f.contact_method && (
-        <div className="sf-field">
-          <label htmlFor="pf-contact_value">{contactLabel(f.contact_method)}<em>必填</em></label>
-          <input id="pf-contact_value" value={f.contact_value} onChange={e => up('contact_value', e.target.value)} placeholder={hint}
-            inputMode={f.contact_method === 'email' ? 'email' : undefined} {...inv('contact_value')} />
-          {fieldErr('contact_value')}
+      {CONTACTS.filter(c => picked.includes(c.id)).map(c => (
+        <div className="sf-field" key={c.id}>
+          <label htmlFor={`pf-contact-${c.id}`}>{c.label}<em>必填</em></label>
+          <input id={`pf-contact-${c.id}`} value={vals[c.id] || ''} placeholder={c.hint} inputMode={c.id === 'email' ? 'email' : undefined}
+            onChange={e => { setVals(v => ({ ...v, [c.id]: e.target.value })); setMsg('') }} {...inv('c_' + c.id)} />
+          {fieldErr('c_' + c.id)}
         </div>
-      )}
+      ))}
       <label className="mb-check">
         <input type="checkbox" checked={f.show_in_directory} onChange={e => up('show_in_directory', e.target.checked)} />
         <span>在社團名錄顯示我們的社團<small>只有會員社團看得到，不會顯示登入用的 Google 帳號。</small></span>

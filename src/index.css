@@ -969,7 +969,7 @@ details.hb-help { padding: 0; }
 .mb-post-body p { margin: 0 0 .7em; font-size: 15px; line-height: 1.8; white-space: pre-line; }
 .mb-post-body p:last-child { margin-bottom: 0; }
 .mb-dir { display: grid; gap: 12px; }
-.mb-people li { display: grid; gap: 10px; padding: 18px; }
+.mb-people > li { display: grid; gap: 10px; padding: 18px; }
 .mb-person-top { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: start; }
 .mb-person-top img, .mb-initial { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
 .mb-initial { display: grid; place-items: center; background: var(--salmon); font-family: var(--kai); font-size: 19px; }
@@ -1052,3 +1052,9 @@ details.hb-help { padding: 0; }
 .mb-hello { display: grid; gap: 8px; }
 .mb-hello-hi { margin: 0; font-size: 14px; color: var(--leaf); }
 .mb-preview { display: grid; gap: 8px; padding: 12px 14px; border-radius: 14px; background: var(--paper); }
+.mb-contacts { list-style: none; margin: 0; padding: 10px 0 0; border-top: 1px solid rgba(35, 31, 53, .12); display: grid; gap: 6px; }
+.mb-contacts .mb-contact { padding-top: 0; border-top: 0; }
+.club-id > div > .club-id-name, .club-id > div > .club-id-school { margin: 0; }
+.club-id > div > .club-id-school { font-size: 13px; line-height: 1.4; color: var(--ink-soft); }
+.club-id.sm > div > .club-id-school { font-size: 12px; }
+.club-id.lg > div > .club-id-school { font-size: 14px; }

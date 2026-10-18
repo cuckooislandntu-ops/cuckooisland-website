@@ -25,6 +25,7 @@ create table if not exists public.profiles (
   school text not null default '',
   club_role text not null default '',        -- 社團職位
   service_types text[] not null default '{}', -- 服務性質，例如 {營隊,課輔}
+  contacts jsonb not null default '[]',      -- 聯絡方式，可以多個：[{"method":"ig","value":"@club"}, …]（contact_method/value 存第一個）
   contact_method text not null default '' check (contact_method in ('', 'line', 'ig', 'email', 'phone', 'fb', 'other')),
   contact_value text not null default '',
   bio text not null default '',
@@ -35,11 +36,12 @@ create table if not exists public.profiles (
 );
 alter table public.profiles enable row level security;
 alter table public.profiles add column if not exists service_types text[] not null default '{}';
+alter table public.profiles add column if not exists contacts jsonb not null default '[]';
 
 -- 會員自己只能改這些欄位；status、email 只有管理者能改
 revoke all on public.profiles from anon, authenticated;
 grant select on public.profiles to authenticated;
-grant update (name, club_id, club_name, school, club_role, service_types, contact_method, contact_value, bio, show_in_directory) on public.profiles to authenticated;
+grant update (name, club_id, club_name, school, club_role, service_types, contacts, contact_method, contact_value, bio, show_in_directory) on public.profiles to authenticated;
 
 drop policy if exists "read own profile" on public.profiles;
 create policy "read own profile" on public.profiles for select to authenticated using (id = (select auth.uid()));
@@ -63,9 +65,9 @@ grant execute on function public.is_member() to authenticated;
 -- 社團名錄：已開通、願意公開、填了社團的帳號；不含 Email。只有已開通的會員呼叫得到結果。
 drop function if exists public.member_directory();
 create function public.member_directory()
-returns table (id uuid, club_id text, club_name text, school text, service_types text[], contact_method text, contact_value text, avatar_url text)
+returns table (id uuid, club_id text, club_name text, school text, service_types text[], contacts jsonb, contact_method text, contact_value text, avatar_url text)
 language sql stable security definer set search_path = '' as $$
-  select p.id, p.club_id, p.club_name, p.school, p.service_types, p.contact_method, p.contact_value, p.avatar_url
+  select p.id, p.club_id, p.club_name, p.school, p.service_types, p.contacts, p.contact_method, p.contact_value, p.avatar_url
   from public.profiles p
   where public.is_member() and p.status = 'approved' and p.show_in_directory and (p.club_id <> '' or p.club_name <> '')
   order by p.club_name, p.club_id;
