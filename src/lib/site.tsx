@@ -12,14 +12,14 @@ export const NAV: { group: string; items: { id: RouteId; label: string; desc: st
   ] },
   { group: '找資源', items: [
     { id: 'resources', label: '公開資料庫', desc: '贊助、教學資源、講師，人人可查' },
-    { id: 'lessons', label: '會員教案庫', desc: '會員社團分享的教案' },
     { id: 'map', label: '社團地圖', desc: '全台社團與介紹' },
     { id: 'handbook', label: '經營手冊', desc: '一屆傳一屆的做法' },
     { id: 'match', label: '需求媒合', desc: '提出需求或提供資源' },
   ] },
-  { group: '一起來', items: [
+  { group: '島鏈會員', items: [
     { id: 'join', label: '加入會員', desc: '成為島鏈的一份子' },
-    { id: 'member', label: '會員專區', desc: '登入、我的檔案、會員名錄' },
+    { id: 'member', label: '會員專區', desc: '登入、公告、社團名錄' },
+    { id: 'lessons', label: '會員教案庫', desc: '會員社團分享的教案' },
   ] },
 ]
 export const ALL_ROUTES = NAV.flatMap(g => g.items)
