@@ -2,14 +2,17 @@
 // ① 夜晚的荒島封面（火堆旁讀手冊的人、用炭畫上笑臉的椰子朋友）
 // ② 書櫃：點章節名稱或左右滑動，一本一章；每章底下是一份份 Google 文件（後台「經營手冊」編輯，可換封面圖）
 // ③ 使用說明
-// 手冊內容只放在 Google 雲端給會員看，這裡只有章節名稱和連結。
-import { useEffect, useRef, useState } from 'react'
+// 章節名稱、封面是公開的（後台「經營手冊」）；每一章的檔案和手冊資料夾只給審核通過的會員，
+// 放在 Supabase 的 handbook_files、member_settings，用 Google 登入後才讀得到（src/lib/member.ts）。
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent, ReactNode } from 'react'
 import { Empty } from '@/components/Chrome'
 import EditLink from '@/components/EditLink'
 import { SETTINGS } from '@/lib/content'
 import type { Chapter, HandbookFile } from '@/lib/content'
 import { to } from '@/lib/site'
+import { MEMBER_ENABLED, fetchHandbook, isApproved, signIn, useMember } from '@/lib/member'
+import type { HandbookRow } from '@/lib/member'
 
 const RM = () => typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -37,23 +40,59 @@ const ICONS = [
 const KEYS = [/招生|幹部|培訓|人/, /經費|核銷|補助|預算|贊助/, /教案|課程|教學/, /安全|保險|急/, /溝通|學校|聯絡/, /交接|傳承/]
 const look = (c: Chapter, i: number) => { const k = KEYS.findIndex(r => r.test(c.title)); return k >= 0 ? k : i % ICONS.length }
 
+// 看的人是誰：off 預覽版、loading 確認中、out 沒登入、pending 審核中（或停權）、member 已通過
+type Access = 'off' | 'loading' | 'out' | 'pending' | 'member'
+
 export default function Handbook() {
-  const chapters = SETTINGS.chapters?.length ? SETTINGS.chapters : DEFAULT_CHAPTERS
+  const m = useMember()
+  const access: Access = !MEMBER_ENABLED ? 'off' : !m.ready ? 'loading' : !m.session ? 'out' : isApproved(m) ? 'member' : 'pending'
+  const [hb, setHb] = useState<{ files: HandbookRow[]; folder: string } | null>(null)
   const [msg, setMsg] = useState('')
   const shelfRef = useRef<HTMLElement>(null)
-  const notSet = () => setMsg('手冊資料夾網址還沒設定。設定好以後，這裡會直接打開手冊。')
+
+  useEffect(() => {
+    if (access !== 'member') { setHb(null); return }
+    let alive = true
+    fetchHandbook().then(d => alive && setHb(d), () => alive && setMsg('手冊檔案讀取失敗，請重新整理再試一次。'))
+    return () => { alive = false }
+  }, [access])
+
+  const base = SETTINGS.chapters?.length ? SETTINGS.chapters : DEFAULT_CHAPTERS
+  // 檔案依「第幾章」（書櫃上的編號）放進每一本書
+  const chapters = useMemo<Chapter[]>(() => base.map((c, i) => ({
+    ...c, files: (hb?.files || []).filter(f => f.chapter === i + 1).map(f => ({ title: f.title, url: f.url, date: f.date || '', scenes: f.scenes || [] })),
+  })), [base, hb])
+  const folder = hb?.folder || ''
+  const gate: Gate = { access, folder, loaded: !!hb }
+  const toShelf = () => shelfRef.current?.scrollIntoView({ behavior: RM() ? 'auto' : 'smooth', block: 'start' })
 
   return (
     <main className="page hb" id="main">
-      <Hero onOpen={notSet} onShelf={() => shelfRef.current?.scrollIntoView({ behavior: RM() ? 'auto' : 'smooth', block: 'start' })} msg={msg} />
-      <Shelf chapters={chapters} innerRef={shelfRef} onNoUrl={notSet} />
+      <Hero gate={gate} onShelf={toShelf} onMsg={setMsg} msg={msg || (m.error && access === 'out' ? m.error : '')} />
+      <Shelf chapters={chapters} innerRef={shelfRef} gate={gate} />
       <Guide />
     </main>
   )
 }
 
+type Gate = { access: Access; folder: string; loaded: boolean }
+
+// 還不能看檔案時，告訴對方下一步
+function Locked({ access }: { access: Access }) {
+  if (access === 'member') return null
+  return (
+    <div className="hb-lock">
+      {access === 'out' && <><p>每一章的檔案只開放給島鏈會員。請用申請加入時留的 Google 帳號登入。</p><button className="hb-btn ink" type="button" onClick={() => void signIn()}>用 Google 登入</button></>}
+      {access === 'pending' && <><p>你已經登入了，帳號還在等布穀島夥伴確認。開通後這裡就會出現檔案。</p><a className="hb-btn ink" href={to('member')}>查看會員狀態</a></>}
+      {access === 'loading' && <p>確認登入狀態中⋯</p>}
+      {access === 'off' && <p>每一章的檔案只開放給島鏈會員，正式網站登入後就能看到。</p>}
+    </div>
+  )
+}
+
 /* ---------- ① 荒島封面 ---------- */
-function Hero({ onOpen, onShelf, msg }: { onOpen: () => void; onShelf: () => void; msg: string }) {
+function Hero({ gate, onShelf, onMsg, msg }: { gate: Gate; onShelf: () => void; onMsg: (s: string) => void; msg: string }) {
+  const { access, folder } = gate
   const ref = useRef<HTMLElement>(null)
   // 捲出畫面時暫停火焰動畫，省電也讓下面的書櫃滑得更順
   useEffect(() => {
@@ -71,9 +110,15 @@ function Hero({ onOpen, onShelf, msg }: { onOpen: () => void; onShelf: () => voi
           <h1 id="hb-title"><span>教育服務性社團</span><span className="hb-big">生存指南</span></h1>
           <p className="hb-lede">招生、經費、教案、交接⋯⋯一屆屆撐過來的做法，都收在這座島上。接手的人，不用從零開始。</p>
           <div className="hb-actions">
-            {SETTINGS.handbookUrl
-              ? <a className="hb-btn lime" href={SETTINGS.handbookUrl} target="_blank" rel="noopener noreferrer">打開手冊</a>
-              : <button className="hb-btn lime" type="button" onClick={onOpen}>打開手冊</button>}
+            {access === 'member'
+              ? folder
+                ? <a className="hb-btn lime" href={folder} target="_blank" rel="noopener noreferrer">打開手冊</a>
+                : <button className="hb-btn lime" type="button" onClick={onShelf}>翻開手冊</button>
+              : access === 'out'
+                ? <button className="hb-btn lime" type="button" onClick={() => void signIn()}>會員登入</button>
+                : access === 'pending'
+                  ? <a className="hb-btn lime" href={to('member')}>查看會員狀態</a>
+                  : <button className="hb-btn lime" type="button" onClick={() => onMsg(access === 'off' ? '正式網站才能登入會員。' : '確認登入狀態中，請稍等一下。')}>會員登入</button>}
             <button className="hb-btn line" type="button" onClick={onShelf}>看看有哪些章節</button>
           </div>
           <p className="hb-status" role="status" aria-live="polite">{msg}</p>
@@ -278,7 +323,7 @@ function Finder({ chapters, onJump }: { chapters: Chapter[]; onJump: (i: number)
   )
 }
 
-function Shelf({ chapters, innerRef, onNoUrl }: { chapters: Chapter[]; innerRef: React.RefObject<HTMLElement | null>; onNoUrl: () => void }) {
+function Shelf({ chapters, innerRef, gate }: { chapters: Chapter[]; innerRef: React.RefObject<HTMLElement | null>; gate: Gate }) {
   const track = useRef<HTMLUListElement>(null)
   const chips = useRef<HTMLDivElement>(null)
   const detail = useRef<HTMLDivElement>(null)
@@ -411,15 +456,16 @@ function Shelf({ chapters, innerRef, onNoUrl }: { chapters: Chapter[]; innerRef:
               </>
             : <>
                 {ch.points.length > 0 && <ul className="hb-points">{ch.points.map(p => <li key={p}>{p}</li>)}</ul>}
-                <p className="hb-note">這一章的檔案還在整理，可以先到手冊資料夾看看。</p>
-                {SETTINGS.handbookUrl
-                  ? <a className="hb-btn ink" href={SETTINGS.handbookUrl} target="_blank" rel="noopener noreferrer">打開手冊資料夾</a>
-                  : <button className="hb-btn ink" type="button" onClick={onNoUrl}>打開手冊資料夾</button>}
+                {gate.access === 'member'
+                  ? gate.loaded && <>
+                      <p className="hb-note">這一章的檔案還在整理{gate.folder ? '，可以先到手冊資料夾看看' : ''}。</p>
+                      {gate.folder && <a className="hb-btn ink" href={gate.folder} target="_blank" rel="noopener noreferrer">打開手冊資料夾</a>}
+                    </>
+                  : <Locked access={gate.access} />}
               </>}
-          <p className="hb-note">會員限定：請用申請加入時留的 Google 帳號登入。</p>
         </div>
       )}
-      <EditLink collection="handbook" label="在後台編輯章節、封面與檔案" />
+      <EditLink collection="handbook" label="在後台編輯章節與封面（檔案在 Supabase）" />
     </section>
   )
 }
@@ -433,8 +479,8 @@ function Guide() {
           <h2 id="hb-guide-title">使用說明</h2>
           <p className="section-lede">手冊放在線上，隨時更新。第一次打開前，先看這幾步。</p>
           <ol className="steps" style={{ marginTop: 14 }}>
-            <li><div><b>先加入島鏈</b><span>手冊只開放給會員。填<a href={to('join')}>會員申請表單</a>時留下的 Google 帳號，就是之後打開手冊用的帳號。</span></div></li>
-            <li><div><b>用那個帳號登入</b><span>通過後我們會把你加進「布穀島會員」群組。打開手冊時，請確認瀏覽器登入的是同一個 Google 帳號。</span></div></li>
+            <li><div><b>先加入島鏈</b><span>手冊只開放給會員。先填<a href={to('join')}>會員申請表單</a>。</span></div></li>
+            <li><div><b>用 Google 帳號登入網站</b><span>按「會員登入」，填好個人檔案。布穀島夥伴確認後就會開通，每一章的檔案會直接出現在書櫃上。</span></div></li>
             <li><div><b>遇到問題時查</b><span>依情境找章節，例如「第一次寫補助計畫」翻〈經費申請與核銷〉，「營隊前一週」翻〈營隊安全與保險〉。</span></div></li>
             <li><div><b>需要範本，到資料庫拿</b><span>預算表、家長同意書這類可以直接改的檔案，放在<a href={to('resources')}>資料庫</a>的「模板」分類。</span></div></li>
             <li><div><b>留言補上你們的做法</b><span>會員可以在手冊裡留言。你們社團的經驗，會整理進下一版，傳給下一屆。</span></div></li>
@@ -444,9 +490,9 @@ function Guide() {
         <details className="hb-help">
           <summary><h3>打不開手冊？</h3><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg></summary>
           <ul>
-            <li><b>看到「要求存取權」</b>：目前登入的不是會員帳號。切換成申請時留的 Google 帳號再試一次。</li>
-            <li><b>用學校信箱登入</b>：少數學校會擋外部分享，看不到時改用個人 Gmail，並告訴我們新的帳號。</li>
-            <li><b>剛加入還看不到</b>：Google 群組邀請要在信裡按「接受」才會生效，記得檢查信箱。</li>
+            <li><b>登入後顯示「審核中」</b>：布穀島夥伴還在確認，通常幾天內完成。可以先到<a href={to('member')}>會員專區</a>把檔案填完整。</li>
+            <li><b>登錯帳號</b>：到<a href={to('member')}>會員專區</a>登出，再用申請時留的 Google 帳號登入。</li>
+            <li><b>打開檔案時看到「要求存取權」</b>：這份檔案的共用設定還沒開好，私訊我們，我們會盡快處理。</li>
           </ul>
           <p>還是不行，私訊 IG <a href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer">@cuckoo_island</a>。</p>
         </details>

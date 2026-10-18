@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { startStory } from '@/story/engine'
 import { Logo, to } from '@/lib/site'
+import { isApproved, useMember } from '@/lib/member'
 
 const Chevron = () => <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
 
 export default function Home({ onTone }: { onTone: (t: 'light' | 'dark') => void }) {
+  const member = isApproved(useMember())
   const cv = useRef<HTMLCanvasElement>(null)
   const main = useRef<HTMLElement>(null)
   useEffect(() => {
@@ -159,8 +161,9 @@ export default function Home({ onTone }: { onTone: (t: 'light' | 'dark') => void
                 <li><b>正式加入島鏈</b><span>收到整理好的教案、贊助資訊與講師名單，也能看到其他社團的經驗整理。</span></li>
               </ol>
               <div className="btns">
-                <a className="btn primary" href={to('join')}>替社團申請加入</a>
-                <a className="btn ghost" href={to('resources')}>先逛逛資料庫</a>
+                {member
+                  ? <><a className="btn primary" href={to('member')}>到會員專區</a><a className="btn ghost" href={to('handbook')}>打開經營手冊</a></>
+                  : <><a className="btn primary" href={to('join')}>替社團申請加入</a><a className="btn ghost" href={to('resources')}>先逛逛資料庫</a></>}
               </div>
               <p className="panel-others">是資源單位、講師或個人？也可以<a href={to('join')}>申請加入</a>，或到<a href={to('match')}>需求媒合</a>提供資源。</p>
               <p style={{ margin: 0 }}><a className="ig" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a><a className="about-link" href={to('about')}>認識布穀島社</a></p>

@@ -31,6 +31,7 @@ const PAGES = [
   { id: 'handbook', title: `教育服務性社團生存指南｜經營手冊｜${NAME}`, desc: '教育服務性社團生存指南：招生、經費、教案、營隊安全、與學校溝通、交接，一屆屆累積下來的做法，會員可線上閱讀與留言補充。' },
   { id: 'events', title: `活動｜${NAME}`, desc: '布穀島社的交流活動報名資訊與活動紀錄。' },
   { id: 'column', title: `專欄｜${NAME}`, desc: '布穀島社專欄：《布穀好朋友》社團介紹、《布可不資道》教學資源評比，以及服務故事與經驗分享。' },
+  { id: 'member', title: `會員專區｜${NAME}`, desc: '布穀島社島鏈會員專區：用 Google 帳號登入，查看會員公告、會員名錄與經營手冊檔案。', noindex: true },
   { id: 'match', title: `需求媒合｜${NAME}`, desc: '社團提出需求、企業與教育組織提供資源：企業 CSR 與員工志工合作、教案改編成營隊版本，布穀島社協助教育服務性社團與資源單位媒合。' },
 ]
 
@@ -76,7 +77,7 @@ for (const p of PAGES) {
   const url = urlOf(p.id)
   const jsonld = p.id ? [] : [ORG, { '@context': 'https://schema.org', '@type': 'WebSite', name: NAME, url: SITE + '/' }]
   write(p.id ? `p/${p.id}.html` : 'index.html', render({ url, title: p.title, desc: p.desc, image: abs('/og.png'), jsonld }))
-  urls.push({ loc: url, priority: p.id ? '0.8' : '1.0' })
+  if (!p.noindex) urls.push({ loc: url, priority: p.id ? '0.8' : '1.0' })
 }
 
 for (const post of POSTS) {
@@ -115,6 +116,7 @@ ${urls.map(u => `  <url><loc>${esc(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.last
 fs.writeFileSync(path.join(DIST, 'robots.txt'), `User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /member
 
 Sitemap: ${SITE}/sitemap.xml
 `)

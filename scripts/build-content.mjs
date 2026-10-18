@@ -148,13 +148,9 @@ try { SETTINGS = JSON.parse(fs.readFileSync(path.join(CONTENT, 'settings.json'),
 // 書櫃上的書：後台「經營手冊」一章一筆（content/handbook/）。沒有的話用舊的 settings.chapters，再沒有就用網站預設（src/pages/Handbook.tsx 的 DEFAULT_CHAPTERS）
 function chapter(c, file, i) {
   const name = str(c?.title) || `第 ${i + 1} 章`
-  const files = (Array.isArray(c?.files) ? c.files : []).map(f => ({ title: str(f?.title), url: str(f?.url), date: date(f?.date),
-    scenes: (Array.isArray(f?.scenes) ? f.scenes : []).map(str).filter(Boolean) })).filter(f => {
-    if (f.title && f.url) return true
-    if (f.title || f.url) warn(file, `手冊「${name}」有一份檔案缺少${f.title ? '網址' : '名稱'}，已略過`)
-    return false
-  })
-  if (!files.length && str(c?.url)) files.push({ title: str(c?.title), url: str(c.url), date: '', scenes: [] }) // 舊格式：一章一個網址
+  // 每一章的檔案只給會員看，放在 Supabase（handbook_files），網站登入後才讀得到。這裡的舊資料不會公開。
+  if ((Array.isArray(c?.files) && c.files.length) || str(c?.url)) warn(file, `手冊「${name}」還留有檔案連結，網站不會公開；請搬到 Supabase 的 handbook_files 後刪掉`)
+  const files = []
   const ch = { title: str(c?.title), tag: str(c?.tag), desc: str(c?.desc), files,
     points: (Array.isArray(c?.points) ? list(c.points) : typeof c?.points === 'string' ? c.points.split(/[\n,，、]/).map(str).filter(Boolean) : []),
     cover: media(c?.cover, file), coverText: c?.coverText !== false }
@@ -163,7 +159,7 @@ function chapter(c, file, i) {
 }
 const fromAdmin = readDir('handbook').sort((x, y) => (Number(x.data.order) || 999) - (Number(y.data.order) || 999)).map(({ file, data }, i) => chapter(data, file, i))
 const chapters = (fromAdmin.length ? fromAdmin : (Array.isArray(SETTINGS.chapters) ? SETTINGS.chapters : []).map((c, i) => chapter(c, 'content/settings.json', i))).filter(c => c.title)
-SETTINGS = { joinFormUrl: str(SETTINGS.joinFormUrl) || 'https://forms.gle/Qm3Nj9ytpMLVAHbWA', joinFormEmbed: str(SETTINGS.joinFormEmbed), handbookUrl: str(SETTINGS.handbookUrl), chapters }
+SETTINGS = { joinFormUrl: str(SETTINGS.joinFormUrl) || 'https://forms.gle/Qm3Nj9ytpMLVAHbWA', joinFormEmbed: str(SETTINGS.joinFormEmbed), handbookUrl: '', chapters } // 手冊資料夾網址改放 Supabase（member_settings）
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true })
 fs.writeFileSync(OUT, `// 自動產生的檔案，請不要手動修改：內容請到網站的 /admin 編輯（原始資料在 content/ 資料夾）。\nexport default ${JSON.stringify({ ENTRIES, CLUBS, POSTS, EVENTS, SETTINGS })}\n`)

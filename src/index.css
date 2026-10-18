@@ -944,3 +944,83 @@ details.hb-help { padding: 0; }
 .role-others { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
 .role-others > span { width: 100%; font-size: 14px; color: var(--ink-soft); }
 .role-others .chip { min-height: 44px; }
+
+/* ================= 會員專區（Member.tsx） ================= */
+.mb-box { display: grid; gap: 12px; justify-items: start; }
+.mb-box h2 { font-size: clamp(22px, 6vw, 27px); }
+.mb-google { gap: 10px; padding: 0 22px; }
+.mb-google svg { width: 20px; height: 20px; }
+.mb-inline-btn { display: inline-flex; min-height: 46px; padding: 0 18px; font-size: 15px; }
+.mb-who { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; margin: 0; font-size: 13.5px; color: var(--ink-soft); word-break: break-all; }
+.mb-who .link-plain { border: 0; background: none; padding: 0; cursor: pointer; font-family: var(--sans); }
+.mb-badge { display: inline-block; margin: 0; padding: 2px 12px; border-radius: 999px; background: var(--lime); color: var(--ink); font-size: 13px; }
+.mb-hello { display: flex; align-items: center; gap: 14px; }
+.mb-hello img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; box-shadow: 3px 3px 0 rgba(35, 31, 53, .14); }
+.mb-hello h2 { font-size: clamp(21px, 5.6vw, 26px); }
+.mb-hb-link { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 4px 12px; padding: 16px 18px; border-radius: 18px; background: var(--night); color: var(--cream); text-decoration: none; box-shadow: var(--shadow-riso); }
+.mb-hb-link b { font-family: var(--kai); font-weight: 400; font-size: 19px; color: var(--lime); }
+.mb-hb-link span { font-size: 14px; opacity: .85; }
+.mb-hb-link svg { width: 20px; height: 20px; }
+.mb-tabs { display: grid; gap: 18px; }
+.mb-posts, .mb-people { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.mb-posts li { display: grid; gap: 8px; justify-items: start; }
+.mb-posts h3 { font-size: 21px; }
+.mb-post-meta { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 13px; color: var(--ink-soft); }
+.mb-post-body p { margin: 0 0 .7em; font-size: 15px; line-height: 1.8; white-space: pre-line; }
+.mb-post-body p:last-child { margin-bottom: 0; }
+.mb-dir { display: grid; gap: 12px; }
+.mb-people li { display: grid; gap: 10px; padding: 18px; }
+.mb-person-top { display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: start; }
+.mb-person-top img, .mb-initial { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+.mb-initial { display: grid; place-items: center; background: var(--salmon); font-family: var(--kai); font-size: 19px; }
+.mb-person-top h3 { font-size: 19px; }
+.mb-person-top h3 small { font-family: var(--sans); font-size: 13px; color: var(--ink-soft); margin-left: 4px; }
+.mb-person-top p { margin: 2px 0 0; font-size: 14px; color: var(--ink-soft); }
+.mb-bio { margin: 0; font-size: 14.5px; line-height: 1.75; white-space: pre-line; }
+.mb-contact { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; padding-top: 10px; border-top: 1px solid rgba(35, 31, 53, .12); font-size: 15px; word-break: break-all; }
+.mb-contact span { font-size: 13px; padding: 1px 10px; border-radius: 999px; background: var(--paper-2); }
+.mb-contact a { color: var(--leaf); text-underline-offset: 4px; }
+.mb-contact b { font-weight: 400; }
+.mb-form { display: grid; gap: 16px; }
+.mb-form h2 { font-size: 22px; }
+.mb-form .chip[aria-checked="true"] { background: var(--ink); color: var(--lime); border-color: var(--ink); }
+.mb-form .chip { min-height: 44px; }
+.mb-form .sf-group[aria-invalid="true"] .chip { border-color: #A3301F; }
+.mb-check { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; font-size: 15px; cursor: pointer; }
+.mb-check input { width: 20px; height: 20px; margin: 3px 0 0; accent-color: var(--ink); }
+.mb-check small { display: block; font-size: 13px; color: var(--ink-soft); }
+/* 經營手冊：登入提示 */
+.hb-lock { display: grid; gap: 10px; justify-items: start; margin-top: 4px; padding: 14px 16px; border-radius: 16px; background: rgba(214, 236, 110, .12); }
+.hb-lock p { margin: 0; font-size: 14.5px; }
+/* 頁首頭像（登入後取代「加入會員」） */
+.me { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.me img, .me > span { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--cream), 3px 3px 0 2px rgba(35, 31, 53, .18); transition: transform .2s; }
+.me > span { display: grid; place-items: center; background: var(--salmon); color: var(--ink); font-family: var(--kai); font-size: 17px; }
+.me:hover img, .me:hover > span { transform: translateY(-1px); }
+.me:active img, .me:active > span { transform: translateY(1px); }
+.me[aria-current="page"] img, .me[aria-current="page"] > span { box-shadow: 0 0 0 2px var(--cream), 0 0 0 4.5px var(--leaf); }
+.me i { position: absolute; right: 2px; top: 3px; width: 11px; height: 11px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 2px var(--cream); }
+.me:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
+.bar.dark .me img, .bar.dark .me > span, .bar.night .me img, .bar.night .me > span { box-shadow: 0 0 0 2px var(--lime), 3px 3px 0 2px rgba(0, 0, 0, .3); }
+@media (prefers-reduced-motion: reduce) { .me img, .me > span { transition: none; } }
+
+/* ================= 會員專區島民（MemberGuide.tsx） ================= */
+.mb-hero { background-color: #DCEBB0; }
+.mb-stage { margin-top: 10px; }
+.mb-guide { overflow: visible; }
+.mb-guide .mb-eyes { transform-origin: 268px 104px; animation: blink 4.6s infinite; }
+.mb-guide .mb-eyes g g { transition: transform .08s linear; }
+/* 燈泡：彈出、發光，再慢慢淡掉 */
+.mb-bulb { animation: bulbOut 2.4s ease-in forwards; }
+.mb-bulb-body { transform-origin: 268px 44px; animation: bulbPop .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+.mb-rays { opacity: 0; transform-origin: 268px 30px; animation: bulbRays .7s .18s ease-out both; }
+@keyframes bulbPop { from { transform: scale(0) rotate(-14deg); } to { transform: none; } }
+@keyframes bulbRays { 0% { opacity: 0; transform: scale(.6); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(1.25); } }
+@keyframes bulbOut { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+.mb-stage .mascot-btn:active .mb-guide .bob { animation: none; transform: translateY(2px); }
+.mb-stage .mascot-btn:focus-visible { outline: 3px solid var(--coral); outline-offset: 4px; border-radius: 18px; }
+@media (prefers-reduced-motion: reduce) {
+  .mb-bulb-body, .mb-rays { animation: none; }
+  .mb-rays { opacity: 1; }
+  .mb-guide .mb-eyes g g { transition: none; }
+}

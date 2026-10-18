@@ -433,7 +433,7 @@ collections:
     editor: { preview: false }
     label: 經營手冊
     label_singular: 章節
-    description: 經營手冊頁「書櫃」上的書，一筆是一章：封面、章節說明和這一章的檔案。章節與檔案名稱會公開在網站上，手冊內容本身只放在 Google 雲端。
+    description: 經營手冊頁「書櫃」上的書，一筆是一章：封面和章節說明，會公開在網站上。每一章的檔案只給會員看，改在 Supabase 的 handbook_files 資料表編輯（見維護說明「會員登入」）。
     folder: content/handbook
     format: json
     extension: json
@@ -456,26 +456,9 @@ collections:
         widget: list
         required: false
         field: { name: point, label: 項目, widget: string }
-        hint: 還沒有檔案時，網站會先顯示這幾項。三項左右最好讀。
+        hint: 還沒登入的訪客、或這一章還沒有檔案時，網站會顯示這幾項。三項左右最好讀。
       - { name: cover, label: 封面圖（選填）, widget: image, required: false, hint: "直式，建議 900×1245 像素（約 3:4）。沒有放的話，網站會用彩色色塊加圖示當封面。" }
       - { name: coverText, label: 在封面圖上疊章節編號與名稱, widget: boolean, default: true, required: false, hint: 如果封面圖本身已經寫了章節名稱，就取消勾選。 }
-      - label: 這一章的檔案
-        name: files
-        widget: list
-        required: false
-        hint: 一個內容一份 Google 文件，一份一行，可拖曳排序。還沒有檔案時，網站會顯示上面的「這一章有什麼」。
-        summary: "{{fields.title}}"
-        fields:
-          - { name: title, label: 檔案名稱, widget: string, hint: 例如「社博擺攤檢查表」 }
-          - { name: url, label: 檔案網址, widget: string, hint: 在 Google 文件按「共用 → 複製連結」貼上 }
-          - { name: date, label: 新增或大改的日期（選填）, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, required: false, hint: 30 天內的檔案會標「新」，也會排進「最近新增」。 }
-          - label: 適合的情境（選填）
-            name: scenes
-            widget: select
-            multiple: true
-            required: false
-            hint: 手冊頁的「依情境找」會把同一個情境的檔案集合在一起，可以跨章節。要新增情境請 Claude 改 public/admin/config.yml。
-            options: [第一次當幹部, 招生季, 寫補助計畫, 營隊前一個月, 營隊前一週, 營隊當天, 活動結束後, 要交接了]
 
   # ---------------- 網站設定 ----------------
   - name: settings
@@ -483,10 +466,9 @@ collections:
     editor: { preview: false }
     files:
       - name: site
-        label: 表單與手冊連結
+        label: 會員申請表單
         file: content/settings.json
         format: json
         fields:
           - { name: joinFormUrl, label: 會員申請表單連結, widget: string, hint: "Google 表單的分享連結，例如 https://forms.gle/..." }
-          - { name: handbookUrl, label: 經營手冊資料夾網址（選填）, widget: string, required: false, hint: 放所有手冊檔案的 Google 雲端資料夾。經營手冊頁的「打開手冊」按鈕會連過去。章節、封面和檔案請到左邊的「經營手冊」編輯。 }
           - { name: joinFormEmbed, label: 表單嵌入網址（選填）, widget: string, required: false, hint: "在 Google 表單按「傳送 → <> 嵌入 HTML」，複製 iframe 裡 src=\"...\" 的網址貼在這裡，加入會員頁就會直接嵌入表單。" }
