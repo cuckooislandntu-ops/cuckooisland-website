@@ -12,16 +12,17 @@ import EventPage from '@/pages/EventPage'
 import Member from '@/pages/Member'
 import Privacy from '@/pages/Privacy'
 import Logout from '@/pages/Logout'
+import Lessons, { LessonPage } from '@/pages/Lessons'
 import Cuckoo from '@/components/Cuckoo'
 import { EVENTS, POSTS } from '@/lib/content'
 
-const TITLES: Record<string, string> = { '': '布穀島社', about: '關於我們', join: '加入會員', resources: '資料庫', map: '社團地圖', handbook: '經營手冊', events: '活動', column: '專欄', match: '需求媒合', member: '會員專區', privacy: '隱私權政策', logout: '已登出' }
+const TITLES: Record<string, string> = { '': '布穀島社', about: '關於我們', join: '加入會員', resources: '公開資料庫', map: '社團地圖', handbook: '經營手冊', events: '活動', column: '專欄', match: '需求媒合', lessons: '會員教案庫', member: '會員專區', privacy: '隱私權政策', logout: '已登出' }
 
 export default function App() {
   const route = useRoute()
   const [tone, setTone] = useState<'light' | 'dark'>('light')
 
-  useEffect(() => { const post = POSTS.find(p => p.id === route) || EVENTS.find(e => e.id === route); document.title = post ? `${post.title}｜布穀島社` : route ? `${TITLES[route] || '專欄'}｜布穀島社` : '布穀島社｜串聯全台教育服務性社團' }, [route])
+  useEffect(() => { const post = POSTS.find(p => p.id === route) || EVENTS.find(e => e.id === route); document.title = post ? `${post.title}｜布穀島社` : route ? `${TITLES[route] || (route.startsWith('lesson-') ? '會員教案庫' : '專欄')}｜布穀島社` : '布穀島社｜串聯全台教育服務性社團' }, [route])
   useEffect(() => {
     // fine paper grain, one device pixel per speck; used as a background layer (--grain), never on top of content
     const dpr = Math.min(3, Math.max(1, Math.round(devicePixelRatio || 1))), size = 256
@@ -44,6 +45,8 @@ export default function App() {
       {route === 'column' && <Column />}
       {route === 'match' && <Match />}
       {route === 'member' && <Member />}
+      {route === 'lessons' && <Lessons />}
+      {route.startsWith('lesson-') && <LessonPage key={route} id={Number(route.slice(7))} />}
       {route === 'privacy' && <Privacy />}
       {route === 'logout' && <Logout />}
       {route.startsWith('post-') && <Article key={route} id={route} />}

@@ -8,6 +8,7 @@ import * as Tabs from '@radix-ui/react-tabs'
 import { Empty } from '@/components/Chrome'
 import MemberGuide from '@/components/MemberGuide'
 import { PillTab, PillTabsList } from '@/components/PillTabs'
+import ClubIdentity, { clubOf, mapClub, schoolOf } from '@/components/ClubIdentity'
 import { CLUBS } from '@/lib/content'
 import { to } from '@/lib/site'
 import {
@@ -16,28 +17,6 @@ import {
 import type { Contact, ContactMethod, DirectoryEntry, EditableProfile, MemberPost, Profile } from '@/lib/member'
 
 const IG = 'https://www.instagram.com/cuckoo_island/'
-const clubOf = (p: Pick<Profile, 'club_id' | 'club_name'>) => p.club_name || CLUBS.find(c => c.id === p.club_id)?.name || ''
-const schoolOf = (p: Pick<Profile, 'club_id' | 'school'>) => p.school || CLUBS.find(c => c.id === p.club_id)?.school || ''
-// 社團地圖上同名的社團（名錄卡片連到地圖介紹、頭像沒圖時用地圖顏色）
-const mapClub = (p: Pick<Profile, 'club_id' | 'club_name'>) => CLUBS.find(c => c.id === p.club_id) || CLUBS.find(c => c.name === p.club_name.trim())
-
-/** 社團身分：頭像在左，右邊上面是學校或單位（小、灰），下面是社團全名（大、黑）。名錄、歡迎詞、之後的留言都用這個。 */
-export function ClubIdentity({ p, size = 'md', suffix, as: H = 'h3' }: {
-  p: Pick<Profile, 'club_id' | 'club_name' | 'school' | 'avatar_url'>; size?: 'sm' | 'md' | 'lg'; suffix?: ReactNode; as?: 'h2' | 'h3' | 'p'
-}) {
-  const name = clubOf(p), school = schoolOf(p), c = mapClub(p)
-  return (
-    <div className={'club-id ' + size}>
-      {p.avatar_url
-        ? <img src={p.avatar_url} alt="" loading="lazy" referrerPolicy="no-referrer" />
-        : <span className="club-id-initial" aria-hidden="true" style={c ? { background: c.color } : undefined}>{name.slice(0, 1) || '社'}</span>}
-      <div>
-        {school && <p className="club-id-school">{school}</p>}
-        <H className="club-id-name">{name}{suffix}</H>
-      </div>
-    </div>
-  )
-}
 const hasClub = (p: Profile) => !!(clubOf(p) && contactsOf(p).length)
 
 export default function Member() {

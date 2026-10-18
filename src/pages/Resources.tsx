@@ -5,6 +5,7 @@ import { CAT_COLLECTION, ENTRIES, newestFirst } from '@/lib/content'
 import EditLink from '@/components/EditLink'
 import type { Cat, Entry } from '@/lib/content'
 import { to } from '@/lib/site'
+import { isApproved, useMember } from '@/lib/member'
 
 const PERSONA: Record<Cat, { label: string; bg: string; badge: string; lines: string[]; subs: string[] }> = {
   all: { label: '總覽', bg: '#E6F1B5', badge: '#6E8C25', subs: [],
@@ -260,7 +261,7 @@ export default function Resources() {
     <main className="page" id="main">
       <section className="db-stage" style={{ backgroundColor: p.bg }}>
         <div className="hero-inner">
-          <h1>資料庫</h1>
+          <h1>公開資料庫</h1>
           <p className="lede">贊助、教學資源、講師、團隊活動和模板，都整理在這裡。</p>
           <div className="stage-box">
             <button type="button" className="mascot-btn" onClick={talk.next} aria-label="換一句話">
@@ -287,7 +288,7 @@ export default function Resources() {
       </div>
 
       <div className="content"><div className="content-inner">
-        <p className="sample-note">共 {ENTRIES.length} 筆資源，整理自布穀島社現有的資源清單。島鏈會員會收到這些資源的整理與更新。</p>
+        <PublicNote />
         {cat === 'all' ? (
           <>
             <div>
@@ -329,12 +330,25 @@ export default function Resources() {
             </div>
           </div>
         )}
-        <div className="sheet" style={{ display: 'grid', gap: 8 }}>
-          <h2>有資源想分享？</h2>
-          <p className="section-lede" style={{ marginTop: 0 }}>加入島鏈後，可以把你們的教案、講師或贊助資訊分享進資料庫。你分享一份，其他社團就少準備一份。</p>
-          <a className="btn primary" href={to('join')}>申請加入島鏈</a>
-        </div>
       </div></div>
     </main>
+  )
+}
+
+// 最上面的說明：這裡都是公開資訊；想看更多、想分享，申請成為會員（會員直接連到會員教案庫）
+function PublicNote() {
+  const member = isApproved(useMember())
+  return (
+    <div className="public-note">
+      <div>
+        <h2>這裡的資料都是公開資訊</h2>
+        <p>共 {ENTRIES.length} 筆，整理自布穀島社的資源清單，任何人都能查。想看會員社團分享的教案和經營經驗，或把你們的資源分享出去，歡迎申請成為島鏈會員。</p>
+      </div>
+      <div className="public-note-actions">
+        {member
+          ? <a className="btn primary" href={to('lessons')}>前往會員教案庫</a>
+          : <><a className="btn primary" href={to('join')}>申請成為會員</a><a className="btn ghost" href={to('lessons')}>會員教案庫</a></>}
+      </div>
+    </div>
   )
 }

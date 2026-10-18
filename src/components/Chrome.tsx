@@ -3,14 +3,14 @@ import { ALL_ROUTES, Logo, NAV, to } from '@/lib/site'
 import type { RouteId } from '@/lib/site'
 import type { ReactElement, ReactNode } from 'react'
 import { isApproved, useMember } from '@/lib/member'
-import { CLUBS } from '@/lib/content'
+import { clubOf } from '@/components/ClubIdentity'
 
 export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' | 'dark' }) {
-  const route = (raw.startsWith('post-') ? 'column' : raw.startsWith('event-') ? 'events' : raw) as RouteId
+  const route = (raw.startsWith('post-') ? 'column' : raw.startsWith('event-') ? 'events' : raw.startsWith('lesson-') ? 'lessons' : raw) as RouteId
   const onHome = raw === ''
   const m = useMember()
   const signedIn = isApproved(m) // 只有核可的會員帳號會停在登入狀態
-  const clubName = m.profile ? CLUBS.find(c => c.id === m.profile!.club_id)?.name || m.profile.club_name : ''
+  const clubName = m.profile ? clubOf(m.profile) : ''
   return (
     <header className={'bar' + (onHome ? (tone === 'dark' ? ' dark' : '') : ' solid') + (route === 'handbook' ? ' night' : '')}>
       <a className="brand" href={to('')} aria-label="布穀島社首頁"><Logo />布穀島社</a>
@@ -109,6 +109,7 @@ export function HeroArt({ kind }: { kind: RouteId }) {
     member: <><rect x="122" y="44" width="76" height="54" rx="8" fill={sh} transform="translate(4 3)" /><rect x="122" y="44" width="76" height="54" rx="8" fill="#FFFDF6" /><circle cx="144" cy="66" r="9" fill="#F4A7A0" /><path d="M132 88c2-8 7-11 12-11s10 3 12 11z" fill="#F4A7A0" /><path d="M162 62h26M162 72h20M162 82h24" stroke={ink} strokeWidth="3" strokeLinecap="round" /><rect x="152" y="36" width="16" height="12" rx="3" fill="#6E8C25" />{person(220, 112, '#B7A6D9', .85)}</>,
     logout: <><g transform="translate(206 0)"><path d="M-30 112h60l-10 12h-40z" fill={sh} transform="translate(3 2)" /><path d="M-30 112h60l-10 12h-40z" fill="#C9955A" /><path d="M0 112V58" stroke={ink} strokeWidth="2.5" /><path d="M2 60l28 46H2z" fill="#FFFDF6" /><path d="M-2 66l-22 40h22z" fill="#F4A7A0" /></g>{person(136, 112, '#F7C948', .85)}<path d="M146 98l14-18" stroke="#F7C948" strokeWidth="7" strokeLinecap="round" /><circle cx="161" cy="78" r="4.5" fill="#F6C7A8" /></>,
     privacy: <><rect x="134" y="66" width="52" height="44" rx="8" fill={sh} transform="translate(4 3)" /><rect x="134" y="66" width="52" height="44" rx="8" fill="#B7A6D9" /><path d="M146 66v-10a14 14 0 0 1 28 0v10" fill="none" stroke={ink} strokeWidth="6" /><circle cx="160" cy="84" r="5" fill={ink} /><path d="M160 86v10" stroke={ink} strokeWidth="4" strokeLinecap="round" /></>,
+    lessons: <><rect x="112" y="40" width="96" height="62" rx="5" fill={sh} transform="translate(4 3)" /><rect x="112" y="40" width="96" height="62" rx="5" fill="#2F5A46" /><rect x="112" y="40" width="96" height="62" rx="5" fill="none" stroke="#B98B5E" strokeWidth="4" /><path d="M126 58h40M126 70h28M126 82h34" stroke="#FFFDF6" strokeWidth="3" strokeLinecap="round" opacity=".85" /><path d="M188 76c0-4 3-6 6-6s5 3 5 3 2-3 5-3 6 2 6 6c0 6-11 12-11 12s-11-6-11-12z" fill="#F06A5A" transform="translate(-14 -10)" />{person(228, 112, '#4FB5C0', .85)}</>,
     match: <>{person(104, 104, '#F7C948', .85)}{person(216, 104, '#F4A7A0', .85)}<path d="M120 64Q160 22 200 64" fill="none" stroke="#D6EC6E" strokeWidth="6" strokeLinecap="round" /><circle cx="160" cy="43" r="6" fill={ink} /></>,
   }
   return (
