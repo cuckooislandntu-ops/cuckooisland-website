@@ -163,5 +163,5 @@ SETTINGS = { joinFormUrl: str(SETTINGS.joinFormUrl) || 'https://forms.gle/Qm3Nj9
 
 fs.mkdirSync(path.dirname(OUT), { recursive: true })
 fs.writeFileSync(OUT, `// 自動產生的檔案，請不要手動修改：內容請到網站的 /admin 編輯（原始資料在 content/ 資料夾）。\nexport default ${JSON.stringify({ ENTRIES, CLUBS, POSTS, EVENTS, SETTINGS })}\n`)
-console.log(`content: ${ENTRIES.length} 筆資源、${CLUBS.length} 個社團、${POSTS.length} 篇專欄、${EVENTS.length} 場活動${INLINE ? '（內嵌圖片）' : ''}`)
+console.log(`content: ${ENTRIES.length} 筆資源、${CLUBS.length} 個社團、${POSTS.length} 篇文章（社團介紹 ${POSTS.filter(p => p.series === '布穀好朋友').length}）、${EVENTS.length} 場活動${INLINE ? '（內嵌圖片）' : ''}`)
 if (warnings.length) console.warn('注意：\n' + warnings.join('\n'))

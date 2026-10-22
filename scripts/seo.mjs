@@ -92,7 +92,16 @@ for (const post of POSTS) {
     datePublished: post.date || undefined, url, mainEntityOfPage: url,
     author: { '@type': 'Organization', name: NAME, url: SITE + '/' }, publisher: ORG,
   }
-  write(`p/column/${post.id.slice(5)}.html`, render({ url, title, desc, image: image(post.cover), type: 'article', jsonld: [article] }))
+  // 麵包屑：社團介紹（布穀好朋友）在社團地圖底下，其他文章在專欄底下，和頁面上顯示的一致
+  const parent = post.series === '布穀好朋友' ? { id: 'map', name: '社團地圖' } : { id: 'column', name: '專欄' }
+  const crumbs = {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: NAME, item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: parent.name, item: urlOf(parent.id) },
+      { '@type': 'ListItem', position: 3, name: post.title, item: url },
+    ],
+  }
+  write(`p/column/${post.id.slice(5)}.html`, render({ url, title, desc, image: image(post.cover), type: 'article', jsonld: [article, crumbs] }))
   urls.push({ loc: url, lastmod: post.date, priority: '0.6' })
 }
 
@@ -125,4 +134,4 @@ Disallow: /uploads/templates/
 
 Sitemap: ${SITE}/sitemap.xml
 `)
-console.log(`seo: ${PAGES.length} 個頁面、${POSTS.length} 篇專欄、${EVENTS.length} 場活動，已產生 sitemap.xml 與 robots.txt（網址：${SITE}）`)
+console.log(`seo: ${PAGES.length} 個頁面、${POSTS.length} 篇文章（含社團介紹）、${EVENTS.length} 場活動，已產生 sitemap.xml 與 robots.txt（網址：${SITE}）`)

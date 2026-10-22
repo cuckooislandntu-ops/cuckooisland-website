@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import { Empty, PageShell } from '@/components/Chrome'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { CLUBS, CLUB_INTROS, CLUB_SERIES, COLUMN_POSTS, EVENTS, REGION_LABEL, SERIES_INFO, STATUS_LABEL, eventStatus, weekday } from '@/lib/content'
@@ -9,6 +9,8 @@ import MatchScene, { type Beat } from '@/components/MatchScene'
 import SchoolCampForm from '@/components/SchoolCampForm'
 import { PillTab, PillTabsList } from '@/components/PillTabs'
 import { isApproved, useMember } from '@/lib/member'
+import { PostCard } from '@/components/ColumnBits'
+import { takeClub, takeSeries } from '@/lib/column'
 
 const IG_URL = 'https://www.instagram.com/cuckoo_island/'
 const ctaStyle = { minHeight: 46, padding: '0 18px', fontSize: 15 }
@@ -23,7 +25,9 @@ const IG = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke=
 export function ClubMap() {
   const member = isApproved(useMember())
   const [region, setRegion] = useState<Region | null>(null)
-  const [pick, setPick] = useState<string | null>(null)
+  // 從社團介紹按「在社團地圖上看」過來時，直接展開那個社團
+  const [pick, setPick] = useState<string | null>(() => { const v = takeClub(); return v && CLUBS.some(c => c.id === v) ? v : null })
+  useEffect(() => { if (pick) reveal(pick) }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const shown = CLUBS.filter(c => !region || c.sites.some(s => s.region === region))
   // 選到的社團卡片會展開。等上一張收起的動畫（約 .28 秒）跑完再捲過去，位置才不會跑掉
   const reveal = (id: string) => setTimeout(() => document.getElementById('club-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 320)
@@ -141,35 +145,77 @@ export function Events() {
 }
 
 /* ---------- 專欄 ---------- */
-// 《布穀好朋友》社團介紹搬到社團地圖，專欄只列其他系列
+/* 版面參考社企流文章總覽：最新一篇放大、其餘排成卡片，右側（手機在下方）是系列介紹、社團介紹入口與投稿邀請。
+   《布穀好朋友》社團介紹不在這裡，在社團地圖。卡片、縮圖、標籤在 src/components/ColumnBits.tsx，樣式在 src/pages/column.css。 */
+const SERIES_DESC: Record<Series, string> = {
+  布穀好朋友: '一集認識一個教育服務性社團。',
+  布可不資道: '我們實際用過、評過的教學資源，附上小編推薦指數。',
+  服務故事: '服務現場的故事、撐過的難關，和交接時想對學弟妹說的話。',
+}
+const PAGE = 9
 export function Column() {
   const member = isApproved(useMember())
-  const [f, setF] = useState<string | null>(null)
+  const allSeries = (Object.keys(SERIES_INFO) as Series[]).filter(k => k !== CLUB_SERIES)
+  const series = allSeries.filter(k => COLUMN_POSTS.some(p => p.series === k))
+  const [f, setF] = useState<Series | null>(() => { const v = takeSeries(); return v && series.includes(v as Series) ? (v as Series) : null })
+  const [n, setN] = useState(PAGE)
   const list = COLUMN_POSTS.filter(p => !f || p.series === f)
-  const series = (Object.keys(SERIES_INFO) as Series[]).filter(k => k !== CLUB_SERIES && COLUMN_POSTS.some(p => p.series === k))
+  const pick = (k: Series | null) => { setF(k); setN(PAGE) }
+  const count = (k: Series) => COLUMN_POSTS.filter(p => p.series === k).length
+  const [feature, ...rest] = list
+  const more = rest.length - n
   return (
-    <PageShell kind="column" title="專欄" tint="#F3E2B8" lede="服務現場的故事，和我們實際評過的教學資源。各社團的介紹在社團地圖。">
-      <div className="chips" role="group" aria-label="專欄系列">
-        <button type="button" className="chip" aria-pressed={f === null} onClick={() => setF(null)}>全部</button>
-        {series.map(k => <button key={k} type="button" className="chip" aria-pressed={f === k} onClick={() => setF(f === k ? null : k)}>{k}（{SERIES_INFO[k].label}）</button>)}
+    <PageShell kind="column" title="專欄" tint="#F3E2B8" wide lede="服務現場的故事，和我們實際評過的教學資源。各社團的介紹在社團地圖。">
+      <div className="col-wrap">
+        <div className="col-main">
+          {/* 只有一個系列有文章時，篩選沒有意義，先不顯示 */}
+          {series.length > 1 && <div className="chips" role="group" aria-label="專欄系列">
+            <button type="button" className="chip" aria-pressed={f === null} onClick={() => pick(null)}>全部<span className="chip-n">{COLUMN_POSTS.length}</span></button>
+            {series.map(k => <button key={k} type="button" className="chip" aria-pressed={f === k} onClick={() => pick(f === k ? null : k)}>{k}<span className="chip-n">{count(k)}</span></button>)}
+          </div>}
+          {f && <p className="col-series-note">{SERIES_INFO[f].label}：{SERIES_DESC[f]}</p>}
+          {feature && <PostCard p={feature} variant="feature" />}
+          {rest.length > 0 && <div className="pc-grid">{rest.slice(0, n).map(p => <PostCard key={p.id} p={p} />)}</div>}
+          {more > 0 && <button type="button" className="btn ghost col-more" onClick={() => setN(n + PAGE)}>再看 {Math.min(more, PAGE)} 篇</button>}
+          {!feature && <Empty title="專欄文章準備中">第一篇很快就來，先到 IG 看看我們最近在聊什麼。</Empty>}
+        </div>
+
+        <aside className="col-side" aria-label="專欄系列、社團介紹與投稿">
+          <section className="side-box">
+            <h2>專欄系列</h2>
+            <ul className="side-series">
+              {allSeries.map(k => count(k) > 0
+                ? <li key={k}>
+                    <button type="button" aria-pressed={f === k} onClick={() => { pick(f === k ? null : k); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>
+                      <span className="dot" style={{ background: SERIES_INFO[k].color }} />
+                      <b>{k}</b><em>{count(k)} 篇</em>
+                      <span className="desc">{SERIES_DESC[k]}</span>
+                    </button>
+                  </li>
+                : <li key={k}>
+                    <div className="soon">
+                      <span className="dot" style={{ background: SERIES_INFO[k].color }} />
+                      <b>{k}</b><em>徵稿中</em>
+                      <span className="desc">{SERIES_DESC[k]}</span>
+                    </div>
+                  </li>)}
+            </ul>
+          </section>
+          {CLUB_INTROS.length > 0 && <a className="side-box side-link" href={to('map')}>
+            <h2>想認識各個社團？</h2>
+            <p>《布穀好朋友》{CLUB_INTROS.length} 篇社團介紹都放在社團地圖，看看他們在哪裡服務、怎麼服務。</p>
+            <span className="read-more">到社團地圖<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 3l5 5-5 5" /></svg></span>
+          </a>}
+          <section className="side-box invite">
+            <h2>想寫你們社團的故事？</h2>
+            <p>帶營隊時印象最深的一刻、社團撐過的難關、交接時想對學弟妹說的話，都歡迎寫下來{member ? '，私訊 IG 告訴我們。' : '。加入島鏈後，布穀島社會和你們一起完成。'}</p>
+            {member
+              ? <a className="btn primary" href={IG_URL} target="_blank" rel="noopener noreferrer">私訊 IG 投稿</a>
+              : <a className="btn primary" href={to('join')}>申請加入島鏈</a>}
+            {!member && <a className="ig" href={IG_URL} target="_blank" rel="noopener noreferrer"><IG />在 IG 追蹤 @cuckoo_island</a>}
+          </section>
+        </aside>
       </div>
-      <div className="entries">
-        {list.map(p => (
-          <a key={p.id} className="entry post-card" href={to(p.id)}>
-            {p.cover && <img className="post-cover" src={p.cover} alt="" loading="lazy" />}
-            <div className="entry-top"><span className="cat-badge" style={{ background: SERIES_INFO[p.series].color }}>{p.series} {p.ep}</span>{p.date && <span className="sub-tag">{+p.date.slice(5, 7)} 月 {+p.date.slice(8)} 日</span>}</div>
-            <h3>{p.title}</h3>
-            <p className="entry-desc">{p.sum}</p>
-            <span className="read-more">閱讀全文<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 3l5 5-5 5" /></svg></span>
-          </a>
-        ))}
-      </div>
-      <p className="status">想認識各個社團？社團介紹都在<a href={to('map')}>社團地圖</a>。</p>
-      <Empty title="想寫你們社團的故事？" action={member
-        ? <a className="btn primary" style={ctaStyle} href={IG_URL} target="_blank" rel="noopener noreferrer">私訊 IG 投稿</a>
-        : <a className="btn primary" style={ctaStyle} href={to('join')}>申請加入島鏈</a>}>
-        帶營隊時印象最深的一刻、社團撐過的難關、交接時想對學弟妹說的話，都歡迎寫下來。
-      </Empty>
     </PageShell>
   )
 }

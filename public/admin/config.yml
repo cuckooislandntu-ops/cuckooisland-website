@@ -320,9 +320,9 @@ collections:
 
   # ---------------- 專欄 ----------------
   - name: posts
-    label: 專欄文章
+    label: 專欄與社團介紹
     label_singular: 文章
-    description: 社團介紹寫在《布穀好朋友》（選介紹的社團，資料會自動帶入），資源評比寫在《布可不資道》，其他服務故事選「服務故事」。
+    description: 《布穀好朋友》是社團介紹，會出現在「社團地圖」該社團的卡片裡（選介紹的社團，資料會自動帶入），不會出現在專欄。《布可不資道》資源評比和「服務故事」才會出現在「專欄」。
     folder: content/posts
     format: json
     extension: json
@@ -357,8 +357,8 @@ collections:
       - { name: date, label: 發布日期, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, default: "{{now}}" }
       - { name: title, label: 標題, widget: string }
       - { name: hook, label: 開場一句, widget: string, required: false, hint: 標題下方的小字。 }
-      - { name: sum, label: 卡片摘要, widget: text, hint: 專欄列表卡片上的一兩句話。 }
-      - { name: cover, label: 封面圖, widget: image, required: false, hint: 會出現在專欄列表卡片和文章最上方，建議橫式照片。 }
+      - { name: sum, label: 卡片摘要, widget: text, hint: 列表卡片上的一兩句話（專欄總覽，或社團地圖的社團卡片）。 }
+      - { name: cover, label: 封面圖, widget: image, required: false, hint: 會出現在列表卡片和文章最上方，建議橫式照片。沒有封面時，專欄卡片會用系列色自動畫一張。 }
       - name: body
         label: 內文
         widget: richtext
