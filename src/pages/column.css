@@ -142,3 +142,11 @@ a.tag:hover { background: var(--paper-2); color: var(--ink); }
 .side-link { text-decoration: none; color: inherit; transition: transform .2s; }
 .side-link:hover { transform: translateY(-2px); }
 .side-link .read-more { font-size: 14px; }
+
+/* 文章底下的會員留言（列表與表單沿用教案庫的 .ls-c-*；沒登入時是說明卡） */
+.cc { display: grid; gap: 12px; }
+.cc h2 { font-size: 22px; }
+.cc-note { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+.cc-locked { padding: 18px; border-radius: 20px; background: var(--cream); box-shadow: 4px 5px 0 rgba(35,31,53,.08); }
+.cc-locked p { margin: 0; font-size: 15px; line-height: 1.8; }
+.cc-actions { display: flex; flex-wrap: wrap; gap: 10px; }

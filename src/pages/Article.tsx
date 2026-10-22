@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLightbox } from '@/components/Lightbox'
 import { PostCard, ShareBar } from '@/components/ColumnBits'
+import ColumnComments from '@/components/ColumnComments'
 import { postTags, readMinutes, relatedPosts, rememberClub, rememberSeries } from '@/lib/column'
 import { LOGO_SRC } from '@/lib/logo'
 import { CLUBS, CLUB_INTROS, COLUMN_POSTS, ENTRIES, POSTS, REGION_LABEL, SERIES_INFO, fmtDate, isClubIntro, isMemberCat } from '@/lib/content'
@@ -184,6 +185,8 @@ export default function Article({ id }: { id: string }) {
                 </div>
               </div>
             </section>
+
+            <ColumnComments postId={post.id} intro={intro} />
 
             <nav className="article-nav" aria-label={'其他' + noun}>
               {newer ? <a href={to(newer.id)}><span>較新的{noun}</span><b>{newer.title}</b></a> : <span />}
