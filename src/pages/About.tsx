@@ -8,6 +8,7 @@ import Construction from '@/components/Construction'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { PillTab, PillTabsList } from '@/components/PillTabs'
 import { to } from '@/lib/site'
+import { isApproved, useMember } from '@/lib/member'
 
 const HOLES = [
   { n: '①', t: '社團與社團之間', d: '彼此搶社員、搶合作機構和贊助，經驗留在各自的社辦裡。' },
@@ -46,6 +47,7 @@ function Fact({ q, a, tint, i }: { q: string; a: ReactNode; tint: string; i: num
 
 
 export default function About() {
+  const member = isApproved(useMember())
   const [tab, setTab] = useState('story')
   // 換分頁時，如果已經往下捲了，回到分頁列的位置
   const change = (v: string) => {
@@ -126,10 +128,11 @@ export default function About() {
 
         <section className="sheet about-end">
           <h2>這座島還在長大</h2>
-          <p>如果你也在社團裡扛著，歡迎一起來。</p>
+          <p>{member ? '謝謝你們一起撐起島鏈。' : '如果你也在社團裡扛著，歡迎一起來。'}</p>
           <div className="btns" style={{ marginTop: 6 }}>
-            <a className="btn primary" href={to('join')}>申請加入島鏈</a>
-            <a className="btn ghost" href={to('resources')}>先逛逛資料庫</a>
+            {member
+              ? <><a className="btn primary" href={to('member')}>到會員專區</a><a className="btn ghost" href={to('resources')}>逛逛資料庫</a></>
+              : <><a className="btn primary" href={to('join')}>申請加入島鏈</a><a className="btn ghost" href={to('resources')}>先逛逛資料庫</a></>}
           </div>
         </section>
         </TabsContent>

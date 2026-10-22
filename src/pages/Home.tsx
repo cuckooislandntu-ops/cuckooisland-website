@@ -119,7 +119,7 @@ export default function Home({ onTone }: { onTone: (t: 'light' | 'dark') => void
               <svg viewBox="0 0 26 26" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"><path d="M13 7c-3-2-6-2-9-1v14c3-1 6-1 9 1 3-2 6-2 9-1V6c-3-1-6-1-9 1z" /><path d="M13 7v14" /></svg>
               <h3>共享資源</h3>
               <p>你上傳一份教案，就能用到其他社團的教案、講師名單與贊助資訊。</p>
-              <div className="go"><a href={to('resources')}>查資料庫</a><a href={to('handbook')}>翻手冊</a></div>
+              <div className="go"><a href={to('resources')}>查資料庫</a><a href={to('member')}>會員資源</a></div>
             </div>
             <div className="route">
               <svg viewBox="0 0 26 26" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M13 23V11" /><path d="M13 14c0-4 3-7 8-7 0 5-3 7-8 7z" /><path d="M13 17c0-3-2-6-7-6 0 4 2 6 7 6z" /></svg>
@@ -165,7 +165,7 @@ export default function Home({ onTone }: { onTone: (t: 'light' | 'dark') => void
                   ? <><a className="btn primary" href={to('member')}>到會員專區</a><a className="btn ghost" href={to('handbook')}>打開經營手冊</a></>
                   : <><a className="btn primary" href={to('join')}>替社團申請加入</a><a className="btn ghost" href={to('resources')}>先逛逛資料庫</a></>}
               </div>
-              <p className="panel-others">是資源單位、講師或個人？也可以<a href={to('join')}>申請加入</a>，或到<a href={to('match')}>需求媒合</a>提供資源。</p>
+              <p className="panel-others">島鏈會員以社團為單位。是資源單位、講師或個人？歡迎到<a href={to('match')}>需求媒合</a>提供資源。</p>
               <p style={{ margin: 0 }}><a className="ig" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a><a className="about-link" href={to('about')}>認識布穀島社</a></p>
             </div>
           </div>

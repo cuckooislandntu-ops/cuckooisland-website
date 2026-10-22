@@ -1,13 +1,17 @@
 import { Suspense, lazy, useState } from 'react'
 import { Empty, PageShell } from '@/components/Chrome'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
-import { CLUBS, EVENTS, POSTS, REGION_LABEL, SERIES_INFO, STATUS_LABEL, eventStatus, weekday } from '@/lib/content'
+import { CLUBS, CLUB_INTROS, CLUB_SERIES, COLUMN_POSTS, EVENTS, REGION_LABEL, SERIES_INFO, STATUS_LABEL, eventStatus, weekday } from '@/lib/content'
 import type { Event, Region, Series } from '@/lib/content'
 import EditLink from '@/components/EditLink'
 import { to } from '@/lib/site'
 import MatchScene, { type Beat } from '@/components/MatchScene'
 import SchoolCampForm from '@/components/SchoolCampForm'
 import { PillTab, PillTabsList } from '@/components/PillTabs'
+import { isApproved, useMember } from '@/lib/member'
+
+const IG_URL = 'https://www.instagram.com/cuckoo_island/'
+const ctaStyle = { minHeight: 46, padding: '0 18px', fontSize: 15 }
 
 
 
@@ -17,12 +21,15 @@ const ClubLeafletMap = lazy(() => import('@/components/ClubLeafletMap'))
 const IG = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>
 
 export function ClubMap() {
+  const member = isApproved(useMember())
   const [region, setRegion] = useState<Region | null>(null)
   const [pick, setPick] = useState<string | null>(null)
   const shown = CLUBS.filter(c => !region || c.sites.some(s => s.region === region))
   const choose = (id: string) => { setPick(pick === id ? null : id); setTimeout(() => document.getElementById('club-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50) }
   return (
-    <PageShell kind="map" title="社團地圖" tint="#CDEBEC" lede="全台教育服務性社團在哪裡服務、怎麼服務。點地圖上的點，看看是哪個社團。">
+    <PageShell kind="map" title="社團地圖" tint="#CDEBEC" wide lede="全台教育服務性社團在哪裡服務、怎麼服務。點地圖上的點，看看是哪個社團。">
+      {/* 手機：地圖在上、社團清單在下；電腦（960px 以上）：地圖固定在左邊，右邊捲動社團清單（樣式在 index.css「社團地圖：電腦版」） */}
+      <div className="map-layout">
       <div className="sheet map-sheet">
         <div className="chips" role="group" aria-label="依服務地區篩選">
           <button type="button" className="chip" aria-pressed={region === null} onClick={() => setRegion(null)}>全部</button>
@@ -37,17 +44,17 @@ export function ClubMap() {
         <p className="status" style={{ fontSize: 12.5 }}>點地圖上的圓點看據點介紹；點一下地圖後可以用滑鼠滾輪縮放。部分社團的據點每學期更換，沒有標在地圖上。</p>
       </div>
 
-      <div style={{ display: 'grid', gap: 12 }}>
+      <div className="map-list">
         <h2>{region ? REGION_LABEL[region] + '的社團' : '所有社團'}（{shown.length}）</h2>
-        <p className="section-lede" style={{ marginTop: -6 }}>社團介紹整理自布穀島社 IG《布穀好朋友》系列。</p>
-        {shown.map(c => { const post = POSTS.find(p => p.clubId === c.id); return (
+        <p className="section-lede" style={{ marginTop: -6 }}>社團介紹整理自布穀島社 IG《布穀好朋友》系列，點社團卡片裡的介紹看完整的一篇。</p>
+        {shown.map(c => { const post = CLUB_INTROS.find(p => p.clubId === c.id); return (
           <article key={c.id} id={'club-' + c.id} className={'club' + (pick === c.id ? ' lit' : '')} style={{ ['--club' as any]: c.color }}>
             <div className="club-head">
               <h3>{c.name}</h3>
               <p className="club-tag">{c.tagline}</p>
               <div className="entry-top">
                 {c.types.map(t => <span key={t} className="sub-tag">{t}</span>)}
-                {post?.series === '布穀好朋友' && <span className="sub-tag">{post.series} {post.ep}</span>}
+                {post && <span className="sub-tag">{post.series} {post.ep}</span>}
               </div>
               <p className="club-meta"><span>{c.school}</span>{c.size && <span>{c.size}</span>}</p>
             </div>
@@ -55,17 +62,27 @@ export function ClubMap() {
               {c.sites.map(s => <li key={s.name}><b>{s.name}{s.region && <em>{REGION_LABEL[s.region]}</em>}</b><span>{s.detail}</span></li>)}
             </ul>
             <ul className="highlights">{c.highlights.map(h => <li key={h}>{h}</li>)}</ul>
+            {post && (
+              <a className="club-intro" href={to(post.id)}>
+                {post.cover && <img src={post.cover} alt="" loading="lazy" />}
+                <span><em>社團介紹 {post.ep}</em><b>{post.title}</b>{(post.sum || post.hook) && <small>{post.sum || post.hook}</small>}<i>閱讀社團介紹</i></span>
+              </a>
+            )}
             {c.partial && <p className="status">這個社團的介紹還在整理，內容可能不完整。</p>}
             <div className="entry-foot">
               {c.ig ? <a className="ig club-ig" href={`https://www.instagram.com/${c.ig}/`} target="_blank" rel="noopener noreferrer"><IG />@{c.ig}</a> : <span />}
-              {post && <a className="open-link" href={to(post.id)}>完整介紹</a>}
             </div>
             <EditLink collection="clubs" id={c.id} label="編輯社團資料" />
           </article>
         ) })}
-        <Empty title="你們的社團也想出現在這裡？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={to('join')}>申請加入島鏈</a>}>
-          申請加入島鏈時填寫社團訪談文件，經你們審稿後，我們會把社團整理到地圖上，也寫成《布穀好朋友》專欄。
-        </Empty>
+        {member
+          ? <Empty title="你們的社團還沒在地圖上？" action={<a className="btn primary" style={ctaStyle} href={IG_URL} target="_blank" rel="noopener noreferrer">私訊 IG 告訴我們</a>}>
+              跟我們說一聲，我們會和你們一起整理社團訪談，經你們審稿後放上地圖，也寫成一篇社團介紹。
+            </Empty>
+          : <Empty title="你們的社團也想出現在這裡？" action={<a className="btn primary" style={ctaStyle} href={to('join')}>申請加入島鏈</a>}>
+              加入島鏈後，我們會和你們一起整理社團訪談，經你們審稿後放上地圖，也寫成一篇社團介紹。
+            </Empty>}
+      </div>
       </div>
     </PageShell>
   )
@@ -118,12 +135,14 @@ export function Events() {
 }
 
 /* ---------- 專欄 ---------- */
+// 《布穀好朋友》社團介紹搬到社團地圖，專欄只列其他系列
 export function Column() {
+  const member = isApproved(useMember())
   const [f, setF] = useState<string | null>(null)
-  const list = POSTS.filter(p => !f || p.series === f)
-  const series = (Object.keys(SERIES_INFO) as Series[]).filter(k => POSTS.some(p => p.series === k))
+  const list = COLUMN_POSTS.filter(p => !f || p.series === f)
+  const series = (Object.keys(SERIES_INFO) as Series[]).filter(k => k !== CLUB_SERIES && COLUMN_POSTS.some(p => p.series === k))
   return (
-    <PageShell kind="column" title="專欄" tint="#F3E2B8" lede="服務現場的故事、社團的樣子，和我們實際評過的教學資源。">
+    <PageShell kind="column" title="專欄" tint="#F3E2B8" lede="服務現場的故事，和我們實際評過的教學資源。各社團的介紹在社團地圖。">
       <div className="chips" role="group" aria-label="專欄系列">
         <button type="button" className="chip" aria-pressed={f === null} onClick={() => setF(null)}>全部</button>
         {series.map(k => <button key={k} type="button" className="chip" aria-pressed={f === k} onClick={() => setF(f === k ? null : k)}>{k}（{SERIES_INFO[k].label}）</button>)}
@@ -139,7 +158,10 @@ export function Column() {
           </a>
         ))}
       </div>
-      <Empty title="想寫你們社團的故事？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={to('join')}>申請加入島鏈</a>}>
+      <p className="status">想認識各個社團？社團介紹都在<a href={to('map')}>社團地圖</a>。</p>
+      <Empty title="想寫你們社團的故事？" action={member
+        ? <a className="btn primary" style={ctaStyle} href={IG_URL} target="_blank" rel="noopener noreferrer">私訊 IG 投稿</a>
+        : <a className="btn primary" style={ctaStyle} href={to('join')}>申請加入島鏈</a>}>
         帶營隊時印象最深的一刻、社團撐過的難關、交接時想對學弟妹說的話，都歡迎寫下來。
       </Empty>
     </PageShell>
@@ -225,9 +247,10 @@ const ROLE_COLOR: Record<PartnerKey, string> = { club: '#F4A7A0', school: '#B7A6
 const IG_LINK = 'https://www.instagram.com/cuckoo_island/'
 
 function RoleCta({ k, formOpen, openForm }: { k: PartnerKey; formOpen: boolean; openForm: () => void }) {
+  const member = isApproved(useMember())
   if (k === 'club') return (
     <div className="role-cta">
-      <a className="btn primary" href={to('join')}>替社團申請加入</a>
+      {member ? <a className="btn primary" href={to('member')}>到會員專區</a> : <a className="btn primary" href={to('join')}>申請加入島鏈</a>}
       <a className="btn ghost" href={IG_LINK} target="_blank" rel="noopener noreferrer">到 IG 私訊提出需求</a>
     </div>
   )

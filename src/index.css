@@ -332,6 +332,16 @@ body, .hero-band, .article-head, .db-stage, .cat-bar, .bar.solid { background-im
 .sites span { font-size: 13.5px; color: var(--ink-soft); line-height: 1.65; }
 .highlights { margin: 0; padding-left: 1.1em; font-size: 14px; line-height: 1.7; }
 .club-ig { color: var(--ink-soft); font-size: 14px; }
+/* 社團卡片裡的《布穀好朋友》社團介紹（從專欄搬過來） */
+.club-intro { display: grid; grid-template-columns: 76px 1fr; gap: 12px; align-items: start; padding: 10px; border-radius: 14px; background: color-mix(in srgb, var(--club) 12%, #FFFDF6); color: var(--ink); text-decoration: none; }
+.club-intro:not(:has(img)) { grid-template-columns: 1fr; }
+.club-intro img { width: 76px; height: 76px; border-radius: 10px; object-fit: cover; }
+.club-intro > span { display: grid; gap: 3px; min-width: 0; }
+.club-intro em { font-style: normal; font-size: 12.5px; color: var(--ink-soft); }
+.club-intro b { font-family: var(--kai); font-weight: 400; font-size: 16.5px; line-height: 1.4; }
+.club-intro small { font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.club-intro i { font-style: normal; font-size: 14px; color: var(--leaf); margin-top: 2px; }
+.club-intro:hover b, .club-intro:focus-visible b { text-decoration: underline; text-underline-offset: 3px; }
 .event { display: grid; grid-template-columns: 64px 1fr; gap: 14px; background: var(--cream); border-radius: 20px; padding: 16px; box-shadow: 4px 5px 0 rgba(35,31,53,.1); }
 .event h3 { font-size: 20px; margin: 6px 0 2px; }
 .event-date { display: grid; align-content: start; justify-items: center; background: var(--ink); color: var(--lime); border-radius: 14px; padding: 10px 4px; }
@@ -1145,3 +1155,32 @@ button.ls-act:hover { background: rgba(35, 31, 53, .06); }
 .ls-file-input::file-selector-button { margin-right: 10px; min-height: 42px; padding: 0 16px; border-radius: 12px; border: 1.5px solid var(--ink); background: var(--cream); color: var(--ink); font: inherit; cursor: pointer; }
 .ls-file-kept { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0; font-size: 14.5px; }
 @media (prefers-reduced-motion: reduce) { .ls-act svg { transition: none; } }
+
+/* 公開資料庫：團隊活動、模板只給會員（類別按鈕上的小鎖、沒登入時的說明卡） */
+.cat-lock { display: inline-grid; place-items: center; margin-left: 5px; vertical-align: -2px; }
+.cat-lock svg { width: 14px; height: 14px; }
+.member-only h2 { display: flex; align-items: center; gap: 8px; }
+.member-only h2 svg { width: 22px; height: 22px; flex: none; }
+
+/* 會員專區：會員資源（經營手冊、教案庫、團隊活動、模板） */
+.mb-res { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 720px) { .mb-res { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.mb-res a { display: grid; gap: 4px; align-content: start; padding: 14px 14px 16px; border-radius: 16px; background: var(--tile); color: var(--ink); text-decoration: none; box-shadow: 4px 5px 0 rgba(35,31,53,.1); min-height: 104px; }
+.mb-res a:hover b, .mb-res a:focus-visible b { text-decoration: underline; text-underline-offset: 3px; }
+.mb-res b { font-family: var(--kai); font-weight: 400; font-size: 19px; }
+.mb-res span { font-size: 13.5px; line-height: 1.55; color: var(--ink-soft); }
+.hb-back { display: inline-flex; align-items: center; gap: 4px; width: fit-content; min-height: 32px; margin-bottom: 6px; font-size: 14px; color: var(--cream); opacity: .8; text-decoration: none; }
+.hb-back:hover, .hb-back:focus-visible { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+.hb-back svg { width: 14px; height: 14px; }
+
+/* 社團地圖：電腦版（960px 以上）地圖固定在左邊，社團清單在右邊捲動；手機維持上下排列 */
+.map-layout { display: grid; gap: 30px; }
+.map-list { display: grid; gap: 12px; align-content: start; }
+@media (min-width: 960px) {
+  .content-inner.wide { max-width: 1240px; }
+  .map-layout { grid-template-columns: minmax(0, 1.35fr) minmax(360px, 1fr); gap: 28px; align-items: start; }
+  /* 整張地圖卡片剛好填滿畫面高度：篩選、圖例、說明各占需要的高度，剩下的給地圖 */
+  .map-layout .map-sheet { position: sticky; top: 76px; display: flex; flex-direction: column; height: calc(100vh - 96px); min-height: 560px; max-height: 900px; }
+  .map-layout .osm-wrap { flex: 1; min-height: 0; }
+  .map-layout .osm-map { height: 100%; min-height: 0; }
+}

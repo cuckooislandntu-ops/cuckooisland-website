@@ -1,5 +1,6 @@
 import { useLightbox } from '@/components/Lightbox'
-import { CLUBS, ENTRIES, POSTS, REGION_LABEL, SERIES_INFO, fmtDate } from '@/lib/content'
+import { CLUBS, CLUB_INTROS, COLUMN_POSTS, ENTRIES, POSTS, REGION_LABEL, SERIES_INFO, fmtDate, isClubIntro, isMemberCat } from '@/lib/content'
+import { isApproved, useMember } from '@/lib/member'
 import { EntryCard } from '@/pages/Resources'
 import EditLink from '@/components/EditLink'
 import { to } from '@/lib/site'
@@ -8,8 +9,12 @@ const IG = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke=
 
 export default function Article({ id }: { id: string }) {
   const lb = useLightbox()
-  const i = POSTS.findIndex(p => p.id === id)
-  const post = POSTS[i]
+  const member = isApproved(useMember())
+  const post = POSTS.find(p => p.id === id)
+  // 社團介紹（布穀好朋友）屬於社團地圖，上一篇／下一篇只在社團介紹之間跳；其他文章在專欄之間跳
+  const intro = isClubIntro(post)
+  const group = intro ? CLUB_INTROS : COLUMN_POSTS
+  const i = group.findIndex(p => p.id === id)
   if (!post) {
     return (
       <main className="page" id="main"><div className="content"><div className="content-inner">
@@ -21,15 +26,17 @@ export default function Article({ id }: { id: string }) {
   }
   const info = SERIES_INFO[post.series]
   const club = post.clubId ? CLUBS.find(c => c.id === post.clubId) : undefined
-  const res = post.resIds.map(r => ENTRIES.find(e => e.id === r)).filter(Boolean) as typeof ENTRIES
-  const newer = POSTS[i - 1], older = POSTS[i + 1]
+  // 團隊活動、模板只給會員看
+  const res = (post.resIds.map(r => ENTRIES.find(e => e.id === r)).filter(Boolean) as typeof ENTRIES).filter(e => member || !isMemberCat(e.cat))
+  const newer = group[i - 1], older = group[i + 1]
+  const noun = intro ? '社團介紹' : '文章'
 
   return (
     <main className="page" id="main">
       <header className="article-head" style={{ backgroundColor: info.tint }}>
         <div className="article-inner">
-          <a className="back" href={to('column')}>
-            <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 3L5 8l5 5" /></svg>專欄
+          <a className="back" href={to(intro ? 'map' : 'column')}>
+            <svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 3L5 8l5 5" /></svg>{intro ? '社團地圖' : '專欄'}
           </a>
           <div className="entry-top" style={{ marginTop: 14 }}>
             <span className="cat-badge" style={{ background: info.color }}>{post.series} {post.ep}</span>
@@ -84,9 +91,9 @@ export default function Article({ id }: { id: string }) {
             </div>
           </>}
 
-          <nav className="article-nav" aria-label="其他文章">
-            {newer ? <a href={to(newer.id)}><span>較新的文章</span><b>{newer.title}</b></a> : <span />}
-            {older ? <a href={to(older.id)} className="right"><span>較早的文章</span><b>{older.title}</b></a> : <span />}
+          <nav className="article-nav" aria-label={'其他' + noun}>
+            {newer ? <a href={to(newer.id)}><span>較新的{noun}</span><b>{newer.title}</b></a> : <span />}
+            {older ? <a href={to(older.id)} className="right"><span>較早的{noun}</span><b>{older.title}</b></a> : <span />}
           </nav>
           <a className="ig" href={post.ig || 'https://www.instagram.com/cuckoo_island/'} target="_blank" rel="noopener noreferrer"><IG />{post.ig ? '在 IG 看原始貼文' : '在 IG @cuckoo_island 看更多'}</a>
         </div>

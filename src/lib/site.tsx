@@ -12,17 +12,19 @@ export const NAV: { group: string; items: { id: RouteId; label: string; desc: st
   ] },
   { group: '找資源', items: [
     { id: 'resources', label: '公開資料庫', desc: '贊助、教學資源、講師，人人可查' },
-    { id: 'map', label: '社團地圖', desc: '全台社團與介紹' },
-    { id: 'handbook', label: '經營手冊', desc: '一屆傳一屆的做法' },
+    { id: 'map', label: '社團地圖', desc: '全台社團在哪裡、社團介紹' },
     { id: 'match', label: '需求媒合', desc: '提出需求或提供資源' },
   ] },
   { group: '島鏈會員', items: [
     { id: 'join', label: '加入會員', desc: '成為島鏈的一份子' },
-    { id: 'member', label: '會員專區', desc: '登入、公告、社團名錄' },
+    { id: 'member', label: '會員專區', desc: '公告、社團名錄、會員資源' },
+    { id: 'handbook', label: '經營手冊', desc: '一屆傳一屆的做法' },
     { id: 'lessons', label: '會員教案庫', desc: '會員社團分享的教案' },
   ] },
 ]
 export const ALL_ROUTES = NAV.flatMap(g => g.items)
+/** 已登入的會員不用再看到「加入會員」：選單、頁尾都拿掉這一項 */
+export const routesFor = (member: boolean) => NAV.map(g => ({ ...g, items: g.items.filter(it => !(member && it.id === 'join')) }))
 // Two URL styles. The real site (Vite build on Vercel) uses normal paths like /join and /column/friends-1,
 // so Google can index every page. The single-file claude.ai preview can't serve paths, so it keeps #join.
 declare const __PATH_ROUTES__: boolean

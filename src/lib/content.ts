@@ -47,6 +47,17 @@ export const SERIES_INFO: Record<Series, { label: string; color: string; tint: s
   服務故事: { label: '服務故事與經驗', color: '#5B4A9A', tint: '#E3DCF2' },
 }
 
+// 《布穀好朋友》是社團介紹，放在社團地圖；專欄只放其他系列。文章網址不變（/column/…），IG 上分享過的連結照樣能開。
+export const CLUB_SERIES: Series = '布穀好朋友'
+export const isClubIntro = (p?: Post) => p?.series === CLUB_SERIES
+export const CLUB_INTROS = POSTS.filter(isClubIntro)
+export const COLUMN_POSTS = POSTS.filter(p => !isClubIntro(p))
+
+// 團隊活動和模板只開放給會員；公開資料庫的總覽、數量只算公開的類別
+export const MEMBER_CATS: Cat[] = ['activity', 'template']
+export const isMemberCat = (c: Cat) => MEMBER_CATS.includes(c)
+export const PUBLIC_ENTRIES = ENTRIES.filter(e => !isMemberCat(e.cat))
+
 export const fmtDate = (d: string) => (d ? `${+d.slice(0, 4)} 年 ${+d.slice(5, 7)} 月 ${+d.slice(8, 10)} 日` : '')
 // newest first: by 登錄日期, then by the time-stamped file name
 export const newestFirst = (a: Entry, b: Entry) => (b.added || '').localeCompare(a.added || '') || b.id.localeCompare(a.id)

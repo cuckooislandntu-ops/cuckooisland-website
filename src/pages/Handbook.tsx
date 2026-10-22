@@ -106,6 +106,7 @@ function Hero({ gate, onShelf, onMsg, msg }: { gate: Gate; onShelf: () => void; 
     <section className="hb-hero" ref={ref} aria-labelledby="hb-title">
       <div className="hb-hero-inner">
         <div className="hb-copy">
+          <a className="hb-back" href={to('member')}><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10 3L5 8l5 5" /></svg>會員專區</a>
           <p className="hb-eyebrow">布穀島社 經營手冊・會員限定</p>
           <h1 id="hb-title"><span>教育服務性社團</span><span className="hb-big">生存指南</span></h1>
           <p className="hb-lede">招生、經費、教案、交接⋯⋯一屆屆撐過來的做法，都收在這座島上。接手的人，不用從零開始。</p>
@@ -472,6 +473,7 @@ function Shelf({ chapters, innerRef, gate }: { chapters: Chapter[]; innerRef: Re
 
 /* ---------- ③ 使用說明 ---------- */
 function Guide() {
+  const member = isApproved(useMember())
   return (
     <section className="hb-guide" aria-labelledby="hb-guide-title">
       <div className="content-inner">
@@ -479,10 +481,12 @@ function Guide() {
           <h2 id="hb-guide-title">使用說明</h2>
           <p className="section-lede">手冊放在線上，隨時更新。第一次打開前，先看這幾步。</p>
           <ol className="steps" style={{ marginTop: 14 }}>
-            <li><div><b>先加入島鏈</b><span>手冊只開放給會員。先填<a href={to('join')}>會員申請表單</a>。</span></div></li>
-            <li><div><b>用 Google 帳號登入網站</b><span>按「會員登入」，填好個人檔案。布穀島夥伴確認後就會開通，每一章的檔案會直接出現在書櫃上。</span></div></li>
+            {!member && <>
+              <li><div><b>先加入島鏈</b><span>手冊只開放給會員。先填<a href={to('join')}>會員申請表單</a>。</span></div></li>
+              <li><div><b>用 Google 帳號登入網站</b><span>按「會員登入」，填好社團資料。布穀島夥伴確認後就會開通，每一章的檔案會直接出現在書櫃上。</span></div></li>
+            </>}
             <li><div><b>遇到問題時查</b><span>依情境找章節，例如「第一次寫補助計畫」翻〈經費申請與核銷〉，「營隊前一週」翻〈營隊安全與保險〉。</span></div></li>
-            <li><div><b>需要範本，到資料庫拿</b><span>預算表、家長同意書這類可以直接改的檔案，放在<a href={to('resources')}>資料庫</a>的「模板」分類。</span></div></li>
+            <li><div><b>需要範本，到會員資源拿</b><span>預算表、家長同意書這類可以直接改的檔案，放在<a href={to('member')}>會員專區</a>的「模板」。</span></div></li>
             <li><div><b>留言補上你們的做法</b><span>會員可以在手冊裡留言。你們社團的經驗，會整理進下一版，傳給下一屆。</span></div></li>
           </ol>
         </div>
@@ -497,9 +501,9 @@ function Guide() {
           <p>還是不行，私訊 IG <a href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer">@cuckoo_island</a>。</p>
         </details>
 
-        <Empty title="還不是會員？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={to('join')}>申請加入島鏈</a>}>
+        {!member && <Empty title="還不是會員？" action={<a className="btn primary" style={{ minHeight: 46, padding: '0 18px', fontSize: 15 }} href={to('join')}>申請加入島鏈</a>}>
           加入後就能打開整本生存指南，也能把你們社團的做法留給下一屆。
-        </Empty>
+        </Empty>}
       </div>
     </section>
   )

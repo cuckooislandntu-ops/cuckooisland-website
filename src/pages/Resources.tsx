@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { CAT_COLLECTION, ENTRIES, newestFirst } from '@/lib/content'
+import { CAT_COLLECTION, ENTRIES, PUBLIC_ENTRIES, isMemberCat, newestFirst } from '@/lib/content'
 import EditLink from '@/components/EditLink'
 import type { Cat, Entry } from '@/lib/content'
 import { to } from '@/lib/site'
-import { isApproved, useMember } from '@/lib/member'
+import { MEMBER_ENABLED, isApproved, signIn, useMember } from '@/lib/member'
 
 const PERSONA: Record<Cat, { label: string; bg: string; badge: string; lines: string[]; subs: string[] }> = {
   all: { label: '總覽', bg: '#E6F1B5', badge: '#6E8C25', subs: [],
@@ -25,7 +25,7 @@ const ORDER: Cat[] = ['all', 'teach', 'sponsor', 'lecturer', 'activity', 'templa
 
 export { ENTRIES }
 const rank = (e: Entry) => (e.review ? 100 + (e.review.rating || 2.5) * 10 : 0)
-const PICKS = ENTRIES.filter(e => (e.review?.rating || 0) >= 4).sort((a, b) => (b.review!.rating! - a.review!.rating!) || newestFirst(a, b))
+const PICKS = PUBLIC_ENTRIES.filter(e => (e.review?.rating || 0) >= 4).sort((a, b) => (b.review!.rating! - a.review!.rating!) || newestFirst(a, b))
 const subsOf = (c: Cat) => { const m = new Map<string, number>(); ENTRIES.filter(e => e.cat === c).forEach(e => m.set(e.sub, (m.get(e.sub) || 0) + 1)); return [...m.entries()].sort((a, b) => b[1] - a[1]).map(x => x[0]) }
 const RM = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -57,7 +57,9 @@ function useCountUp(n: number) {
   }, [n])
   return v
 }
-const countOf = (c: Cat) => (c === 'all' ? ENTRIES.length : ENTRIES.filter(e => e.cat === c).length)
+const countOf = (c: Cat, member: boolean) => (c === 'all' ? (member ? ENTRIES : PUBLIC_ENTRIES).length : ENTRIES.filter(e => e.cat === c).length)
+// 會員專區的連結會帶 ?cat=template 直接打開那一類
+const CAT_FROM_URL = (): Cat => { try { const c = new URLSearchParams(location.search).get('cat') as Cat; return ORDER.includes(c) ? c : 'all' } catch { return 'all' } }
 
 function Mascot({ cat, talking }: { cat: Cat; talking: boolean }) {
   const ink = '#231F35', skin = '#F6C7A8', cream = '#FFFDF6'
@@ -244,15 +246,20 @@ export function EntryCard({ e, fresh }: { e: Entry; fresh?: boolean }) {
 }
 
 export default function Resources() {
-  const [cat, setCat] = useState<Cat>('all')
+  const m = useMember()
+  const member = isApproved(m)
+  const [cat, setCat] = useState<Cat>(CAT_FROM_URL)
+  const locked = isMemberCat(cat) && !member
   const [q, setQ] = useState('')
   const [sub, setSub] = useState<string | null>(null)
   const talk = useTalk(cat)
   const p = PERSONA[cat]
-  const total = countOf(cat), shownCount = useCountUp(total)
+  const total = countOf(cat, member), shownCount = useCountUp(total)
   useEffect(() => { setQ(''); setSub(null) }, [cat])
+  // 從會員專區帶 ?cat= 進來時，把選中的類別按鈕捲進畫面
+  useEffect(() => { if (cat !== 'all') document.querySelector('.cat-tab[aria-selected="true"]')?.scrollIntoView({ block: 'nearest', inline: 'center' }) }, [])
 
-  const latest = useMemo(() => [...ENTRIES].sort(newestFirst).slice(0, 6), [])
+  const latest = useMemo(() => [...(member ? ENTRIES : PUBLIC_ENTRIES)].sort(newestFirst).slice(0, 6), [member])
   const subs = useMemo(() => subsOf(cat), [cat])
   const list = useMemo(() => ENTRIES.filter(e => e.cat === cat && (!sub || e.sub === sub) && (!q.trim() || (e.title + e.desc + e.sub + e.grade).toLowerCase().includes(q.trim().toLowerCase())))
     .sort((a, b) => (rank(b) - rank(a)) || newestFirst(a, b)), [cat, sub, q])
@@ -262,7 +269,7 @@ export default function Resources() {
       <section className="db-stage" style={{ backgroundColor: p.bg }}>
         <div className="hero-inner">
           <h1>公開資料庫</h1>
-          <p className="lede">贊助、教學資源、講師、團隊活動和模板，都整理在這裡。</p>
+          <p className="lede">贊助、教學資源和講師，人人都能查。團隊活動和模板開放給島鏈會員。</p>
           <div className="stage-box">
             <button type="button" className="mascot-btn" onClick={talk.next} aria-label="換一句話">
               <Mascot cat={cat} talking={talk.talking} />
@@ -282,14 +289,14 @@ export default function Resources() {
         {ORDER.map(c => (
           <button key={c} type="button" role="tab" aria-selected={cat === c} className="cat-tab" onClick={() => setCat(c)}
             style={cat === c ? { background: PERSONA[c].badge, color: '#FFFDF6', borderColor: PERSONA[c].badge } : undefined}>
-            {PERSONA[c].label}
+            {PERSONA[c].label}{isMemberCat(c) && !member && <span className="cat-lock" aria-label="（會員限定）"><LockIcon /></span>}
           </button>
         ))}
       </div>
 
       <div className="content"><div className="content-inner">
-        <PublicNote />
-        {cat === 'all' ? (
+        {cat === 'all' && <PublicNote />}
+        {locked ? <MemberOnly label={p.label} count={total} ready={m.ready} signedIn={!!m.session} /> : cat === 'all' ? (
           <>
             <div>
               <h2>最新登錄</h2>
@@ -305,7 +312,7 @@ export default function Resources() {
               <div className="cat-tiles" style={{ marginTop: 12 }}>
                 {ORDER.slice(1).map(c => (
                   <button key={c} type="button" className="cat-tile" onClick={() => { setCat(c); window.scrollTo({ top: 0, behavior: 'smooth' }) }} style={{ background: PERSONA[c].bg }}>
-                    <b>{PERSONA[c].label}</b><span>{ENTRIES.filter(e => e.cat === c).length} 筆</span>
+                    <b>{PERSONA[c].label}</b><span>{ENTRIES.filter(e => e.cat === c).length} 筆{isMemberCat(c) && !member && '・會員限定'}</span>
                   </button>
                 ))}
               </div>
@@ -335,14 +342,37 @@ export default function Resources() {
   )
 }
 
-// 最上面的說明：這裡都是公開資訊；想看更多、想分享，申請成為會員（會員直接連到會員教案庫）
+const LockIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+
+// 團隊活動、模板：沒登入的人看到這張，登入後才列出來
+function MemberOnly({ label, count, ready, signedIn }: { label: string; count: number; ready: boolean; signedIn: boolean }) {
+  return (
+    <div className="sheet mb-box member-only">
+      <h2><LockIcon />{label}只開放給島鏈會員</h2>
+      <p className="section-lede" style={{ marginTop: 0 }}>
+        這裡有 {count} 筆{label}，是布穀島整理給會員社團直接拿去用的。{!MEMBER_ENABLED ? '正式網站登入後就能看到。' : signedIn ? '你的帳號還在等布穀島夥伴確認，開通後這裡就會出現。' : '用申請時登記的 Google 帳號登入就能看到。'}
+      </p>
+      {MEMBER_ENABLED && ready && (
+        <div className="mb-out-actions">
+          {signedIn
+            ? <a className="btn primary mb-inline-btn" href={to('member')}>查看會員狀態</a>
+            : <><button type="button" className="btn primary mb-inline-btn" onClick={() => void signIn()}>會員登入</button><a className="btn ghost mb-inline-btn" href={to('join')}>申請成為會員</a></>}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// 最上面的說明：這裡是公開資訊；團隊活動、模板和會員教案庫給會員（會員直接連到會員教案庫）
 function PublicNote() {
   const member = isApproved(useMember())
   return (
     <div className="public-note">
       <div>
-        <h2>這裡的資料都是公開資訊</h2>
-        <p>共 {ENTRIES.length} 筆，整理自布穀島社的資源清單，任何人都能查。想看會員社團分享的教案和經營經驗，或把你們的資源分享出去，歡迎申請成為島鏈會員。</p>
+        <h2>{member ? '公開資料和會員資源都在這裡' : '這裡的資料都是公開資訊'}</h2>
+        <p>{member
+          ? `共 ${ENTRIES.length} 筆。團隊活動和模板只有會員看得到，會員社團分享的教案在會員教案庫。`
+          : `共 ${PUBLIC_ENTRIES.length} 筆，整理自布穀島社的資源清單，任何人都能查。團隊活動、模板和會員社團分享的教案只開放給島鏈會員。`}</p>
       </div>
       <div className="public-note-actions">
         {member

@@ -1,12 +1,14 @@
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { ALL_ROUTES, Logo, NAV, to } from '@/lib/site'
+import { Logo, routesFor, to } from '@/lib/site'
 import type { RouteId } from '@/lib/site'
 import type { ReactElement, ReactNode } from 'react'
 import { isApproved, useMember } from '@/lib/member'
 import { clubOf } from '@/components/ClubIdentity'
+import { POSTS, isClubIntro } from '@/lib/content'
 
 export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' | 'dark' }) {
-  const route = (raw.startsWith('post-') ? 'column' : raw.startsWith('event-') ? 'events' : raw.startsWith('lesson-') ? 'lessons' : raw) as RouteId
+  // 《布穀好朋友》社團介紹現在歸在社團地圖，選單亮「社團地圖」
+  const route = (isClubIntro(POSTS.find(p => p.id === raw)) ? 'map' : raw.startsWith('post-') ? 'column' : raw.startsWith('event-') ? 'events' : raw.startsWith('lesson-') ? 'lessons' : raw) as RouteId
   const onHome = raw === ''
   const m = useMember()
   const signedIn = isApproved(m) // 只有核可的會員帳號會停在登入狀態
@@ -30,7 +32,7 @@ export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' 
               <SheetDescription style={{ color: 'var(--ink-soft)' }}>串聯全台教育服務性社團</SheetDescription>
             </SheetHeader>
             <nav aria-label="主選單">
-              {NAV.map(g => (
+              {routesFor(signedIn).map(g => (
                 <div className="nav-group" key={g.group}>
                   <h2>{g.group}</h2>
                   {g.items.map(it => (
@@ -71,13 +73,14 @@ function MeButton({ name, avatar, current }: { name: string; avatar: string; cur
 }
 
 export function Footer() {
+  const member = isApproved(useMember())
   return (
     <footer className="foot">
       <div className="foot-inner">
         <a className="brand" href={to('')} style={{ color: 'var(--cream)' }}><Logo />布穀島社</a>
         <nav aria-label="網站地圖">
           <ul className="sitemap">
-            {ALL_ROUTES.map(r => <li key={r.id || 'home'}><a href={to(r.id)}>{r.label}</a></li>)}
+            {routesFor(member).flatMap(g => g.items).map(r => <li key={r.id || 'home'}><a href={to(r.id)}>{r.label}</a></li>)}
           </ul>
         </nav>
         <a className="ig" aria-label="布穀島社 Instagram：@cuckoo_island" href="https://www.instagram.com/cuckoo_island/" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" /></svg>@cuckoo_island</a>
@@ -124,7 +127,7 @@ export function HeroArt({ kind }: { kind: RouteId }) {
   )
 }
 
-export function PageShell({ kind, title, lede, tint, children }: { kind: RouteId; title: string; lede: string; tint: string; children: ReactNode }) {
+export function PageShell({ kind, title, lede, tint, wide, children }: { kind: RouteId; title: string; lede: string; tint: string; wide?: boolean; children: ReactNode }) {
   return (
     <main className="page" id="main">
       <section className="hero-band" style={{ backgroundColor: tint }}>
@@ -134,7 +137,7 @@ export function PageShell({ kind, title, lede, tint, children }: { kind: RouteId
           <HeroArt kind={kind} />
         </div>
       </section>
-      <div className="content"><div className="content-inner">{children}</div></div>
+      <div className="content"><div className={'content-inner' + (wide ? ' wide' : '')}>{children}</div></div>
     </main>
   )
 }

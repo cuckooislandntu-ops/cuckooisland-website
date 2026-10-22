@@ -9,7 +9,7 @@ import { Empty } from '@/components/Chrome'
 import MemberGuide from '@/components/MemberGuide'
 import { PillTab, PillTabsList } from '@/components/PillTabs'
 import ClubIdentity, { clubOf, mapClub, schoolOf } from '@/components/ClubIdentity'
-import { CLUBS } from '@/lib/content'
+import { CLUBS, ENTRIES } from '@/lib/content'
 import { to } from '@/lib/site'
 import {
   CONTACTS, MEMBER_ENABLED, SERVICE_TYPES, contactHref, contactsOf, contactLabel, fetchDirectory, fetchPosts, isApproved, saveProfile, signIn, useMember,
@@ -35,7 +35,7 @@ export default function Member() {
       <section className="hero-band mb-hero">
         <div className="hero-inner">
           <h1>會員專區</h1>
-          <p className="lede">島鏈社團的小據點：看公告、找到其他社團，也讓大家認識你們。</p>
+          <p className="lede">島鏈社團的小據點：看公告、拿會員資源、找到其他社團，也讓大家認識你們。</p>
           <MemberGuide mood={mood} name={p ? clubOf(p) : ''} />
         </div>
       </section>
@@ -83,7 +83,7 @@ function SignedOut({ error }: { error: string }) {
         <ol className="steps" style={{ marginTop: 12 }}>
           <li><div><b>社團申請加入島鏈</b><span>在會員申請表單留下社團要用來登入的 Google 帳號，建議用社團的共用帳號。</span></div></li>
           <li><div><b>布穀島夥伴開通</b><span>確認後，我們會開通這個帳號的登入權限，通常幾天內完成。</span></div></li>
-          <li><div><b>登入、填好社團資料</b><span>社團名稱、服務性質和聯絡方式，一分鐘就好。之後就能打開經營手冊的每一份檔案、會員公告和社團名錄。</span></div></li>
+          <li><div><b>登入、填好社團資料</b><span>社團名稱、服務性質和聯絡方式，一分鐘就好。之後就能看會員公告、社團名錄，打開經營手冊、會員教案庫、團隊活動和模板。</span></div></li>
         </ol>
       </div>
       <Empty title="還不是會員？" action={<a className="btn primary mb-inline-btn" href={to('join')}>申請加入島鏈</a>}>
@@ -118,10 +118,7 @@ function Approved({ profile }: { profile: Profile }) {
         <ClubIdentity p={profile} size="lg" as="h2" />
         <Who email={profile.email} />
       </div>
-      <a className="mb-hb-link" href={to('handbook')}>
-        <b>經營手冊</b><span>每一章的檔案都打開了</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
-      </a>
+      <MemberResources />
       <Tabs.Root value={tab} onValueChange={setTab} className="mb-tabs">
         <PillTabsList cols={3} aria-label="會員專區">
           <PillTab value="posts">公告</PillTab>
@@ -133,6 +130,30 @@ function Approved({ profile }: { profile: Profile }) {
         <Tabs.Content value="profile"><ProfileForm profile={profile} submitLabel="儲存" /></Tabs.Content>
       </Tabs.Root>
     </>
+  )
+}
+
+// 會員資源：經營手冊、會員教案庫、團隊活動、模板都只開放給會員，從這裡進去
+const ACT_COUNT = ENTRIES.filter(e => e.cat === 'activity').length, TPL_COUNT = ENTRIES.filter(e => e.cat === 'template').length
+function MemberResources() {
+  const items = [
+    { href: to('handbook'), t: '經營手冊', d: '招生、經費、教案到交接，每一章的檔案', tile: 'var(--night)', night: true },
+    { href: to('lessons'), t: '會員教案庫', d: '會員社團分享的教案，也能上傳你們的', tile: '#CFE6D8' },
+    { href: to('resources') + '?cat=activity', t: '團隊活動', d: `${ACT_COUNT} 個破冰、團康和凝聚活動的帶法`, tile: '#D5EDC9' },
+    { href: to('resources') + '?cat=template', t: '模板', d: `${TPL_COUNT} 份同意書、表單範本，下載就能改`, tile: '#EADFCB' },
+  ]
+  return (
+    <section aria-labelledby="mb-res-title" style={{ display: 'grid', gap: 10 }}>
+      <h2 id="mb-res-title">會員資源</h2>
+      <div className="mb-res">
+        {items.map(it => (
+          <a key={it.t} href={it.href} style={{ ['--tile' as string]: it.tile, ...(it.night ? { color: 'var(--cream)' } : {}) }}>
+            <b style={it.night ? { color: 'var(--lime)' } : undefined}>{it.t}</b>
+            <span style={it.night ? { color: 'var(--cream)', opacity: .85 } : undefined}>{it.d}</span>
+          </a>
+        ))}
+      </div>
+    </section>
   )
 }
 

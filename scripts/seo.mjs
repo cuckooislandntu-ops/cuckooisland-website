@@ -26,13 +26,13 @@ const PAGES = [
   { id: '', title: `${NAME}｜串聯全台教育服務性社團`, desc: '布穀島社串聯全台教育服務性社團，整理教案、贊助、講師與團隊活動資源，讓服務隊、課輔與營隊社團的幹部交流經驗、共享資源、一起成長。' },
   { id: 'about', title: `關於我們｜${NAME}`, desc: '布穀島社的願景、起源與角色：一群服務性社團的夥伴，希望每座投入教育的島嶼都能突破圈層限制，串成彼此支持的島鏈。' },
   { id: 'join', title: `加入會員｜${NAME}`, desc: '教育服務性社團申請加入布穀島社島鏈：填寫申請表約 15 分鐘，即可取得整理好的教案、贊助與講師資源，並優先收到活動與贊助資訊。' },
-  { id: 'resources', title: `公開資料庫｜${NAME}`, desc: `給服務性社團的公開資料庫：${count('teach')} 筆教學資源、${count('sponsor')} 筆贊助資源，以及講師、團隊活動與文件模板，附小編評分。` },
-  { id: 'map', title: `社團地圖｜${NAME}`, desc: '全台教育服務性社團地圖：看看各社團在哪些學校、部落與社區服務，以及他們的介紹。' },
+  { id: 'resources', title: `公開資料庫｜${NAME}`, desc: `給服務性社團的公開資料庫：${count('teach')} 筆教學資源、${count('sponsor')} 筆贊助資源與講師名單，附小編評分；團隊活動與文件模板開放給島鏈會員。` },
+  { id: 'map', title: `社團地圖｜${NAME}`, desc: '全台教育服務性社團地圖：看看各社團在哪些學校、部落與社區服務，並閱讀《布穀好朋友》社團介紹。' },
   { id: 'handbook', title: `教育服務性社團生存指南｜經營手冊｜${NAME}`, desc: '教育服務性社團生存指南：招生、經費、教案、營隊安全、與學校溝通、交接，一屆屆累積下來的做法，會員可線上閱讀與留言補充。' },
   { id: 'events', title: `活動｜${NAME}`, desc: '布穀島社的交流活動報名資訊與活動紀錄。' },
-  { id: 'column', title: `專欄｜${NAME}`, desc: '布穀島社專欄：《布穀好朋友》社團介紹、《布可不資道》教學資源評比，以及服務故事與經驗分享。' },
+  { id: 'column', title: `專欄｜${NAME}`, desc: '布穀島社專欄：《布可不資道》教學資源評比，以及服務故事與經驗分享。' },
   { id: 'lessons', title: `會員教案庫｜${NAME}`, desc: '布穀島社島鏈會員社團分享的教案：依年段與主題查詢，按讚、收藏、留言交流，看看最近最夯的教案。' },
-  { id: 'member', title: `會員專區｜${NAME}`, desc: '布穀島社島鏈會員專區：用 Google 帳號登入，查看會員公告、會員名錄與經營手冊檔案。', noindex: true },
+  { id: 'member', title: `會員專區｜${NAME}`, desc: '布穀島社島鏈會員專區：用 Google 帳號登入，查看會員公告、社團名錄，以及經營手冊、會員教案庫、團隊活動與模板。', noindex: true },
   { id: 'logout', title: `已登出｜${NAME}`, desc: '你已經登出布穀島社會員專區。', noindex: true },
   { id: 'privacy', title: `隱私權政策｜${NAME}`, desc: '布穀島社網站如何蒐集、使用與保護會員登入資料與個人檔案。' },
   { id: 'match', title: `需求媒合｜${NAME}`, desc: '社團提出需求、企業與教育組織提供資源：企業 CSR 與員工志工合作、教案改編成營隊版本，布穀島社協助教育服務性社團與資源單位媒合。' },
@@ -121,6 +121,7 @@ Allow: /
 Disallow: /admin/
 Disallow: /member
 Disallow: /logout
+Disallow: /uploads/templates/
 
 Sitemap: ${SITE}/sitemap.xml
 `)

@@ -16,10 +16,9 @@ const BENEFITS = [
 ]
 
 const SECTIONS = [
-  { t: '基本資料', who: '所有人', d: '姓名、Email（審核結果會寄到這裡）、手機或 LINE ID，以及申請身分。' },
-  { t: '社團資料', who: '代表社團申請', d: '學校與社團全名、你的系級與社團角色、幹部任期、社團 IG 或 FB，以及社團訪談文件。' },
-  { t: '單位或個人資料', who: '資源單位、個人', d: '單位或學校名稱，以及你想怎麼參與：提供贊助或物資、擔任講師、分享教案或經驗、活動志工，或先了解看看。' },
-  { t: '最後幾題', who: '所有人', d: '從哪裡知道布穀島、是否有興趣加入布穀島團隊，以及資料使用同意。' },
+  { t: '基本資料', d: '填寫的幹部姓名、Email（審核結果會寄到這裡）、手機或 LINE ID。' },
+  { t: '社團資料', d: '學校與社團全名、你的系級與社團角色、幹部任期、社團 IG 或 FB，社團要用來登入網站的 Google 帳號，以及社團訪談文件。' },
+  { t: '最後幾題', d: '從哪裡知道布穀島、是否有興趣加入布穀島團隊，以及資料使用同意。' },
 ]
 
 const TIPS = [
@@ -41,7 +40,7 @@ export default function Join() {
 
       <div className="sheet" style={{ display: 'grid', gap: 12 }}>
         <h2>申請表單</h2>
-        <p className="section-lede" style={{ marginTop: 0 }}>社團、資源單位或個人都可以申請。代表社團申請的話，表單會帶你下載社團訪談文件。</p>
+        <p className="section-lede" style={{ marginTop: 0 }}>只能以社團為單位申請，由一位社團幹部代表填寫。表單會帶你下載社團訪談文件。</p>
         {JOIN_FORM_EMBED
           ? <iframe className="form-embed" src={JOIN_FORM_EMBED} title="島鏈計畫會員申請表單" loading="lazy">載入中…</iframe>
           : null}
@@ -59,17 +58,17 @@ export default function Join() {
 
       <div>
         <h2>表單會問這些</h2>
-        <p className="section-lede">選好申請身分後，只需要回答和你有關的題目。</p>
+        <p className="section-lede">一共三個部分。</p>
         <ul className="toc" style={{ marginTop: 12 }}>
-          {SECTIONS.map((s, i) => <li key={s.t}><i>{i + 1}</i><div><b>{s.t}<em className="who">{s.who}</em></b><span>{s.d}</span></div></li>)}
+          {SECTIONS.map((s, i) => <li key={s.t}><i>{i + 1}</i><div><b>{s.t}</b><span>{s.d}</span></div></li>)}
         </ul>
       </div>
 
       <div className="sheet" style={{ display: 'grid', gap: 10 }}>
         <h2>填寫社團訪談文件的小提醒</h2>
-        <p className="section-lede" style={{ marginTop: 0 }}>訪談文件的內容，經你們審稿後，會整理成社團地圖和專欄《布穀好朋友》裡的介紹。</p>
+        <p className="section-lede" style={{ marginTop: 0 }}>訪談文件的內容，經你們審稿後，會整理成社團地圖上的社團介紹（IG《布穀好朋友》系列）。</p>
         <ul className="tips">{TIPS.map(t => <li key={t}>{t}</li>)}</ul>
-        <a className="link-plain" href={to('post-friends-1')}>看看《布穀好朋友》寫成的樣子</a>
+        <a className="link-plain" href={to('map')}>到社團地圖看看寫成的樣子</a>
       </div>
 
       <div className="paths">

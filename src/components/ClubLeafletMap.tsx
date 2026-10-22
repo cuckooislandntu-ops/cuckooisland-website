@@ -67,7 +67,7 @@ export default function ClubLeafletMap({ clubs, region, pick, onPick }: Props) {
   return (
     <div className="osm-wrap">
       <div ref={box} className="osm-map" role="region" aria-label="社團服務據點地圖（OpenStreetMap）" />
-      {noPins && <p className="osm-note">{region === 'abroad' ? '海外據點沒有標在地圖上，請看下方的社團介紹。' : '這個地區目前還沒有標在地圖上的據點。'}</p>}
+      {noPins && <p className="osm-note">{region === 'abroad' ? '海外據點沒有標在地圖上，請看社團清單。' : '這個地區目前還沒有標在地圖上的據點。'}</p>}
     </div>
   )
 }
