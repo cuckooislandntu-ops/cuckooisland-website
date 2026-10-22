@@ -331,6 +331,23 @@ body, .hero-band, .article-head, .db-stage, .cat-bar, .bar.solid { background-im
 .sites em { font-style: normal; font-family: var(--sans); font-size: 12px; color: var(--ink-soft); }
 .sites span { font-size: 13.5px; color: var(--ink-soft); line-height: 1.65; }
 .highlights { margin: 0; padding-left: 1.1em; font-size: 14px; line-height: 1.7; }
+/* 社團卡片收合：平常只露出名稱、一句話、學校與據點；選到（.open）才展開 .club-more */
+.club { gap: 0; }
+.club-head { position: relative; }
+.club-toggle { all: unset; display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; font: inherit; cursor: pointer; }
+.club-toggle::after { content: ''; position: absolute; inset: -18px -16px -6px; border-radius: 20px 20px 0 0; } /* 整個卡片頭都能點 */
+.club-toggle svg { flex: none; width: 22px; height: 22px; padding: 4px; border-radius: 50%; background: color-mix(in srgb, var(--club) 35%, #FFFDF6); transition: transform .28s; }
+.club.open .club-toggle svg { transform: rotate(180deg); }
+.club-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 6px; }
+.club:not(.open) .club-head:hover h3 { text-decoration: underline; text-underline-offset: 4px; }
+.club-where { margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: var(--ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.club-where::before { content: '據點　'; color: var(--ink); }
+.club.open .club-where { display: none; }
+.club-more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s ease; }
+.club.open .club-more { grid-template-rows: 1fr; }
+.club-more > div { min-height: 0; overflow: hidden; display: grid; gap: 12px; }
+.club.open .club-more > div { padding-top: 12px; }
+@media (prefers-reduced-motion: reduce) { .club-more, .club-toggle svg { transition: none; } }
 .club-ig { color: var(--ink-soft); font-size: 14px; }
 /* 社團卡片裡的《布穀好朋友》社團介紹（從專欄搬過來） */
 .club-intro { display: grid; grid-template-columns: 76px 1fr; gap: 12px; align-items: start; padding: 10px; border-radius: 14px; background: color-mix(in srgb, var(--club) 12%, #FFFDF6); color: var(--ink); text-decoration: none; }

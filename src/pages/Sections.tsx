@@ -25,9 +25,11 @@ export function ClubMap() {
   const [region, setRegion] = useState<Region | null>(null)
   const [pick, setPick] = useState<string | null>(null)
   const shown = CLUBS.filter(c => !region || c.sites.some(s => s.region === region))
-  const choose = (id: string) => { setPick(pick === id ? null : id); setTimeout(() => document.getElementById('club-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50) }
+  // 選到的社團卡片會展開。等上一張收起的動畫（約 .28 秒）跑完再捲過去，位置才不會跑掉
+  const reveal = (id: string) => setTimeout(() => document.getElementById('club-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 320)
+  const choose = (id: string) => { const next = pick === id ? null : id; setPick(next); if (next) reveal(next) }
   return (
-    <PageShell kind="map" title="社團地圖" tint="#CDEBEC" wide lede="全台教育服務性社團在哪裡服務、怎麼服務。點地圖上的點，看看是哪個社團。">
+    <PageShell kind="map" title="社團地圖" tint="#CDEBEC" wide lede="全台教育服務性社團在哪裡服務、怎麼服務。點地圖上的點或社團名稱，展開看完整介紹。">
       {/* 手機：地圖在上、社團清單在下；電腦（960px 以上）：地圖固定在左邊，右邊捲動社團清單（樣式在 index.css「社團地圖：電腦版」） */}
       <div className="map-layout">
       <div className="sheet map-sheet">
@@ -36,7 +38,7 @@ export function ClubMap() {
           {REGIONS.map(r => <button key={r} type="button" className="chip" aria-pressed={region === r} onClick={() => setRegion(r)}>{REGION_LABEL[r]}</button>)}
         </div>
         <Suspense fallback={<div className="osm-wrap"><div className="osm-map osm-loading">地圖載入中…</div></div>}>
-          <ClubLeafletMap clubs={CLUBS} region={region} pick={pick} onPick={id => { setPick(id); setTimeout(() => document.getElementById('club-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50) }} />
+          <ClubLeafletMap clubs={CLUBS} region={region} pick={pick} onPick={id => { setPick(id); reveal(id) }} />
         </Suspense>
         <ul className="legend" aria-label="圖例">
           {CLUBS.map(c => <li key={c.id}><button type="button" aria-pressed={pick === c.id} onClick={() => choose(c.id)}><i style={{ background: c.color }} />{c.name}</button></li>)}
@@ -46,33 +48,37 @@ export function ClubMap() {
 
       <div className="map-list">
         <h2>{region ? REGION_LABEL[region] + '的社團' : '所有社團'}（{shown.length}）</h2>
-        <p className="section-lede" style={{ marginTop: -6 }}>社團介紹整理自布穀島社 IG《布穀好朋友》系列，點社團卡片裡的介紹看完整的一篇。</p>
-        {shown.map(c => { const post = CLUB_INTROS.find(p => p.clubId === c.id); return (
-          <article key={c.id} id={'club-' + c.id} className={'club' + (pick === c.id ? ' lit' : '')} style={{ ['--club' as any]: c.color }}>
+        <p className="section-lede" style={{ marginTop: -6 }}>社團介紹整理自布穀島社 IG《布穀好朋友》系列，展開社團卡片，可以讀完整的一篇。</p>
+        {/* 社團卡片：平常只顯示名稱、一句話、學校與據點名稱；點卡片或地圖上的點才展開服務內容、特色、社團介紹和 IG */}
+        {shown.map(c => { const post = CLUB_INTROS.find(p => p.clubId === c.id); const open = pick === c.id; return (
+          <article key={c.id} id={'club-' + c.id} className={'club' + (open ? ' lit open' : '')} style={{ ['--club' as any]: c.color }}>
             <div className="club-head">
-              <h3>{c.name}</h3>
+              <h3><button type="button" className="club-toggle" aria-expanded={open} aria-controls={'club-more-' + c.id} onClick={() => choose(c.id)}>{c.name}<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 6l4 4 4-4" /></svg></button></h3>
               <p className="club-tag">{c.tagline}</p>
-              <div className="entry-top">
-                {c.types.map(t => <span key={t} className="sub-tag">{t}</span>)}
-                {post && <span className="sub-tag">{post.series} {post.ep}</span>}
-              </div>
               <p className="club-meta"><span>{c.school}</span>{c.size && <span>{c.size}</span>}</p>
+              {c.sites.length > 0 && <p className="club-where">{c.sites.map(s => s.name).join('、')}</p>}
             </div>
-            <ul className="sites">
-              {c.sites.map(s => <li key={s.name}><b>{s.name}{s.region && <em>{REGION_LABEL[s.region]}</em>}</b><span>{s.detail}</span></li>)}
-            </ul>
-            <ul className="highlights">{c.highlights.map(h => <li key={h}>{h}</li>)}</ul>
-            {post && (
-              <a className="club-intro" href={to(post.id)}>
-                {post.cover && <img src={post.cover} alt="" loading="lazy" />}
-                <span><em>社團介紹 {post.ep}</em><b>{post.title}</b>{(post.sum || post.hook) && <small>{post.sum || post.hook}</small>}<i>閱讀社團介紹</i></span>
-              </a>
-            )}
-            {c.partial && <p className="status">這個社團的介紹還在整理，內容可能不完整。</p>}
-            <div className="entry-foot">
-              {c.ig ? <a className="ig club-ig" href={`https://www.instagram.com/${c.ig}/`} target="_blank" rel="noopener noreferrer"><IG />@{c.ig}</a> : <span />}
+            <div className="club-more" id={'club-more-' + c.id} inert={!open}>
+              <div>
+                <div className="entry-top">
+                  {c.types.map(t => <span key={t} className="sub-tag">{t}</span>)}
+                  {post && <span className="sub-tag">{post.series} {post.ep}</span>}
+                </div>
+                <ul className="sites">
+                  {c.sites.map(s => <li key={s.name}><b>{s.name}{s.region && <em>{REGION_LABEL[s.region]}</em>}</b><span>{s.detail}</span></li>)}
+                </ul>
+                <ul className="highlights">{c.highlights.map(h => <li key={h}>{h}</li>)}</ul>
+                {post && (
+                  <a className="club-intro" href={to(post.id)}>
+                    {post.cover && <img src={post.cover} alt="" loading="lazy" />}
+                    <span><em>社團介紹 {post.ep}</em><b>{post.title}</b>{(post.sum || post.hook) && <small>{post.sum || post.hook}</small>}<i>閱讀社團介紹</i></span>
+                  </a>
+                )}
+                {c.partial && <p className="status">這個社團的介紹還在整理，內容可能不完整。</p>}
+                {c.ig && <div className="entry-foot"><a className="ig club-ig" href={`https://www.instagram.com/${c.ig}/`} target="_blank" rel="noopener noreferrer"><IG />@{c.ig}</a></div>}
+                <EditLink collection="clubs" id={c.id} label="編輯社團資料" />
+              </div>
             </div>
-            <EditLink collection="clubs" id={c.id} label="編輯社團資料" />
           </article>
         ) })}
         {member
