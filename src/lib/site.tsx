@@ -30,7 +30,7 @@ export const routesFor = (member: boolean) => NAV.map(g => ({ ...g, items: g.ite
 declare const __PATH_ROUTES__: boolean
 export const PATH_ROUTES = typeof __PATH_ROUTES__ !== 'undefined' && __PATH_ROUTES__
 
-const PAGE_IDS = new Set<string>([...ALL_ROUTES.map(r => r.id), 'privacy', 'logout']) // privacy 隱私權政策（頁尾連結）、logout 登出頁（選單與會員專區的「登出」）
+const PAGE_IDS = new Set<string>([...ALL_ROUTES.map(r => r.id), 'privacy', 'logout', 'notifications']) // privacy 隱私權政策（頁尾連結）、logout 登出頁（選單與會員專區的「登出」）
 const isRoute = (id: string) => PAGE_IDS.has(id) || /^(post|event|lesson)-[a-z0-9-]+$/.test(id)
 
 /** link to a page id ('', 'join', …), an article ('post-friends-1' → /column/friends-1) or an event ('event-…' → /events/…) */
@@ -87,7 +87,8 @@ export function useRoute(): string {
       const id = url.hash && url.pathname === location.pathname ? null : fromPath(url.pathname)
       if (id === null) return
       e.preventDefault()
-      if (url.pathname !== location.pathname) history.pushState(null, '', url.pathname)
+      const destination = url.pathname + url.search + url.hash
+      if (url.href !== location.href) history.pushState(null, '', destination)
       go()
     }
     const back = () => setR(read())

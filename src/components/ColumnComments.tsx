@@ -1,8 +1,8 @@
 // 專欄文章底下的會員留言：已開通的會員社團可以看、可以留言、可以刪自己的留言；
 // 沒登入或還沒開通的人只會看到說明（留言內容不公開）。資料在 src/lib/comments.ts、supabase/comments.sql。
-import { useCallback, useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
-import ClubIdentity from '@/components/ClubIdentity'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { FormEvent, ReactNode } from 'react'
+import ClubIdentity, { clubOf } from '@/components/ClubIdentity'
 import { COMMENT_MAX, addColumnComment, deleteColumnComment, fetchColumnComments } from '@/lib/comments'
 import type { ColumnComment } from '@/lib/comments'
 import { MEMBER_ENABLED, isApproved, signIn, useMember } from '@/lib/member'
@@ -39,61 +39,185 @@ export default function ColumnComments({ postId, intro }: { postId: string; intr
       </section>
     )
   }
-  return <Thread postId={postId} intro={intro} />
+  return <Thread key={m.profile?.id} postId={postId} intro={intro} />
+}
+
+// 回覆可以接著回覆，畫面維持一層縮排。RPC 按 id 排序，先有被回覆的留言。
+function groupThreads(comments: ColumnComment[]) {
+  const threads: ColumnComment[][] = []
+  const threadByComment = new Map<number, ColumnComment[]>()
+  for (const comment of comments) {
+    const parentThread = comment.parent_id == null ? undefined : threadByComment.get(comment.parent_id)
+    const thread = parentThread ?? []
+    if (!parentThread) threads.push(thread)
+    thread.push(comment)
+    threadByComment.set(comment.id, thread)
+  }
+  return threads
+}
+
+function replyAnchor() {
+  return location.hash.match(/^#comment-(\d+)$/)?.[1] ?? ''
 }
 
 function Thread({ postId, intro }: { postId: string; intro?: boolean }) {
   const me = useMember().profile
   const [list, setList] = useState<ColumnComment[] | null>(null)
-  const [text, setText] = useState('')
+  const [activeReply, setActiveReply] = useState<number | null>(null)
   const [busy, setBusy] = useState(false)
-  const [msg, setMsg] = useState('')
-  const load = useCallback(() => fetchColumnComments(postId).then(setList, () => { setList([]); setMsg('留言讀取失敗，請重新整理再試一次。') }), [postId])
-  useEffect(() => { setList(null); void load() }, [load])
+  const [loadError, setLoadError] = useState(false)
+  const [deleteError, setDeleteError] = useState(false)
+  const [target, setTarget] = useState(replyAnchor)
+  const scrolled = useRef('')
+  const load = useCallback(async () => {
+    setLoadError(false)
+    try {
+      setList(await fetchColumnComments(postId))
+    } catch {
+      setLoadError(true)
+    }
+  }, [postId])
 
-  const send = async (e: FormEvent) => {
-    e.preventDefault()
-    const t = text.trim()
-    if (!t) { setMsg('請先寫點什麼。'); return }
+  useEffect(() => { void load() }, [load])
+  useEffect(() => {
+    const sync = () => setTarget(replyAnchor())
+    window.addEventListener('hashchange', sync)
+    return () => window.removeEventListener('hashchange', sync)
+  }, [])
+  useEffect(() => {
+    if (!target) scrolled.current = ''
+    if (!list || !target || scrolled.current === target) return
+    const comment = document.getElementById(`comment-${target}`)
+    const destination = comment ?? document.getElementById('cc-h')
+    destination?.scrollIntoView({ block: 'start' })
+    if (comment) comment.focus({ preventScroll: true })
+    scrolled.current = target
+  }, [list, target])
+
+  async function send(body: string, parentId?: number) {
     setBusy(true)
-    try { await addColumnComment(postId, t); setText(''); setMsg(''); await load() } catch (er) { setMsg('留言沒有送出：' + (er as Error).message) }
-    setBusy(false)
+    try {
+      await addColumnComment(postId, body, parentId)
+      if (parentId !== undefined) setActiveReply(null)
+      await load()
+    } finally {
+      setBusy(false)
+    }
   }
-  const del = async (c: ColumnComment) => {
+
+  async function remove(comment: ColumnComment) {
     if (!confirm('確定要刪除這則留言？')) return
-    try { await deleteColumnComment(c.id); await load() } catch (er) { setMsg('刪除失敗：' + (er as Error).message) }
+    setBusy(true)
+    setDeleteError(false)
+    try {
+      await deleteColumnComment(comment.id)
+      if (activeReply === comment.id) setActiveReply(null)
+      await load()
+    } catch {
+      setDeleteError(true)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const byId = new Map(list?.map(c => [c.id, c]))
+  const threads = groupThreads(list ?? [])
+
+  function renderComment(comment: ColumnComment) {
+    const parent = comment.parent_id == null ? undefined : byId.get(comment.parent_id)
+    const replying = activeReply === comment.id
+    return (
+      <div id={`comment-${comment.id}`} className="cc-comment" tabIndex={-1}>
+        <div className="ls-c-head">
+          <ClubIdentity p={comment} size="sm" as="p" />
+          <time className="ls-c-time" dateTime={comment.created_at}>{ago(comment.created_at)}</time>
+        </div>
+        {parent && <p className="cc-reply-to">回覆 {clubOf(parent) || '會員社團'}</p>}
+        <p className="ls-c-body">{comment.body}</p>
+        <div className="cc-comment-actions">
+          <button type="button" className="link-plain" disabled={busy} aria-expanded={replying}
+            onClick={() => setActiveReply(replying ? null : comment.id)}>回覆</button>
+          {comment.mine && <button type="button" className="link-plain danger" disabled={busy} onClick={() => void remove(comment)}>刪除</button>}
+        </div>
+        {replying && (
+          <CommentForm id={`cc-reply-${comment.id}`} label="回覆" busy={busy}
+            placeholder={`回覆 ${clubOf(comment) || '會員社團'}的留言`}
+            onSend={body => send(body, comment.id)} onCancel={() => setActiveReply(null)} />
+        )}
+      </div>
+    )
   }
 
   return (
     <section className="cc" aria-labelledby="cc-h">
       <h2 id="cc-h">會員留言{list && list.length > 0 ? `（${list.length}）` : ''}</h2>
       <p className="cc-note">只有島鏈會員看得到，留言會顯示你們的社團名稱。</p>
-      {list === null ? <p className="status">讀取留言中⋯</p>
-        : list.length === 0 ? <p className="section-lede">還沒有留言。有什麼想法、相似的經驗，或想問問這篇的社團，都可以留在這裡。</p>
-        : <ul className="ls-c-list">
-            {list.map(c => (
-              <li key={c.id}>
-                <div className="ls-c-head">
-                  <ClubIdentity p={c} size="sm" as="p" />
-                  <span className="ls-c-time">{ago(c.created_at)}</span>
-                </div>
-                <p className="ls-c-body">{c.body}</p>
-                {c.mine && <button type="button" className="link-plain danger ls-c-del" onClick={() => void del(c)}>刪除</button>}
-              </li>
-            ))}
-          </ul>}
-      <form className="ls-c-form" onSubmit={send}>
-        {me && <ClubIdentity p={me} size="sm" as="p" />}
-        <div className="sf-field">
-          <label htmlFor="cc-text" className="sr-only">留言</label>
-          <textarea id="cc-text" value={text} maxLength={COMMENT_MAX} onChange={e => { setText(e.target.value); setMsg('') }}
-            placeholder={intro ? '想認識這個社團、或有想交流的事，都可以留言' : '分享你們的想法或經驗，或問問寫這篇的社團'} />
-        </div>
-        <div className="sf-submit">
-          <button className="btn primary mb-inline-btn" type="submit" disabled={busy}>{busy ? '送出中⋯' : '送出留言'}</button>
-          <p className="status" role="status" aria-live="polite">{msg}</p>
-        </div>
-      </form>
+      {loadError && <div className="cc-actions">
+        <p className="status" role="alert">留言讀取失敗。</p>
+        <button className="link-plain" disabled={busy} type="button" onClick={() => void load()}>重新讀取</button>
+      </div>}
+      {deleteError && <p className="status" role="alert">刪除失敗，請再試一次。</p>}
+      {list && target && !byId.has(Number(target)) && !loadError && <p className="status">找不到這則留言，可能已被刪除。</p>}
+      {!loadError && list === null && <p className="status">讀取留言中⋯</p>}
+      {!loadError && list?.length === 0 && <p className="section-lede">還沒有留言。有什麼想法、相似的經驗，或想問問這篇的社團，都可以留在這裡。</p>}
+      {threads.length > 0 && (
+        <ul className="ls-c-list">
+          {threads.map(([root, ...replies]) => (
+            <li key={root.id}>
+              {renderComment(root)}
+              {replies.length > 0 && (
+                <ul className="cc-replies" aria-label="留言回覆">
+                  {replies.map(reply => <li key={reply.id}>{renderComment(reply)}</li>)}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      <CommentForm id="cc-text" label="留言" busy={busy} onSend={send}
+        identity={me ? <ClubIdentity p={me} size="sm" as="p" /> : undefined}
+        placeholder={intro ? '想認識這個社團、或有想交流的事，都可以留言' : '分享你們的想法或經驗，或問問寫這篇的社團'} />
     </section>
+  )
+}
+
+function CommentForm({ id, label, busy, placeholder, identity, onSend, onCancel }: {
+  id: string; label: string; busy: boolean; placeholder: string; identity?: ReactNode
+  onSend: (body: string) => Promise<void>; onCancel?: () => void
+}) {
+  const [text, setText] = useState('')
+  const [message, setMessage] = useState('')
+  const field = useRef<HTMLTextAreaElement>(null)
+
+  const isReply = !!onCancel
+  useEffect(() => { if (isReply) field.current?.focus() }, [isReply])
+
+  async function submit(event: FormEvent) {
+    event.preventDefault()
+    const body = text.trim()
+    if (!body) { setMessage('請先寫點什麼。'); return }
+    try {
+      await onSend(body)
+      setText('')
+      setMessage('')
+    } catch {
+      setMessage(`${label}沒有送出，請重新整理留言或再試一次。`)
+    }
+  }
+
+  return (
+    <form className="ls-c-form" aria-label={label} onSubmit={submit}>
+      {identity}
+      <div className="sf-field">
+        <label htmlFor={id} className="sr-only">{label}</label>
+        <textarea id={id} ref={field} value={text} maxLength={COMMENT_MAX} disabled={busy}
+          onChange={e => { setText(e.target.value); setMessage('') }} placeholder={placeholder} />
+      </div>
+      <div className="cc-actions">
+        <button className="btn primary mb-inline-btn" type="submit" disabled={busy}>送出{label}</button>
+        {onCancel && <button className="btn ghost mb-inline-btn" type="button" disabled={busy} onClick={onCancel}>取消</button>}
+      </div>
+      {message && <p className="status" role="status">{message}</p>}
+    </form>
   )
 }

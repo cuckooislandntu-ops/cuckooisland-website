@@ -6,14 +6,15 @@ const IG = 'https://www.instagram.com/cuckoo_island/'
 
 export default function Privacy() {
   return (
-    <PageShell kind="privacy" title="隱私權政策" tint="#E9E2F3" lede="布穀島社網站怎麼使用你登入時提供的資料。最後更新：2026 年 10 月 18 日。">
+    <PageShell kind="privacy" title="隱私權政策" tint="#E9E2F3" lede="布穀島社網站怎麼使用你登入時提供的資料。最後更新：2026 年 11 月 19 日。">
       <div className="policy" style={{ display: 'grid', gap: 26 }}>
         <section>
           <h2>我們蒐集哪些資料</h2>
-          <p>只有在你使用<a href={to('member')}>會員專區</a>、按下「用 Google 登入」時，我們才會取得以下資料：</p>
+          <p>透過<a href={to('member')}>會員專區</a>登入或使用會員功能時，我們會取得以下資料：</p>
           <ul>
             <li>Google 帳號提供的名字、Email 和大頭貼網址。</li>
             <li>你自己填的個人檔案：姓名、社團、學校、社團職位、習慣的聯絡方式、簡介，以及是否在會員名錄顯示。</li>
+            <li>你發表的留言與回覆，以及站內通知的已讀狀態和郵件通知偏好。</li>
           </ul>
           <p>只瀏覽網站、不登入的話，我們不會蒐集任何個人資料。</p>
         </section>
@@ -23,8 +24,9 @@ export default function Privacy() {
             <li>確認你是不是島鏈會員，開通會員專區和經營手冊的檔案。</li>
             <li>你選擇在會員名錄顯示時，讓其他已開通的會員看到你的姓名、社團、職位、聯絡方式和簡介。名錄不會顯示你的 Email 登入帳號。</li>
             <li>布穀島夥伴需要聯絡你時使用。</li>
+            <li>留言有回覆時，會在站內通知你。你可在<a href={to('notifications')}>通知設定</a>選擇是否同時寄到登入信箱。</li>
           </ul>
-          <p>我們不會把資料賣給或提供給其他單位，也不會用來投放廣告。</p>
+          <p>開啟郵件通知後，寄信服務 Resend 會處理你的登入信箱和通知信，以便完成寄送。通知信只提供事件提示和網站連結，留言內容需登入網站查看。我們不會出售資料或用於廣告投放。</p>
         </section>
         <section>
           <h2>Google 使用者資料</h2>
@@ -32,7 +34,7 @@ export default function Privacy() {
         </section>
         <section>
           <h2>資料存放在哪裡</h2>
-          <p>會員資料存放在 Supabase 提供的雲端資料庫，傳輸過程加密。只有本人、已開通的會員（僅限名錄上你願意公開的內容）和布穀島的管理夥伴看得到。登入狀態會存在你的瀏覽器裡，按「登出」就會清除。</p>
+          <p>會員資料存放在 Supabase 提供的雲端資料庫，傳輸過程加密。站內通知和郵件偏好只對你和布穀島的管理夥伴開放。已開通的會員也能看到你在會員名錄公開的資料，以及你發表的會員留言。登入狀態會存在你的瀏覽器裡，按「登出」就會清除。</p>
         </section>
         <section>
           <h2>修改或刪除你的資料</h2>

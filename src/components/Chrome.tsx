@@ -5,6 +5,7 @@ import type { ReactElement, ReactNode } from 'react'
 import { isApproved, useMember } from '@/lib/member'
 import { clubOf } from '@/components/ClubIdentity'
 import { POSTS, isClubIntro } from '@/lib/content'
+import NotificationLink from '@/components/NotificationLink'
 
 export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' | 'dark' }) {
   // 《布穀好朋友》社團介紹現在歸在社團地圖，選單亮「社團地圖」
@@ -17,6 +18,7 @@ export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' 
     <header className={'bar' + (onHome ? (tone === 'dark' ? ' dark' : '') : ' solid') + (route === 'handbook' ? ' night' : '')}>
       <a className="brand" href={to('')} aria-label="布穀島社首頁"><Logo />布穀島社</a>
       <div className="bar-actions">
+        {signedIn && <NotificationLink key={m.profile?.id} current={raw === 'notifications'} />}
         {signedIn
           ? <MeButton name={clubName || m.profile?.name || ''} avatar={m.profile?.avatar_url || ''} current={route === 'member'} />
           : route !== 'join' && <a className="pill" href={to('join')}>加入會員</a>}
@@ -47,6 +49,9 @@ export function SiteHeader({ route: raw, tone }: { route: string; tone: 'light' 
               {signedIn && (
                 <div className="nav-group">
                   <h2>帳號</h2>
+                  <SheetClose asChild>
+                    <a className="nav-link" href={to('notifications')} aria-current={raw === 'notifications' ? 'page' : undefined}><b>通知</b><span>站內通知與郵件設定</span></a>
+                  </SheetClose>
                   <SheetClose asChild>
                     <a className="nav-link" href={to('logout')}><b>登出</b><span>{m.session?.user.email}</span></a>
                   </SheetClose>
