@@ -33,6 +33,7 @@ const PAGES = [
   { id: 'column', title: `專欄｜${NAME}`, desc: '布穀島社專欄：《布可不資道》教學資源評比，以及服務故事與經驗分享。' },
   { id: 'lessons', title: `會員教案庫｜${NAME}`, desc: '布穀島社島鏈會員社團分享的教案：依年段與主題查詢，按讚、收藏、留言交流，看看最近最夯的教案。' },
   { id: 'member', title: `會員專區｜${NAME}`, desc: '布穀島社島鏈會員專區：用 Google 帳號登入，查看會員公告、社團名錄，以及經營手冊、會員教案庫、團隊活動與模板。', noindex: true },
+  { id: 'notifications', title: `通知｜${NAME}`, desc: '查看站內通知與郵件通知設定。', noindex: true },
   { id: 'logout', title: `已登出｜${NAME}`, desc: '你已經登出布穀島社會員專區。', noindex: true },
   { id: 'privacy', title: `隱私權政策｜${NAME}`, desc: '布穀島社網站如何蒐集、使用與保護會員登入資料與個人檔案。' },
   { id: 'match', title: `需求媒合｜${NAME}`, desc: '社團提出需求、企業與教育組織提供資源：企業 CSR 與員工志工合作、教案改編成營隊版本，布穀島社協助教育服務性社團與資源單位媒合。' },
@@ -49,13 +50,14 @@ const ORG = {
   description: '串聯全台教育服務性社團：交流經驗、共享資源、一起成長。',
 }
 
-function render({ url, title, desc, image, type = 'website', jsonld = [] }) {
+function render({ url, title, desc, image, type = 'website', jsonld = [], noindex = false }) {
   const head = [
     `<link rel="canonical" href="${esc(url)}" />`,
     `<meta property="og:url" content="${esc(url)}" />`,
     `<meta property="og:site_name" content="${NAME}" />`,
     `<meta property="og:locale" content="zh_TW" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
+    ...(noindex ? ['<meta name="robots" content="noindex" />'] : []),
     ...jsonld.map(j => `<script type="application/ld+json">${JSON.stringify(j).replace(/</g, '\\u003c')}</script>`),
   ].join('\n    ')
   let html = template
@@ -79,7 +81,7 @@ const urls = []
 for (const p of PAGES) {
   const url = urlOf(p.id)
   const jsonld = p.id ? [] : [ORG, { '@context': 'https://schema.org', '@type': 'WebSite', name: NAME, url: SITE + '/' }]
-  write(p.id ? `p/${p.id}.html` : 'index.html', render({ url, title: p.title, desc: p.desc, image: abs('/og.png'), jsonld }))
+  write(p.id ? `p/${p.id}.html` : 'index.html', render({ url, title: p.title, desc: p.desc, image: abs('/og.png'), jsonld, noindex: p.noindex }))
   if (!p.noindex) urls.push({ loc: url, priority: p.id ? '0.8' : '1.0' })
 }
 

@@ -150,3 +150,12 @@ a.tag:hover { background: var(--paper-2); color: var(--ink); }
 .cc-locked { padding: 18px; border-radius: 20px; background: var(--cream); box-shadow: 4px 5px 0 rgba(35,31,53,.08); }
 .cc-locked p { margin: 0; font-size: 15px; line-height: 1.8; }
 .cc-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.prose .cc .ls-c-list { padding-left: 0; }
+.cc-comment { display: grid; gap: 8px; scroll-margin-top: 88px; }
+.cc-comment:target { background: #D6EC6E40; border-radius: 10px; outline: 2px solid var(--leaf); outline-offset: 3px; }
+.cc #cc-h { scroll-margin-top: 88px; }
+.cc-comment-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-left: 46px; }
+.cc-comment-actions button { min-height: 36px; font-size: 13.5px; }
+.prose .cc-replies { list-style: none; display: grid; margin: 0 0 0 clamp(12px, 6vw, 46px); padding-left: 12px; border-left: 2px solid #6E8C2540; }
+.cc .cc-replies li:last-child { border-bottom: 0; padding-bottom: 0; }
+.prose .cc-reply-to { margin: 0 0 0 46px; color: var(--ink-soft); font-size: 13px; }
